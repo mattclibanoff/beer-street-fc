@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beer Street FC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#120d18; --ink-2:#1b1522; --ink-3:#241c2c;
+  --plum:#5b4455; --plum-2:#6e5568; --plum-soft:#3a2d3a;
+  --cream:#f0e4d0; --cream-2:#cfc2ae; --muted:#9b8c97;
+  --navy:#1d2c45;
+  --win:#8fbf8a; --draw:#cfc2ae; --loss:#c97a7a;
+  --stripe:72px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ink);color:var(--cream);font-family:"Barlow",system-ui,sans-serif;font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.cond{font-family:"Barlow Condensed",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;overflow:hidden;
+  background:repeating-linear-gradient(90deg,var(--ink) 0 var(--stripe),var(--plum) var(--stripe) calc(var(--stripe)*2));
+  border-bottom:6px solid var(--ink)}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;
+  background:linear-gradient(var(--cream) 0 3px,var(--ink) 3px 5px,var(--cream) 5px 8px,transparent 8px)}
+.hero-inner{position:relative;max-width:1120px;margin:0 auto;padding:28px 24px 44px;display:flex;align-items:center;gap:28px}
+.badges{position:absolute;top:22px;left:24px;right:24px;display:flex;justify-content:space-between;pointer-events:none}
+.badges svg{width:34px;height:44px;opacity:.95}
+.wordmark{margin:34px auto 0;text-align:center;transform:rotate(-3deg)}
+.wordmark .l1,.wordmark .l2{font-family:"Permanent Marker",cursive;color:var(--cream);line-height:.86;display:block;letter-spacing:.02em}
+.wordmark .l1{font-size:clamp(54px,9vw,104px)}
+.wordmark .l2{font-size:clamp(58px,10vw,116px);margin-left:.4em}
+.wordmark .l3{font-family:"Permanent Marker",cursive;font-size:clamp(22px,3.2vw,36px);display:block;margin:4px 0 0 2.4em;text-transform:lowercase}
+.wordmark .fc{font-family:"Barlow Condensed";font-style:italic;font-weight:800;font-size:clamp(20px,2.6vw,28px);letter-spacing:.12em;
+  display:inline-block;margin-top:14px;padding:3px 14px;background:var(--cream);color:var(--ink);transform:rotate(3deg)}
+.hero-meta{position:absolute;right:24px;bottom:26px;text-align:right;font-family:"Barlow Condensed";font-style:italic;font-weight:800;
+  letter-spacing:.04em;font-size:18px;color:var(--cream)}
+.hero-meta small{display:block;font-style:normal;font-weight:600;font-size:13px;letter-spacing:.14em;color:var(--cream-2);text-transform:uppercase}
+
+/* ---------- Tabs ---------- */
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--ink);border-bottom:1px solid var(--plum-soft)}
+.tabs-inner{max-width:1120px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab{background:none;border:0;padding:16px 16px 13px;white-space:nowrap;font-family:"Barlow Condensed";font-weight:700;font-size:17px;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:3px solid transparent}
+.tab:hover{color:var(--cream)}
+.tab[aria-selected="true"]{color:var(--cream);border-bottom-color:var(--cream)}
+.tab .pill{font-size:11px;letter-spacing:.08em;background:var(--plum);color:var(--cream);padding:2px 6px;margin-left:6px;vertical-align:2px;border-radius:2px}
+
+main{max-width:1120px;margin:0 auto;padding:28px 24px 64px}
+.panel[hidden]{display:none}
+.section-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:20px}
+h2{font-family:"Barlow Condensed";font-style:italic;font-weight:800;font-size:40px;line-height:1;margin:0;text-transform:uppercase;letter-spacing:.01em}
+h2 .sub{display:block;font-style:normal;font-weight:600;font-size:14px;letter-spacing:.16em;color:var(--muted);margin-bottom:6px}
+h3{font-family:"Barlow Condensed";font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 12px;color:var(--cream-2)}
+
+/* ---------- Season picker ---------- */
+.picker{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.picker-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.chip{border:1px solid var(--plum);background:transparent;padding:6px 12px;font-family:"Barlow Condensed";font-weight:700;font-size:15px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--cream-2);border-radius:2px}
+.chip:hover:not(:disabled){border-color:var(--cream-2);color:var(--cream)}
+.chip[aria-pressed="true"]{background:var(--cream);border-color:var(--cream);color:var(--ink)}
+.chip:disabled{opacity:.3;cursor:default}
+.chip.year[aria-pressed="true"]{background:var(--plum);border-color:var(--plum);color:var(--cream)}
+
+/* ---------- Cards / layout ---------- */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+.card{background:var(--ink-2);border:1px solid var(--plum-soft);border-radius:4px;padding:20px}
+.card.flush{padding:0;overflow:hidden}
+.card.flush h3{padding:18px 20px 0}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.hero-meta{display:none}}
+
+/* summary strip */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--plum-soft);border:1px solid var(--plum-soft);border-radius:4px;overflow:hidden;margin-bottom:24px}
+.strip>div{background:var(--ink-2);padding:14px 16px}
+.strip .k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.strip .v{font-family:"Barlow Condensed";font-weight:800;font-style:italic;font-size:34px;line-height:1.05;font-variant-numeric:tabular-nums}
+.strip .v small{font-size:16px;font-style:normal;font-weight:600;color:var(--cream-2);margin-left:4px}
+
+/* tables */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:10px 10px;text-align:right;white-space:nowrap}
+th{font-family:"Barlow Condensed";font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--plum-soft)}
+td{border-bottom:1px solid rgba(91,68,85,.35)}
+tr:last-child td{border-bottom:0}
+th.l,td.l{text-align:left}
+td.pos{width:36px;color:var(--muted);font-family:"Barlow Condensed";font-weight:700;font-size:17px;text-align:center}
+td.team{font-weight:600}
+td.pts{font-family:"Barlow Condensed";font-weight:800;font-size:19px;color:var(--cream)}
+tr.us td{background:rgba(91,68,85,.45)}
+tr.us td.team{color:var(--cream)}
+tr.us td.pos{color:var(--cream);box-shadow:inset 3px 0 0 var(--cream)}
+tr.champ td.pos{color:var(--cream)}
+.trophy{display:inline-block;width:14px;height:14px;margin-left:6px;vertical-align:-2px}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--cream)}
+th.sorted{color:var(--cream)}
+th.sorted::after{content:" ▾";font-size:10px}
+th.sorted.asc::after{content:" ▴"}
+.num-badge{display:inline-grid;place-items:center;width:28px;height:28px;margin-right:10px;border-radius:2px;background:var(--plum);
+  font-family:"Barlow Condensed";font-weight:800;font-size:15px;color:var(--cream)}
+.posn{font-size:12px;color:var(--muted);letter-spacing:.1em;margin-left:8px}
+td.zero{color:#5f5260}
+.cards{display:inline-flex;align-items:center;gap:4px}
+.cards i{display:inline-block;width:9px;height:13px;border-radius:1.5px;margin-left:4px}
+.cards .yc{background:#e8c547}.cards .rc{background:#d0473f}
+.form{display:inline-flex;gap:3px}
+.form i{width:18px;height:18px;display:grid;place-items:center;font-style:normal;font-family:"Barlow Condensed";font-weight:800;font-size:12px;border-radius:2px;color:var(--ink)}
+.form .W{background:var(--win)}.form .D{background:var(--draw)}.form .L{background:var(--loss)}
+.hide-sm{}
+@media (max-width:640px){.next-match .when{text-align:left}.hide-sm{display:none}th,td{padding:9px 7px}h2{font-size:32px}main{padding:22px 14px 48px}}
+
+/* fixtures */
+.fx{list-style:none;margin:0;padding:0}
+.fx li{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;padding:11px 20px;border-top:1px solid rgba(91,68,85,.35)}
+.fx .d{font-family:"Barlow Condensed";font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);line-height:1.15}
+.fx .d b{display:block;font-size:20px;color:var(--cream-2);letter-spacing:0}
+.fx .opp{font-weight:600}
+.fx .opp small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.res{font-family:"Barlow Condensed";font-weight:800;font-size:18px;display:flex;align-items:center;gap:8px}
+.res i{font-style:normal;width:20px;height:20px;display:grid;place-items:center;font-size:12px;border-radius:2px;color:var(--ink)}
+.res .W{background:var(--win)}.res .D{background:var(--draw)}.res .L{background:var(--loss)}
+.fx li.next{background:var(--plum-soft)}
+.tag{font-family:"Barlow Condensed";font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border:1px solid var(--cream-2);border-radius:2px;color:var(--cream-2)}
+
+/* next match */
+.next-match{position:relative;overflow:hidden;margin-bottom:24px;border-radius:4px;border:1px solid var(--plum-soft);
+  background:repeating-linear-gradient(90deg,var(--ink-2) 0 48px,var(--plum-soft) 48px 96px)}
+.next-match .inner{padding:20px 22px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.next-match .vs{font-family:"Barlow Condensed";font-style:italic;font-weight:800;font-size:28px;text-transform:uppercase;line-height:1.05}
+.next-match .vs span{color:var(--muted);font-size:20px;margin:0 8px}
+.next-match .when{text-align:right;font-family:"Barlow Condensed";font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cream-2)}
+.next-match .when b{display:block;color:var(--cream);font-size:22px}
+
+/* leaders */
+.leaders{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.leader{position:relative;overflow:hidden;background:var(--ink-2);border:1px solid var(--plum-soft);border-radius:4px;padding:18px 18px 16px}
+.leader .k{font-family:"Barlow Condensed";font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.leader .big{font-family:"Barlow Condensed";font-style:italic;font-weight:800;font-size:60px;line-height:.95;margin-top:6px;color:var(--cream)}
+.leader .who{font-weight:600;margin-top:6px}
+.leader .who small{color:var(--muted);font-weight:400}
+.leader .ghost{position:absolute;right:-6px;bottom:-22px;font-family:"Barlow Condensed";font-weight:800;font-size:120px;line-height:1;color:var(--plum);opacity:.35;pointer-events:none}
+.leader .runners{margin-top:10px;padding-top:10px;border-top:1px solid rgba(91,68,85,.4);font-size:13px;color:var(--cream-2)}
+.leader .runners div{display:flex;justify-content:space-between}
+
+.side{display:flex;flex-direction:column;gap:16px}
+.side .card.flush h3{font-size:15px;padding:14px 20px 10px;margin:0;white-space:nowrap}
+.scroll{max-height:215px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--plum) transparent;border-top:1px solid rgba(91,68,85,.35)}
+.scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-thumb{background:var(--plum);border-radius:3px}
+.scroll .fx li:first-child{border-top:0}
+.card-foot{padding:10px 20px;border-top:1px solid rgba(91,68,85,.35);font-size:13px}
+.card-foot a{color:var(--cream-2)}
+.lg{list-style:none;margin:0;padding:0}
+.lg .wk{position:sticky;top:0;z-index:1;background:var(--ink-3);padding:6px 20px;font-family:"Barlow Condensed";font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lg .g{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px 20px;border-top:1px solid rgba(91,68,85,.25);font-size:14px}
+.lg .wk+.g{border-top:0}
+.lg .g .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--cream-2)}
+.lg .g .s{font-family:"Barlow Condensed";font-weight:700;font-size:16px;text-align:right;color:var(--cream-2);min-width:18px}
+.lg .g .win{color:var(--cream);font-weight:600}
+.lg .g .s.win{font-weight:800}
+.lg .g .meta{grid-column:1/-1;font-size:12px;color:var(--muted)}
+.lg .g.us{background:rgba(91,68,85,.35);box-shadow:inset 3px 0 0 var(--cream)}
+.motm{position:relative;overflow:hidden;background:var(--plum);border:1px solid var(--plum-2);border-radius:4px;padding:18px 20px 20px}
+.motm::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 36px,rgba(18,13,24,.18) 36px 72px);pointer-events:none}
+.motm>*{position:relative}
+.motm .k{font-family:"Barlow Condensed";font-weight:700;font-size:14px;letter-spacing:.06em;white-space:nowrap;text-transform:uppercase;color:var(--cream-2);display:flex;align-items:center;gap:8px}
+.motm .k svg{width:16px;height:16px;color:var(--cream)}
+.motm .row{display:flex;align-items:center;gap:14px;margin-top:14px}
+.motm .shirt{flex:none;width:58px;height:58px;display:grid;place-items:center;background:var(--cream);color:var(--ink);border-radius:3px;
+  font-family:"Barlow Condensed";font-weight:800;font-style:italic;font-size:32px}
+.motm .name{font-family:"Barlow Condensed";font-weight:800;font-style:italic;font-size:28px;line-height:1;text-transform:uppercase}
+.motm .meta{font-size:13px;color:var(--cream-2);margin-top:4px}
+.motm .blurb{margin:14px 0 0;font-size:14px;color:var(--cream);border-top:1px solid rgba(240,228,208,.2);padding-top:12px}
+.motm.tbd .shirt{background:transparent;border:1.5px dashed var(--cream-2);color:var(--cream-2)}
+.champ-banner{display:flex;align-items:center;gap:14px;padding:14px 18px;margin-bottom:24px;border-radius:4px;background:var(--cream);color:var(--ink)}
+.champ-banner b{font-family:"Barlow Condensed";font-style:italic;font-weight:800;font-size:22px;text-transform:uppercase}
+.champ-banner svg{width:30px;height:30px;flex:none}
+.note{color:var(--muted);font-size:13px;margin-top:14px}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+
+footer{border-top:1px solid var(--plum-soft);padding:28px 24px 40px;text-align:center;color:var(--muted);font-size:13px}
+footer .fm{font-family:"Permanent Marker";font-size:22px;color:var(--cream-2);display:block;margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- tulip beer glass -->
+    <symbol id="glass" viewBox="0 0 34 44">
+      <path fill="currentColor" d="M8 2h18c1.5 4.2 2.4 8.2 2.2 12.2-.3 5.6-4.2 9.3-8.4 10.4V36c2.6.4 5.2 1.2 5.2 2.6V41H8.9v-2.4c0-1.4 2.6-2.2 5.2-2.6V24.6C9.9 23.5 6 19.8 5.8 14.2 5.6 10.2 6.5 6.2 8 2Zm1.5 2.2c-.9 3-1.4 6-1.3 9 .1 1 .3 1.8.6 2.6h16.4c.3-.8.5-1.6.6-2.6.1-3-.4-6-1.3-9H9.5Z"/>
+    </symbol>
+    <!-- pigeon on a ball -->
+    <symbol id="crest" viewBox="0 0 34 44">
+      <g fill="currentColor">
+        <path d="M24.6 3.2c1.6 0 2.8 1.1 2.9 2.5l3.3 1-3.4 1.1c-.2 1-.7 1.8-1.4 2.6 1.3 3.2 1 6.6-1 9.3-1.9 2.5-5.1 4-8.6 4.3l-3 4.1h-1.6l2-4.3c-2.6-.5-4.9-1.8-6.6-3.7L1.2 22l3.6-2.9c-.8-.9-1.3-1.9-1.5-2.8 4.5 1.4 9.6 1 13.6-1.4 2.8-1.7 4.6-4.1 5.3-6.6.2-.8.4-1.6.4-2.4 0-1.6.9-2.7 2-2.7Z"/>
+        <circle cx="25.1" cy="5.6" r=".8" fill="var(--ink)"/>
+      </g>
+      <circle cx="16.5" cy="35.5" r="7.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path fill="currentColor" d="m16.5 32.4 2.9 2.1-1.1 3.4h-3.6l-1.1-3.4Z"/>
+      <path stroke="currentColor" stroke-width="1.2" d="M16.5 32.4v-4M19.4 34.5l3.8-1.3M18.3 37.9l2.3 3.2M14.7 37.9l-2.3 3.2M13.6 34.5l-3.8-1.3"/>
+    </symbol>
+    <symbol id="star" viewBox="0 0 24 24"><path fill="currentColor" d="m12 2 2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6Z"/></symbol>
+    <symbol id="cup" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M6 2h12v2h4v3a5 5 0 0 1-5 5h-.4A6 6 0 0 1 13 15.9V19h4v3H7v-3h4v-3.1A6 6 0 0 1 7.4 12H7a5 5 0 0 1-5-5V4h4V2Zm0 4H4v1a3 3 0 0 0 2.1 2.9A6 6 0 0 1 6 9V6Zm12 0v3c0 .3 0 .6-.1.9A3 3 0 0 0 20 7V6h-2Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="hero">
+  <div class="badges">
+    <svg style="color:var(--cream)"><use href="#glass"/></svg>
+    <svg style="color:var(--cream)"><use href="#crest"/></svg>
+  </div>
+  <div class="hero-inner">
+    <div class="wordmark">
+      <span class="l1">Beer</span>
+      <span class="l2">Street</span>
+      <span class="l3">new york</span>
+      <span class="fc">FOOTBALL CLUB</span>
+    </div>
+  </div>
+  <div class="hero-meta" id="heroMeta"></div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="tabs-inner" role="tablist">
+    <button class="tab" role="tab" data-tab="current-standings">Current Standings<span class="pill" id="livePill">Live</span></button>
+    <button class="tab" role="tab" data-tab="current-stats">Current Season Stats</button>
+    <button class="tab" role="tab" data-tab="past-standings">Past Seasons Standings</button>
+    <button class="tab" role="tab" data-tab="past-stats">Past Season Stats</button>
+  </div>
+</nav>
+
+<main>
+  <section class="panel" id="current-standings" role="tabpanel"></section>
+  <section class="panel" id="current-stats" role="tabpanel"></section>
+  <section class="panel" id="past-standings" role="tabpanel"></section>
+  <section class="panel" id="past-stats" role="tabpanel"></section>
+</main>
+
+<footer>
+  <span class="fm">Beer Street FC</span>
+  New York, NY
+</footer>
+
+<script>
+/* =====================================================================
+   CLUB DATA — edit this object to update the site.
+   Each season: matches (scores null = not yet played) + player totals.
+   Standings are calculated automatically from match scores.
+   ===================================================================== */
+const DATA = {"team": "Beer Street FC", "league": "NYC Footy", "current": "fall-2026", "seasons": [{"id": "summer-2026", "name": "Summer", "year": 2026, "matches": [], "players": [], "league": "2026 Summer | Mondays | Prospect Heights (Chelsea Piers Field House) | 5v5 Coed | P3", "source": "https://nycfooty.leagueapps.com/leagues/4979384/standings", "standings": [{"team": "FC Clementine", "gp": 8, "w": 7, "l": 1, "t": 0, "ps": 95, "psa": 32, "pts": 21}, {"team": "FC Kick Kick", "gp": 8, "w": 6, "l": 2, "t": 0, "ps": 68, "psa": 57, "pts": 18}, {"team": "Club Sporting BK", "gp": 8, "w": 4, "l": 4, "t": 0, "ps": 73, "psa": 67, "pts": 12}, {"team": "FA The Kicks and Stones", "gp": 8, "w": 3, "l": 5, "t": 0, "ps": 65, "psa": 74, "pts": 9}, {"team": "Beer Street FC", "gp": 8, "w": 0, "l": 8, "t": 0, "ps": 36, "psa": 107, "pts": 0}], "final": true}, {"id": "fall-2026", "name": "Fall", "year": 2026, "matches": [{"round": 1, "date": "2026-09-17", "time": "7:50 PM", "field": "Field 1", "home": "BBQ 🍗 Ballers", "away": "Beer Street FC", "hs": 10, "as": 15}, {"round": 2, "date": "2026-09-24", "time": "7:50 PM", "field": "Field 2", "home": "Beer Street FC", "away": "We Don't Bite", "hs": 9, "as": 3}, {"round": 3, "date": "2026-10-01", "bye": true}, {"round": 4, "date": "2026-10-08", "time": "7:00 PM", "field": "Field 2", "home": "Beer Street FC", "away": "ABCDE FC", "hs": 8, "as": 10}, {"round": 5, "date": "2026-10-15", "time": "7:50 PM", "field": "Field 2", "home": "Beer Street FC", "away": "Sloppy Shots", "hs": 11, "as": 2}, {"round": 6, "date": "2026-10-22", "time": "7:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FA FC Ya Later (n)", "hs": 4, "as": 10}, {"round": 7, "date": "2026-10-29", "time": "7:00 PM", "field": "Field 2", "home": "FA Glove Shack", "away": "Beer Street FC", "hs": 2, "as": 11}, {"round": 8, "date": "2026-11-05", "time": "7:00 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "Beer Street FC", "hs": null, "as": null}, {"round": 9, "date": "2026-11-12", "time": "7:50 PM", "field": "Field 1", "home": "Cappello FC", "away": "Beer Street FC", "hs": 12, "as": 4}, {"round": 10, "date": "2026-11-19", "time": "7:00 / 7:50 PM", "field": "Field 1", "stage": "Playoffs", "label": "Semifinals · #1 v #4, #2 v #3", "home": "Beer Street FC", "away": "TBD", "hs": null, "as": null}, {"round": 10, "date": "2026-11-19", "time": "8:40 PM", "field": "Field 1", "stage": "Playoffs", "label": "Championship", "home": "Beer Street FC", "away": "TBD", "hs": null, "as": null}], "players": [], "final": false, "updated": "2026-11-13", "league": "2026 Fall | Thursdays | Prospect Heights (Chelsea Piers Field House) | 5v5 Coed | P4", "source": "https://nycfooty.leagueapps.com/leagues/5086019/standings", "standings": [{"team": "BBQ 🍗 Ballers", "gp": 8, "w": 7, "l": 1, "t": 0, "ps": 98, "psa": 58, "pts": 21}, {"team": "ABCDE FC", "gp": 8, "w": 7, "l": 1, "t": 0, "ps": 75, "psa": 52, "pts": 21}, {"team": "Cappello FC", "gp": 7, "w": 5, "l": 2, "t": 0, "ps": 65, "psa": 31, "pts": 15}, {"team": "Beer Street FC", "gp": 7, "w": 4, "l": 3, "t": 0, "ps": 62, "psa": 49, "pts": 12}, {"team": "FA Hard Pass", "gp": 8, "w": 4, "l": 4, "t": 0, "ps": 33, "psa": 47, "pts": 12}, {"team": "FA FC Ya Later (n)", "gp": 7, "w": 3, "l": 2, "t": 2, "ps": 51, "psa": 45, "pts": 11}, {"team": "We Don't Bite", "gp": 8, "w": 2, "l": 5, "t": 1, "ps": 45, "psa": 61, "pts": 7}, {"team": "FA Fear on the Pier", "gp": 7, "w": 1, "l": 5, "t": 1, "ps": 42, "psa": 62, "pts": 4}, {"team": "FA Glove Shack", "gp": 8, "w": 1, "l": 6, "t": 1, "ps": 40, "psa": 69, "pts": 4}, {"team": "Sloppy Shots", "gp": 8, "w": 1, "l": 6, "t": 1, "ps": 31, "psa": 68, "pts": 4}], "schedule": "https://nycfooty.leagueapps.com/leagues/5086019/schedule", "leagueMatches": [{"round": 1, "date": "2026-09-17", "time": "7:00 PM", "field": "Field 1", "home": "We Don't Bite", "away": "Sloppy Shots", "hs": 4, "as": 4}, {"round": 1, "date": "2026-09-17", "time": "7:00 PM", "field": "Field 2", "home": "Cappello FC", "away": "ABCDE FC", "hs": 5, "as": 9}, {"round": 1, "date": "2026-09-17", "time": "7:50 PM", "field": "Field 1", "home": "BBQ 🍗 Ballers", "away": "Beer Street FC", "hs": 10, "as": 15}, {"round": 1, "date": "2026-09-17", "time": "7:50 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "FA Glove Shack", "hs": 10, "as": 8}, {"round": 2, "date": "2026-09-24", "time": "7:00 PM", "field": "Field 1", "home": "FA Glove Shack", "away": "Sloppy Shots", "hs": 9, "as": 5}, {"round": 2, "date": "2026-09-24", "time": "7:00 PM", "field": "Field 2", "home": "BBQ 🍗 Ballers", "away": "Cappello FC", "hs": 8, "as": 5}, {"round": 2, "date": "2026-09-24", "time": "7:50 PM", "field": "Field 1", "home": "FA Hard Pass", "away": "FA FC Ya Later (n)", "hs": 2, "as": 5}, {"round": 2, "date": "2026-09-24", "time": "7:50 PM", "field": "Field 2", "home": "Beer Street FC", "away": "We Don't Bite", "hs": 9, "as": 3}, {"round": 3, "date": "2026-10-01", "time": "7:00 PM", "field": "Field 1", "home": "Sloppy Shots", "away": "FA Fear on the Pier", "hs": 10, "as": 4}, {"round": 3, "date": "2026-10-01", "time": "7:00 PM", "field": "Field 2", "home": "ABCDE FC", "away": "FA FC Ya Later (n)", "hs": 9, "as": 2}, {"round": 3, "date": "2026-10-01", "time": "7:50 PM", "field": "Field 1", "home": "FA Hard Pass", "away": "We Don't Bite", "hs": 3, "as": 2}, {"round": 3, "date": "2026-10-01", "time": "7:50 PM", "field": "Field 2", "home": "FA Glove Shack", "away": "BBQ 🍗 Ballers", "hs": 6, "as": 13}, {"round": 4, "date": "2026-10-08", "time": "7:00 PM", "field": "Field 1", "home": "FA FC Ya Later (n)", "away": "FA Fear on the Pier", "hs": 7, "as": 7}, {"round": 4, "date": "2026-10-08", "time": "7:00 PM", "field": "Field 2", "home": "Beer Street FC", "away": "ABCDE FC", "hs": 8, "as": 10}, {"round": 4, "date": "2026-10-08", "time": "7:50 PM", "field": "Field 1", "home": "Cappello FC", "away": "We Don't Bite", "hs": 10, "as": 2}, {"round": 4, "date": "2026-10-08", "time": "7:50 PM", "field": "Field 2", "home": "FA Hard Pass", "away": "FA Glove Shack", "hs": 6, "as": 2}, {"round": 5, "date": "2026-10-15", "time": "7:00 PM", "field": "Field 1", "home": "ABCDE FC", "away": "FA Hard Pass", "hs": 8, "as": 6}, {"round": 5, "date": "2026-10-15", "time": "7:00 PM", "field": "Field 2", "home": "FA FC Ya Later (n)", "away": "BBQ 🍗 Ballers", "hs": 10, "as": 11}, {"round": 5, "date": "2026-10-15", "time": "7:50 PM", "field": "Field 1", "home": "Cappello FC", "away": "FA Fear on the Pier", "hs": 12, "as": 7}, {"round": 5, "date": "2026-10-15", "time": "7:50 PM", "field": "Field 2", "home": "Beer Street FC", "away": "Sloppy Shots", "hs": 11, "as": 2}, {"round": 6, "date": "2026-10-22", "time": "7:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FA FC Ya Later (n)", "hs": 4, "as": 10}, {"round": 6, "date": "2026-10-22", "time": "7:00 PM", "field": "Field 2", "home": "Cappello FC", "away": "FA Hard Pass", "hs": 11, "as": 1}, {"round": 6, "date": "2026-10-22", "time": "7:50 PM", "field": "Field 2", "home": "Sloppy Shots", "away": "BBQ 🍗 Ballers", "hs": 6, "as": 11}, {"round": 6, "date": "2026-10-22", "time": "7:50 PM", "field": "Field 1", "home": "FA Glove Shack", "away": "ABCDE FC", "hs": 7, "as": 8}, {"round": 6, "date": "2026-10-22", "time": "8:40 PM", "field": "Field 1", "home": "We Don't Bite", "away": "FA Fear on the Pier", "hs": 11, "as": 8}, {"round": 7, "date": "2026-10-29", "time": "7:00 PM", "field": "Field 1", "home": "FA Hard Pass", "away": "BBQ 🍗 Ballers", "hs": 6, "as": 17}, {"round": 7, "date": "2026-10-29", "time": "7:00 PM", "field": "Field 2", "home": "FA Glove Shack", "away": "Beer Street FC", "hs": 2, "as": 11}, {"round": 7, "date": "2026-10-29", "time": "7:50 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "ABCDE FC", "hs": 6, "as": 8}, {"round": 7, "date": "2026-10-29", "time": "7:50 PM", "field": "Field 1", "home": "We Don't Bite", "away": "FA FC Ya Later (n)", "hs": 8, "as": 13}, {"round": 7, "date": "2026-10-29", "time": "8:40 PM", "field": "Field 1", "home": "Sloppy Shots", "away": "Cappello FC", "hs": 0, "as": 10}, {"round": 8, "date": "2026-11-05", "time": "7:00 PM", "field": "Field 1", "home": "We Don't Bite", "away": "FA Glove Shack", "hs": 12, "as": 2}, {"round": 8, "date": "2026-11-05", "time": "7:00 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "Beer Street FC", "hs": null, "as": null}, {"round": 8, "date": "2026-11-05", "time": "7:50 PM", "field": "Field 1", "home": "Sloppy Shots", "away": "FA Hard Pass", "hs": 2, "as": 3}, {"round": 8, "date": "2026-11-05", "time": "7:50 PM", "field": "Field 2", "home": "Cappello FC", "away": "FA FC Ya Later (n)", "hs": null, "as": null}, {"round": 8, "date": "2026-11-05", "time": "8:40 PM", "field": "Field 1", "home": "ABCDE FC", "away": "BBQ 🍗 Ballers", "hs": 7, "as": 16}, {"round": 9, "date": "2026-11-12", "time": "7:00 PM", "field": "Field 1", "home": "BBQ 🍗 Ballers", "away": "We Don't Bite", "hs": 12, "as": 3}, {"round": 9, "date": "2026-11-12", "time": "7:00 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "FA Hard Pass", "hs": 0, "as": 6}, {"round": 9, "date": "2026-11-12", "time": "7:50 PM", "field": "Field 1", "home": "Cappello FC", "away": "Beer Street FC", "hs": 12, "as": 4}, {"round": 9, "date": "2026-11-12", "time": "7:50 PM", "field": "Field 2", "home": "ABCDE FC", "away": "Sloppy Shots", "hs": 16, "as": 2}, {"round": 9, "date": "2026-11-12", "time": "8:40 PM", "field": "Field 1", "home": "FA FC Ya Later (n)", "away": "FA Glove Shack", "hs": 4, "as": 4}, {"round": 10, "date": "2026-11-19", "time": "7:00 PM", "field": "Field 1", "stage": "Playoffs", "label": "Semifinal · #2 v #3", "home": "TBD", "away": "TBD", "hs": null, "as": null}, {"round": 10, "date": "2026-11-19", "time": "7:50 PM", "field": "Field 1", "stage": "Playoffs", "label": "Semifinal · #1 v #4", "home": "TBD", "away": "TBD", "hs": null, "as": null}, {"round": 10, "date": "2026-11-19", "time": "8:40 PM", "field": "Field 1", "stage": "Playoffs", "label": "Championship · Semifinal winners", "home": "TBD", "away": "TBD", "hs": null, "as": null}]}], "roster": [{"num": 1, "name": "James Case", "pos": "GK"}, {"num": 3, "name": "Pat Uttamobol", "pos": "DF"}, {"num": 4, "name": "Ben Max", "pos": "DF"}, {"num": 5, "name": "Connor Brennan", "pos": "DF"}, {"num": 6, "name": "Shaydah Ghom", "pos": "MF"}, {"num": 7, "name": "Mia Rosenfeld", "pos": "FW/GK"}, {"num": 8, "name": "Becca Tate", "pos": "MF"}, {"num": 9, "name": "Matt Clibanoff", "pos": "FW"}, {"num": 10, "name": "Tucker Troast", "pos": "MF"}, {"num": 11, "name": "Gabi Gallus", "pos": "FW"}, {"num": 17, "name": "Dave King", "pos": "FW/GK"}, {"num": null, "name": "Ciaran Walsh", "pos": "Alternate"}, {"num": null, "name": "Brad Spencer", "pos": "Alternate"}, {"num": null, "name": "DJ Min", "pos": "Retired"}], "statsStart": "Winter 2027", "motm": {"name": "Pat Uttamobol", "opponent": "Cappello FC", "date": "2026-11-12", "score": "L 4–12", "blurb": "Two goals in a tough loss."}};
+
+const US = DATA.team;
+const SEASON_ORDER = ["Winter","Spring","Summer","Fall"];
+const seasons = DATA.seasons.slice().sort((a,b)=>a.year-b.year||SEASON_ORDER.indexOf(a.name)-SEASON_ORDER.indexOf(b.name));
+const byId = Object.fromEntries(seasons.map(s=>[s.id,s]));
+const current = byId[DATA.current];
+const past = seasons.filter(s=>s.id!==DATA.current).reverse();
+const label = s => `${s.name} ${s.year}`;
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- calculations ---------- */
+function standings(season){
+  if(season.standings) return season.standings.map(r=>({team:r.team,p:r.gp,w:r.w,d:r.t,l:r.l,gf:r.ps,ga:r.psa,gd:r.ps-r.psa,pts:r.pts,form:[]}));
+  const t={};
+  const row=n=>t[n]||(t[n]={team:n,p:0,w:0,d:0,l:0,gf:0,ga:0,form:[]});
+  season.matches.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(m=>{
+    const h=row(m.home),a=row(m.away);
+    if(m.hs==null||m.as==null) return;
+    h.p++;a.p++;h.gf+=m.hs;h.ga+=m.as;a.gf+=m.as;a.ga+=m.hs;
+    if(m.hs>m.as){h.w++;a.l++;h.form.push("W");a.form.push("L")}
+    else if(m.hs<m.as){a.w++;h.l++;a.form.push("W");h.form.push("L")}
+    else{h.d++;a.d++;h.form.push("D");a.form.push("D")}
+  });
+  return Object.values(t).map(r=>({...r,gd:r.gf-r.ga,pts:r.w*3+r.d}))
+    .sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.team.localeCompare(b.team));
+}
+const isComplete = s => s.standings ? !!s.final : s.matches.every(m=>m.hs!=null);
+const ourMatches = s => s.matches.filter(m=>m.bye||m.home===US||m.away===US).sort((a,b)=>a.date.localeCompare(b.date));
+const TODAY = (()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`})();
+const nextOf = ms => ms.findIndex(m=>!m.bye&&m.hs==null&&m.date>=TODAY);
+function view(m){ // match from our perspective
+  const home=m.home===US, opp=m.stage?m.label:(home?m.away:m.home);
+  if(m.hs==null) return {opp,home,played:false};
+  const f=home?m.hs:m.as, a=home?m.as:m.hs;
+  return {opp,home,played:true,f,a,r:f>a?"W":f<a?"L":"D"};
+}
+const ord = n => n+(["th","st","nd","rd"][(n%100-20)%10]||["th","st","nd","rd"][n%100]||"th");
+const fmtDate = (iso,opts) => new Date(iso+"T12:00:00").toLocaleDateString("en-US",opts);
+
+/* ---------- renderers ---------- */
+function standingsTable(season){
+  const rows=standings(season), done=isComplete(season);
+  return `<div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th class="l">Club</th><th>P</th><th>W</th><th>D</th><th>L</th>
+      <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th>GD</th><th>Pts</th>${season.standings?"":`<th class="l hide-sm">Form</th>`}</tr></thead>
+    <tbody>${rows.map((r,i)=>`<tr class="${r.team===US?"us":""} ${done&&i===0?"champ":""}">
+      <td class="pos">${i+1}</td>
+      <td class="l team">${esc(r.team)}${done&&i===0?`<svg class="trophy" style="color:var(--cream)"><use href="#cup"/></svg>`:""}</td>
+      <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+      <td class="hide-sm">${r.gf}</td><td class="hide-sm">${r.ga}</td>
+      <td>${r.gd>0?"+":""}${r.gd}</td><td class="pts">${r.pts}</td>
+      ${season.standings?"":`<td class="l hide-sm"><span class="form">${r.form.slice(-5).map(x=>`<i class="${x}">${x}</i>`).join("")}</span></td>`}
+    </tr>`).join("")}</tbody></table></div>`;
+}
+
+function fixtureList(season){
+  const ms=ourMatches(season).sort((a,b)=>b.date.localeCompare(a.date)||(a.time||"").localeCompare(b.time||"")); const nextIdx=(()=>{let k=-1;ms.forEach((m,i)=>{if(!m.bye&&m.hs==null&&m.date>=TODAY)k=i});return k})();
+  if(!ms.length) return `<div class="empty" style="padding:24px 20px">Game-by-game results aren't available for this season yet.${season.source?`<br><a href="${esc(season.source)}" style="color:var(--cream-2)">View on NYC Footy ↗</a>`:""}</div>`;
+  return `<div class="scroll"><ul class="fx">${ms.map((m,i)=>{
+    const d=`<div class="d">${fmtDate(m.date,{month:"short"})}<b>${fmtDate(m.date,{day:"numeric"})}</b></div>`;
+    if(m.bye) return `<li style="opacity:.6">${d}<div class="opp">Bye week<small>Wk ${m.round}</small></div><span></span></li>`;
+    const v=view(m);
+    const right=v.played?`<div class="res">${v.f}–${v.a}<i class="${v.r}">${v.r}</i></div>`
+      :`<span class="tag">${i===nextIdx?"Next":m.date<TODAY?"No score":esc(m.time)}</span>`;
+    return `<li class="${i===nextIdx?"next":""}">${d}
+    <div class="opp">${m.stage?esc(m.stage)+": "+esc(v.opp):`${v.home?"vs":"@"} ${esc(v.opp)}`}<small>${m.stage?"":`Wk ${m.round} · `}${esc(m.time||"")} · ${esc(m.field)}</small></div>
+    ${right}</li>`}).join("")}</ul></div>`;
+}
+
+function teamSummary(season){
+  const row=standings(season).find(r=>r.team===US), pos=standings(season).findIndex(r=>r.team===US)+1;
+  const cs=season.standings&&!ourMatches(season).some(m=>m.hs!=null)?"—":ourMatches(season).filter(m=>{const v=view(m);return v.played&&v.a===0}).length;
+  return `<div class="strip">
+    <div><div class="k">Position</div><div class="v">${ord(pos)}<small>of ${standings(season).length}</small></div></div>
+    <div><div class="k">Points</div><div class="v">${row.pts}</div></div>
+    <div><div class="k">Record</div><div class="v">${row.w}-${row.d}-${row.l}<small>W-D-L</small></div></div>
+    <div><div class="k">Goals</div><div class="v">${row.gf}<small>for</small> ${row.ga}<small>ag</small></div></div>
+    <div><div class="k">Clean Sheets</div><div class="v">${cs}</div></div>
+  </div>`;
+}
+
+function motmCard(){
+  const m=DATA.motm;
+  const head=`<div class="k"><svg><use href="#star"/></svg>This Week's Man of the Match</div>`;
+  if(!m||!m.name) return `<div class="motm tbd">${head}<div class="row"><div class="shirt">?</div>
+    <div><div class="name">To be named</div><div class="meta">Check back after Thursday's game</div></div></div></div>`;
+  const p=(DATA.roster||[]).find(r=>r.name===m.name)||{};
+  const num=m.num??p.num;
+  const meta=[m.opponent?`vs ${esc(m.opponent)}`:"",m.date?fmtDate(m.date,{month:"short",day:"numeric"}):"",m.score?esc(m.score):""].filter(Boolean).join(" · ");
+  return `<div class="motm">${head}<div class="row"><div class="shirt">${num!=null?num:"★"}</div>
+    <div><div class="name">${esc(m.name)}</div>${meta?`<div class="meta">${meta}</div>`:""}</div></div>
+    ${m.blurb?`<p class="blurb">${esc(m.blurb)}</p>`:""}</div>`;
+}
+function leagueList(season){
+  const L=(season.leagueMatches||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)||a.time.localeCompare(b.time));
+  if(!L.length) return `<div class="empty" style="padding:24px 20px">No league games yet.</div>`;
+  let out="",wk=null;
+  L.forEach(m=>{
+    const w=m.stage?"Playoffs":"Week "+m.round;
+    if(w+m.date!==wk){wk=w+m.date;out+=`<li class="wk">${w} · ${fmtDate(m.date,{weekday:"short",month:"short",day:"numeric"})}</li>`;}
+    const us=m.home===US||m.away===US, played=m.hs!=null&&m.as!=null;
+    const aw=played&&m.as>m.hs?"win":"", hw=played&&m.hs>m.as?"win":"";
+    const status=played?"":(m.date<TODAY?" · No score posted":"");
+    if(m.stage) out+=`<li class="g"><span class="t" style="color:var(--cream)">${esc(m.label)}</span><span class="s"></span><span class="meta">${esc(m.time)} · ${esc(m.field)}</span></li>`;
+    else out+=`<li class="g${us?" us":""}">
+      <span class="t ${aw}">${esc(m.away)}</span><span class="s ${aw}">${played?m.as:"–"}</span>
+      <span class="t ${hw}">${esc(m.home)}</span><span class="s ${hw}">${played?m.hs:"–"}</span>
+      <span class="meta">${esc(m.time)} · ${esc(m.field)}${status}</span></li>`;
+  });
+  return `<div class="scroll"><ul class="lg">${out}</ul></div>`;
+}
+function renderCurrentStandings(){
+  const s=current, ms=ourMatches(s), next=ms[nextOf(ms)];
+  const playedRounds=Math.max(0,...s.matches.filter(m=>m.hs!=null).map(m=>m.round));
+  const totalRounds=Math.max(0,...s.matches.map(m=>m.round));
+  document.getElementById("current-standings").innerHTML=`
+    <div class="section-head"><h2><span class="sub">${isComplete(s)?"Final table":s.standings?(s.updated?`Updated ${fmtDate(s.updated,{month:"short",day:"numeric",year:"numeric"})}`:"In progress"):`Matchweek ${playedRounds} of ${totalRounds}`}</span>${label(s)} Table</h2></div>
+    ${s.league?`<p class="note" style="margin:-8px 0 18px">${esc(s.league)}${s.source?` · <a href="${esc(s.source)}" style="color:var(--cream-2)">Official standings ↗</a>`:""}</p>`:""}
+    ${next?`<div class="next-match"><div class="inner">
+      <div><div class="tag" style="display:inline-block;margin-bottom:8px">${next.stage?"Up next":"Next match · Wk "+next.round}</div>
+        <div class="vs">${next.stage?esc(next.stage)+`<span>·</span>`+esc(next.label):`Beer Street FC<span>${view(next).home?"vs":"@"}</span>${esc(view(next).opp)}`}</div></div>
+      <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}</div>
+    </div></div>`:""}
+    ${teamSummary(s)}
+    <div class="grid">
+      <div class="card flush">${standingsTable(s)}</div>
+      <div class="side">${motmCard()}
+        <div class="card flush"><h3>Our Fixtures &amp; Results</h3>${fixtureList(s)}</div>
+        ${s.leagueMatches?`<div class="card flush"><h3>League Fixtures &amp; Results</h3>${leagueList(s)}${s.schedule?`<div class="card-foot"><a href="${esc(s.schedule)}">Official league schedule ↗</a></div>`:""}</div>`:""}
+      </div>
+    </div>`;
+}
+
+/* --- stats --- */
+function aggregatePlayers(list){
+  const m={};
+  list.forEach(s=>s.players.forEach(p=>{
+    const r=m[p.name]||(m[p.name]={num:p.num,name:p.name,pos:p.pos,apps:0,goals:0,assists:0,plusMinus:0,yellow:0,red:0,seasons:0});
+    ["apps","goals","assists","plusMinus","yellow","red"].forEach(k=>r[k]+=(p[k]||0)); r.seasons++;
+  }));
+  return Object.values(m);
+}
+const sortState={};
+function leaderTile(players,key,labelText,ghost,filter){
+  const ranked=players.map(p=>({...p,ga:(p.goals||0)+(p.assists||0)})).filter(filter||(()=>true)).filter(p=>p[key]>0).sort((a,b)=>b[key]-a[key]||b.ga-a.ga);
+  if(!ranked.length) return `<div class="leader"><div class="k">${labelText}</div><div class="big">—</div><div class="who"><small>No data yet</small></div></div>`;
+  const top=ranked[0];
+  return `<div class="leader"><div class="ghost">${ghost}</div>
+    <div class="k">${labelText}</div><div class="big">${key==="plusMinus"?"+":""}${top[key]}</div>
+    <div class="who">${esc(top.name)} <small>#${top.num}</small></div>
+    <div class="runners">${ranked.slice(1,3).map(p=>`<div><span>${esc(p.name)}</span><span>${key==="plusMinus"?"+":""}${p[key]}</span></div>`).join("")}</div></div>`;
+}
+function playerTable(players,tableId,showSeasons){
+  const st=sortState[tableId]||(sortState[tableId]={key:"goals",asc:false});
+  const cols=[["num","#",false],["name","Player",false],["pos","Pos",false]]
+    .concat(showSeasons?[["seasons","Szns",true]]:[])
+    .concat([["apps","Apps",true],["goals","Goals",true],["assists","Assists",true],["ga","G+A",true],["plusMinus","+/-",true],["cards","Cards",true]]);
+  const rows=players.map(p=>({...p,apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0)})).sort((a,b)=>{
+    const x=a[st.key],y=b[st.key]; const c=typeof x==="string"?x.localeCompare(y):x-y;
+    return (st.asc?c:-c)||b.goals-a.goals||a.num-b.num;});
+  const head=cols.filter(c=>c[0]!=="num").map(([k,l])=>`<th class="sortable ${k==="name"||k==="pos"?"l":""} ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${tableId}">${l}</th>`).join("");
+  const z=v=>`<td class="${v===0?"zero":""}">${v}</td>`;
+  return `<div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
+    <td class="l team"><span class="num-badge">${p.num}</span>${esc(p.name)}</td>
+    <td class="l" style="color:var(--muted)">${p.pos}</td>
+    ${showSeasons?z(p.seasons):""}${z(p.apps)}${z(p.goals)}${z(p.assists)}<td class="pts">${p.ga}</td>
+    <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>
+    <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:#5f5260">0</span>`}</td>
+  </tr>`).join("")}</tbody></table></div>`;
+}
+function noStats(){
+  const rank=p=>p.pos==="Retired"?2:p.pos==="Alternate"?1:0;
+  const r=(DATA.roster||[]).slice().sort((a,b)=>rank(a)-rank(b)||(a.num??999)-(b.num??999));
+  return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
+      <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
+      <div style="color:var(--muted);margin-top:6px">Appearances, Goals, Assists, Goals + Assists, +/- and Cards will be tracked from then on.</div></div>
+    ${r.length?`<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr><th class="l">Player</th><th class="l">Pos</th><th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Cards</th></tr></thead><tbody>
+      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${esc(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(6)}</tr>`).join("")}
+    </tbody></table></div></div>`:""}`;
+}
+function statsBody(players,tableId,showSeasons){
+  if(!players.length) return noStats();
+  return `<div class="leaders">
+      ${leaderTile(players,"goals","Golden Boot","G")}
+      ${leaderTile(players,"assists","Assists","A")}
+      ${leaderTile(players,"ga","Goals + Assists","G+A")}
+      ${leaderTile(players,"plusMinus","Plus / Minus","±")}
+    </div>
+    <div class="card flush" data-ptable="${tableId}">${playerTable(players,tableId,showSeasons)}</div>
+    <p class="note">Click a column header to sort. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Cards = yellow / red cards.</p>`;
+}
+function renderCurrentStats(){
+  const s=current;
+  document.getElementById("current-stats").innerHTML=`
+    <div class="section-head"><h2><span class="sub">Beer Street FC · Player stats</span>${label(s)}</h2></div>
+    ${teamSummary(s)}${statsBody(s.players,"cur",false)}`;
+}
+
+/* --- past-season picker --- */
+const years=[...new Set(past.map(s=>s.year))].sort((a,b)=>b-a);
+function picker(state,allowAllTime){
+  const yrChips=(allowAllTime?[`<button class="chip year" data-y="all" aria-pressed="${state.year==="all"}">All-time</button>`]:[])
+    .concat(years.map(y=>`<button class="chip year" data-y="${y}" aria-pressed="${state.year==y}">${y}</button>`)).join("");
+  const seasonChips=state.year==="all"?"":SEASON_ORDER.map(n=>{
+    const s=past.find(x=>x.year==state.year&&x.name===n);
+    return `<button class="chip" data-s="${s?s.id:""}" ${s?"":"disabled"} aria-pressed="${s&&s.id===state.id}">${n}</button>`}).join("");
+  return `<div class="picker"><div class="picker-row">${yrChips}</div>${seasonChips?`<div class="picker-row">${seasonChips}</div>`:""}</div>`;
+}
+function bindPicker(root,state,rerender){
+  root.querySelectorAll(".chip.year").forEach(b=>b.onclick=()=>{
+    const y=b.dataset.y; state.year=y==="all"?"all":+y;
+    if(y!=="all"){const inYear=past.filter(s=>s.year==y); if(!inYear.some(s=>s.id===state.id)) state.id=inYear[0].id;}
+    rerender();});
+  root.querySelectorAll(".chip[data-s]").forEach(b=>b.onclick=()=>{state.id=b.dataset.s;rerender();});
+}
+const psState={year:past[0]?.year,id:past[0]?.id};
+const pstState={year:past[0]?.year,id:past[0]?.id};
+
+function renderPastStandings(){
+  const root=document.getElementById("past-standings");
+  if(!past.length){root.innerHTML=`<div class="empty">No past seasons yet.</div>`;return;}
+  const s=byId[psState.id], rows=standings(s), us=rows.findIndex(r=>r.team===US)+1, champ=rows[0].team;
+  root.innerHTML=`
+    <div class="section-head"><h2><span class="sub">Final table</span>${label(s)}</h2>${picker(psState,false)}</div>
+    <div class="champ-banner"><svg style="color:var(--ink)"><use href="#cup"/></svg>
+      <div><b>${champ===US?"Champions — Beer Street FC":esc(champ)+" won the "+label(s)+" title"}</b>
+      <div style="font-size:14px">${champ===US?"Cheers to that. 🍺":`Beer Street FC finished ${ord(us)} of ${rows.length} with ${rows[us-1].pts} points.`}</div></div></div>
+    ${s.league?`<p class="note" style="margin:-8px 0 18px">${esc(s.league)}${s.source?` · <a href="${esc(s.source)}" style="color:var(--cream-2)">Official standings ↗</a>`:""}</p>`:""}
+    ${teamSummary(s)}
+    <div class="grid">
+      <div class="card flush">${standingsTable(s)}</div>
+      <div class="card flush"><h3>Our Results</h3>${fixtureList(s)}</div>
+    </div>`;
+  bindPicker(root,psState,renderPastStandings);
+}
+function renderPastStats(){
+  const root=document.getElementById("past-stats");
+  if(!past.length){root.innerHTML=`<div class="empty">No past seasons yet.</div>`;return;}
+  const all=pstState.year==="all";
+  const s=all?null:byId[pstState.id];
+  const players=all?aggregatePlayers(past):s.players;
+  const titles=past.filter(x=>standings(x)[0].team===US).map(label);
+  root.innerHTML=`
+    <div class="section-head"><h2><span class="sub">${all?`${past.length} completed seasons`:"Player stats"}</span>${all?"All-time":label(s)}</h2>${picker(pstState,true)}</div>
+    ${all?`<div class="strip">
+      <div><div class="k">Seasons</div><div class="v">${past.length}</div></div>
+      <div><div class="k">Titles</div><div class="v">${titles.length}</div></div>
+      <div><div class="k">Goals scored</div><div class="v">${past.reduce((a,s)=>a+(standings(s).find(r=>r.team===US)?.gf||0),0)}</div></div>
+      <div><div class="k">Squad</div><div class="v">${(DATA.roster||[]).length}</div></div>
+    </div>`:teamSummary(s)}
+    ${statsBody(players,all?"all":"past",all)}
+    ${all&&titles.length?`<p class="note">Titles: ${titles.join(" · ")}</p>`:""}`;
+  bindPicker(root,pstState,renderPastStats);
+}
+
+/* sorting (delegated) */
+document.addEventListener("click",e=>{
+  const th=e.target.closest("th.sortable"); if(!th) return;
+  const id=th.dataset.table,k=th.dataset.sort,st=sortState[id];
+  if(st.key===k) st.asc=!st.asc; else {st.key=k;st.asc=(k==="name"||k==="pos"||k==="num");}
+  ({cur:renderCurrentStats,past:renderPastStats,all:renderPastStats})[id]();
+});
+
+/* ---------- tabs + hash routing ---------- */
+const TABS=["current-standings","current-stats","past-standings","past-stats"];
+function show(id){
+  if(!TABS.includes(id)) id=TABS[0];
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===id));
+  document.querySelectorAll(".panel").forEach(p=>p.hidden=p.id!==id);
+}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  if(location.hash!=="#"+t.dataset.tab){try{history.replaceState(null,"","#"+t.dataset.tab)}catch(_){location.hash=t.dataset.tab}}
+  show(t.dataset.tab);});
+addEventListener("hashchange",()=>show(location.hash.slice(1)));
+
+/* ---------- boot ---------- */
+document.getElementById("livePill").hidden=isComplete(current);
+const curRow=standings(current), curPos=curRow.findIndex(r=>r.team===US)+1;
+document.getElementById("heroMeta").innerHTML=`<small>${esc(DATA.league)}</small>${label(current)} · ${ord(curPos)} place`;
+renderCurrentStandings();renderCurrentStats();renderPastStandings();renderPastStats();
+show(location.hash.slice(1));
+</script>
+</body>
+</html>
