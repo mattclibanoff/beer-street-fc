@@ -99,8 +99,10 @@ tr.us td.team{color:var(--cream)}
 tr.us td.pos{color:var(--cream);box-shadow:inset 3px 0 0 var(--cream)}
 tr.champ td.pos{color:var(--cream)}
 .trophy{display:inline-block;width:14px;height:14px;margin-left:6px;vertical-align:-2px}
-th.sortable{cursor:pointer;user-select:none}
-th.sortable:hover{color:var(--cream)}
+th.sortable{cursor:pointer;user-select:none;transition:color .15s}
+th.sortable:hover{color:var(--cream);text-decoration:underline;text-underline-offset:4px}
+th.sortable:not(.sorted)::after{content:" ↕";font-size:10px;opacity:.35}
+th.sortable:focus-visible{outline:2px solid var(--cream);outline-offset:-2px}
 th.sorted{color:var(--cream)}
 th.sorted::after{content:" ▾";font-size:10px}
 th.sorted.asc::after{content:" ▴"}
@@ -445,9 +447,9 @@ function playerTable(players,tableId,showSeasons){
   const rows=players.map(p=>({...p,apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0)})).sort((a,b)=>{
     const x=st.key==="num"?(a.num??999):a[st.key], y=st.key==="num"?(b.num??999):b[st.key]; const c=typeof x==="string"?x.localeCompare(y):x-y;
     return (st.asc?c:-c)||b.goals-a.goals||(a.num??999)-(b.num??999);});
-  const head=cols.filter(c=>c[0]!=="num").map(([k,l])=>`<th class="sortable ${k==="name"||k==="pos"?"l":""} ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${tableId}">${l}</th>`).join("");
+  const head=cols.filter(c=>c[0]!=="num").map(([k,l])=>`<th class="sortable ${k==="name"||k==="pos"?"l":""} ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${tableId}" tabindex="0" aria-sort="${st.key===k?(st.asc?"ascending":"descending"):"none"}">${l}</th>`).join("");
   const z=v=>`<td class="${v===0?"zero":""}">${v}</td>`;
-  return `${sortBar(tableId,opts)}<div class="card flush"><div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
+  return `<div class="card flush"><div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
     <td class="l team"><span class="num-badge">${p.num??"–"}</span>${esc(p.name)}</td>
     <td class="l" style="color:var(--muted)">${p.pos}</td>
     ${showSeasons?z(p.seasons):""}${z(p.apps)}${z(p.goals)}${z(p.assists)}<td class="pts">${p.ga}</td>
@@ -461,11 +463,11 @@ function noStats(id){
   const val=p=>st.key==="num"?(p.num??999):p[st.key];
   const r=(DATA.roster||[]).slice().sort((a,b)=>{const x=val(a),y=val(b);const c=typeof x==="string"?x.localeCompare(y):x-y;
     return (st.key==="num"?rank(a)-rank(b):0)||(st.asc?c:-c)||rank(a)-rank(b)||(a.num??999)-(b.num??999);});
-  const th=(k,l)=>`<th class="sortable l ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${id}">${l}</th>`;
+  const th=(k,l)=>`<th class="sortable l ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${id}" tabindex="0" aria-sort="${st.key===k?(st.asc?"ascending":"descending"):"none"}">${l}</th>`;
   return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
       <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
       <div style="color:var(--muted);margin-top:6px">Appearances, Goals, Assists, Goals + Assists, +/-, Saves, Goals Against and Cards will be tracked from then on.</div></div>
-    ${r.length?`${sortBar(id,SQUAD_SORTS)}<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}<th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Saves</th><th>GA</th><th>Cards</th></tr></thead><tbody>
+    ${r.length?`<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}<th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Saves</th><th>GA</th><th>Cards</th></tr></thead><tbody>
       ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${esc(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(8)}</tr>`).join("")}
     </tbody></table></div></div>`:""}`;
 }
@@ -478,7 +480,7 @@ function statsBody(players,tableId,showSeasons){
       ${leaderTile(players,"plusMinus","Plus / Minus","±")}
     </div>
     ${playerTable(players,tableId,showSeasons)}
-    <p class="note">Use “Sort by” or click any column header; click again to flip the order. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Saves / GA = saves and goals against while in goal · Cards = yellow / red cards.</p>`;
+    <p class="note">Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Saves / GA = saves and goals against while in goal · Cards = yellow / red cards.</p>`;
 }
 function renderCurrentStats(){
   const s=current;
@@ -553,6 +555,11 @@ document.addEventListener("click",e=>{
   if(th){setSort(th.dataset.table,th.dataset.sort);rerenderFor(th.dataset.table)();return;}
   const dir=e.target.closest("[data-sortdir]");
   if(dir){const id=dir.dataset.sortdir;sortState[id].asc=!sortState[id].asc;rerenderFor(id)();refocus(`[data-sortdir="${id}"]`);}
+});
+document.addEventListener("keydown",e=>{
+  const th=e.target.closest&&e.target.closest("th.sortable"); if(!th||(e.key!=="Enter"&&e.key!==" ")) return;
+  e.preventDefault(); const id=th.dataset.table,k=th.dataset.sort; setSort(id,k); rerenderFor(id)();
+  refocus(`th[data-table="${id}"][data-sort="${k}"]`);
 });
 document.addEventListener("change",e=>{
   const sel=e.target.closest("[data-sortsel]"); if(!sel) return;
