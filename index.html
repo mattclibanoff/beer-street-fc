@@ -181,6 +181,11 @@ td.zero{color:#5f5260}
 .motm.tbd .shirt{background:transparent;border:1.5px dashed var(--cream-2);color:var(--cream-2)}
 .about{display:grid;place-items:center;min-height:46vh;text-align:center;padding:40px 0}
 .about p{margin:0;font-family:"Permanent Marker",cursive;font-size:clamp(34px,6vw,68px);line-height:1.15;color:var(--cream);transform:rotate(-2deg)}
+.sortbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 12px}
+.sortbar label{font-family:"Barlow Condensed";font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:10px}
+.sortbar select{appearance:none;-webkit-appearance:none;background:var(--ink-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23cfc2ae'/%3E%3C/svg%3E") no-repeat right 10px center;
+  color:var(--cream);border:1px solid var(--plum);border-radius:2px;padding:7px 30px 7px 12px;font-family:"Barlow Condensed";font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.sortbar select:focus-visible,.sortbar .chip:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
 .champ-banner{display:flex;align-items:center;gap:14px;padding:14px 18px;margin-bottom:24px;border-radius:4px;background:var(--cream);color:var(--ink)}
 .champ-banner b{font-family:"Barlow Condensed";font-style:italic;font-weight:800;font-size:22px;text-transform:uppercase}
 .champ-banner svg{width:30px;height:30px;flex:none}
@@ -412,6 +417,16 @@ function aggregatePlayers(list){
   return Object.values(m);
 }
 const sortState={};
+const TEXT_KEYS=["name","pos"];
+function sortBar(id,opts){
+  const st=sortState[id], txt=TEXT_KEYS.includes(st.key);
+  const dir=txt?(st.asc?"A → Z":"Z → A"):(st.key==="num"?(st.asc?"Low → High":"High → Low"):(st.asc?"Low → High":"High → Low"));
+  return `<div class="sortbar"><label>Sort by
+    <select data-sortsel="${id}" aria-label="Sort players by">${opts.map(([k,l])=>`<option value="${k}" ${st.key===k?"selected":""}>${l}</option>`).join("")}</select></label>
+    <button class="chip" data-sortdir="${id}" aria-label="Reverse sort order">${st.asc?"↑":"↓"} ${dir}</button></div>`;
+}
+const STAT_SORTS=[["goals","Goals"],["assists","Assists"],["ga","Goals + Assists"],["plusMinus","+/-"],["apps","Appearances"],["saves","Saves"],["goalsAgainst","Goals Against"],["cards","Cards"],["num","Shirt number"],["name","Name"],["pos","Position"]];
+const SQUAD_SORTS=[["num","Shirt number"],["name","Name"],["pos","Position"]];
 function leaderTile(players,key,labelText,ghost,filter){
   const ranked=players.map(p=>({...p,ga:(p.goals||0)+(p.assists||0)})).filter(filter||(()=>true)).filter(p=>p[key]>0).sort((a,b)=>b[key]-a[key]||b.ga-a.ga);
   if(!ranked.length) return `<div class="leader"><div class="k">${labelText}</div><div class="big">—</div><div class="who"><small>No data yet</small></div></div>`;
@@ -423,42 +438,47 @@ function leaderTile(players,key,labelText,ghost,filter){
 }
 function playerTable(players,tableId,showSeasons){
   const st=sortState[tableId]||(sortState[tableId]={key:"goals",asc:false});
+  const opts=(showSeasons?[["seasons","Seasons"]]:[]).concat(STAT_SORTS);
   const cols=[["num","#",false],["name","Player",false],["pos","Pos",false]]
     .concat(showSeasons?[["seasons","Szns",true]]:[])
     .concat([["apps","Apps",true],["goals","Goals",true],["assists","Assists",true],["ga","G+A",true],["plusMinus","+/-",true],["saves","Saves",true],["goalsAgainst","GA",true],["cards","Cards",true]]);
   const rows=players.map(p=>({...p,apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0)})).sort((a,b)=>{
-    const x=a[st.key],y=b[st.key]; const c=typeof x==="string"?x.localeCompare(y):x-y;
-    return (st.asc?c:-c)||b.goals-a.goals||a.num-b.num;});
+    const x=st.key==="num"?(a.num??999):a[st.key], y=st.key==="num"?(b.num??999):b[st.key]; const c=typeof x==="string"?x.localeCompare(y):x-y;
+    return (st.asc?c:-c)||b.goals-a.goals||(a.num??999)-(b.num??999);});
   const head=cols.filter(c=>c[0]!=="num").map(([k,l])=>`<th class="sortable ${k==="name"||k==="pos"?"l":""} ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${tableId}">${l}</th>`).join("");
   const z=v=>`<td class="${v===0?"zero":""}">${v}</td>`;
-  return `<div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
-    <td class="l team"><span class="num-badge">${p.num}</span>${esc(p.name)}</td>
+  return `${sortBar(tableId,opts)}<div class="card flush"><div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
+    <td class="l team"><span class="num-badge">${p.num??"–"}</span>${esc(p.name)}</td>
     <td class="l" style="color:var(--muted)">${p.pos}</td>
     ${showSeasons?z(p.seasons):""}${z(p.apps)}${z(p.goals)}${z(p.assists)}<td class="pts">${p.ga}</td>
     <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.saves)}${z(p.goalsAgainst)}
     <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:#5f5260">0</span>`}</td>
-  </tr>`).join("")}</tbody></table></div>`;
+  </tr>`).join("")}</tbody></table></div></div>`;
 }
-function noStats(){
+function noStats(id){
   const rank=p=>p.pos==="Retired"?2:p.pos==="Alternate"?1:0;
-  const r=(DATA.roster||[]).slice().sort((a,b)=>rank(a)-rank(b)||(a.num??999)-(b.num??999));
+  const st=sortState[id]||(sortState[id]={key:"num",asc:true});
+  const val=p=>st.key==="num"?(p.num??999):p[st.key];
+  const r=(DATA.roster||[]).slice().sort((a,b)=>{const x=val(a),y=val(b);const c=typeof x==="string"?x.localeCompare(y):x-y;
+    return (st.key==="num"?rank(a)-rank(b):0)||(st.asc?c:-c)||rank(a)-rank(b)||(a.num??999)-(b.num??999);});
+  const th=(k,l)=>`<th class="sortable l ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${id}">${l}</th>`;
   return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
       <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
       <div style="color:var(--muted);margin-top:6px">Appearances, Goals, Assists, Goals + Assists, +/-, Saves, Goals Against and Cards will be tracked from then on.</div></div>
-    ${r.length?`<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr><th class="l">Player</th><th class="l">Pos</th><th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Saves</th><th>GA</th><th>Cards</th></tr></thead><tbody>
+    ${r.length?`${sortBar(id,SQUAD_SORTS)}<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}<th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Saves</th><th>GA</th><th>Cards</th></tr></thead><tbody>
       ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${esc(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(8)}</tr>`).join("")}
     </tbody></table></div></div>`:""}`;
 }
 function statsBody(players,tableId,showSeasons){
-  if(!players.length) return noStats();
+  if(!players.length) return noStats("sq-"+tableId);
   return `<div class="leaders">
       ${leaderTile(players,"goals","Golden Boot","G")}
       ${leaderTile(players,"assists","Assists","A")}
       ${leaderTile(players,"ga","Goals + Assists","G+A")}
       ${leaderTile(players,"plusMinus","Plus / Minus","±")}
     </div>
-    <div class="card flush" data-ptable="${tableId}">${playerTable(players,tableId,showSeasons)}</div>
-    <p class="note">Click a column header to sort. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Saves / GA = saves and goals against while in goal · Cards = yellow / red cards.</p>`;
+    ${playerTable(players,tableId,showSeasons)}
+    <p class="note">Use “Sort by” or click any column header; click again to flip the order. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Saves / GA = saves and goals against while in goal · Cards = yellow / red cards.</p>`;
 }
 function renderCurrentStats(){
   const s=current;
@@ -524,12 +544,20 @@ function renderPastStats(){
   bindPicker(root,pstState,renderPastStats);
 }
 
-/* sorting (delegated) */
+/* sorting (delegated): header clicks, Sort-by menu, direction button */
+const rerenderFor=id=>(id.endsWith("cur")?renderCurrentStats:renderPastStats);
+const setSort=(id,k)=>{const st=sortState[id]; if(st.key===k) st.asc=!st.asc; else {st.key=k;st.asc=(TEXT_KEYS.includes(k)||k==="num");}};
+function refocus(sel){const el=document.querySelector(sel); if(el) el.focus();}
 document.addEventListener("click",e=>{
-  const th=e.target.closest("th.sortable"); if(!th) return;
-  const id=th.dataset.table,k=th.dataset.sort,st=sortState[id];
-  if(st.key===k) st.asc=!st.asc; else {st.key=k;st.asc=(k==="name"||k==="pos"||k==="num");}
-  ({cur:renderCurrentStats,past:renderPastStats,all:renderPastStats})[id]();
+  const th=e.target.closest("th.sortable");
+  if(th){setSort(th.dataset.table,th.dataset.sort);rerenderFor(th.dataset.table)();return;}
+  const dir=e.target.closest("[data-sortdir]");
+  if(dir){const id=dir.dataset.sortdir;sortState[id].asc=!sortState[id].asc;rerenderFor(id)();refocus(`[data-sortdir="${id}"]`);}
+});
+document.addEventListener("change",e=>{
+  const sel=e.target.closest("[data-sortsel]"); if(!sel) return;
+  const id=sel.dataset.sortsel,k=sel.value; sortState[id].key=k; sortState[id].asc=(TEXT_KEYS.includes(k)||k==="num");
+  rerenderFor(id)(); refocus(`[data-sortsel="${id}"]`);
 });
 
 /* ---------- tabs + hash routing ---------- */
