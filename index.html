@@ -444,9 +444,11 @@ function playerTable(players,tableId,showSeasons){
   const opts=(showSeasons?[["seasons","Seasons"]]:[]).concat(STAT_SORTS);
   const cols=[["num","#",false],["name","Player",false],["pos","Pos",false]]
     .concat(showSeasons?[["seasons","Szns",true]]:[])
-    .concat([["apps","Apps",true],["goals","Goals",true],["assists","Assists",true],["ga","G+A",true],["plusMinus","+/-",true],["saves","Saves",true],["goalsAgainst","GA",true],["cards","Cards",true]]);
-  const rows=players.map(p=>({...p,apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0)})).sort((a,b)=>{
-    const x=st.key==="num"?(a.num??999):a[st.key], y=st.key==="num"?(b.num??999):b[st.key]; const c=typeof x==="string"?x.localeCompare(y):x-y;
+    .concat([["apps","Apps",true],["goals","Goals",true],["assists","Assists",true],["ga","G+A",true],["plusMinus","+/-",true],["saves","Saves",true],["goalsAgainst","GA",true],["savePct","Save %",true],["cards","Cards",true]]);
+  const rows=players.map(p=>({...p,apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0),
+    savePct:((p.saves||0)+(p.goalsAgainst||0))?(p.saves||0)/((p.saves||0)+(p.goalsAgainst||0)):null})).sort((a,b)=>{
+    if(st.key==="savePct"&&(a.savePct==null)!==(b.savePct==null)) return a.savePct==null?1:-1;
+    const x=st.key==="num"?(a.num??999):(a[st.key]??0), y=st.key==="num"?(b.num??999):(b[st.key]??0); const c=typeof x==="string"?x.localeCompare(y):x-y;
     return (st.asc?c:-c)||b.goals-a.goals||(a.num??999)-(b.num??999);});
   const head=cols.filter(c=>c[0]!=="num").map(([k,l])=>`<th class="sortable ${k==="name"||k==="pos"?"l":""} ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${tableId}" tabindex="0" aria-sort="${st.key===k?(st.asc?"ascending":"descending"):"none"}">${l}</th>`).join("");
   const z=v=>`<td class="${v===0?"zero":""}">${v}</td>`;
@@ -454,7 +456,7 @@ function playerTable(players,tableId,showSeasons){
     <td class="l team"><span class="num-badge">${p.num??"–"}</span>${esc(p.name)}</td>
     <td class="l" style="color:var(--muted)">${p.pos}</td>
     ${showSeasons?z(p.seasons):""}${z(p.apps)}${z(p.goals)}${z(p.assists)}<td class="pts">${p.ga}</td>
-    <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.saves)}${z(p.goalsAgainst)}
+    <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.saves)}${z(p.goalsAgainst)}<td class="${p.savePct==null?"zero":""}">${p.savePct==null?"–":(p.savePct*100).toFixed(1)+"%"}</td>
     <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:#5f5260">0</span>`}</td>
   </tr>`).join("")}</tbody></table></div></div>`;
 }
@@ -467,9 +469,9 @@ function noStats(id){
   const th=(k,l)=>`<th class="sortable l ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${id}" tabindex="0" aria-sort="${st.key===k?(st.asc?"ascending":"descending"):"none"}">${l}</th>`;
   return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
       <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
-      <div style="color:var(--muted);margin-top:6px">Appearances, Goals, Assists, Goals + Assists, +/-, Saves, Goals Against and Cards will be tracked from then on.</div></div>
-    ${r.length?`<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}<th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Saves</th><th>GA</th><th>Cards</th></tr></thead><tbody>
-      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${esc(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(8)}</tr>`).join("")}
+      <div style="color:var(--muted);margin-top:6px">Appearances, Goals, Assists, Goals + Assists, +/-, Saves, Goals Against, Save % and Cards will be tracked from then on.</div></div>
+    ${r.length?`<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}<th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Saves</th><th>GA</th><th>Save %</th><th>Cards</th></tr></thead><tbody>
+      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${esc(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(9)}</tr>`).join("")}
     </tbody></table></div></div>`:""}`;
 }
 function statsBody(players,tableId,showSeasons){
@@ -481,7 +483,7 @@ function statsBody(players,tableId,showSeasons){
       ${leaderTile(players,"plusMinus","Plus / Minus","±")}
     </div>
     ${playerTable(players,tableId,showSeasons)}
-    <p class="note">Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Saves / GA = saves and goals against while in goal · Cards = yellow / red cards.</p>`;
+    <p class="note">Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Cards = yellow / red cards.</p>`;
 }
 function renderCurrentStats(){
   const s=current;
