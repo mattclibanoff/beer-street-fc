@@ -659,7 +659,7 @@ function renderLanding(){
   const prev=played.find(m=>m.home===opp||m.away===opp), pv=prev&&view(prev);
   const last3=played.slice(-3).reverse();
   const semis=(s.leagueMatches||[]).filter(m=>m.stage).sort((a,b)=>a.time.localeCompare(b.time));
-  document.getElementById("npDateline").innerHTML=`<span>Vol. I · No. 10</span><span>${fmtDate(L.date,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</span><span>New York · Price: One Pint</span>`;
+  document.getElementById("npDateline").innerHTML=`<span>Vol. I · No. 10</span><span>${fmtDate(L.date,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</span>`;
   document.getElementById("npDeck").innerHTML=`${esc(L.deck||"")}<span style="display:block;margin-top:8px;font-size:.8em;font-style:normal">${ord(seed(US))}-placed Beer Street FC take on top seed ${esc(opp)} for a place in the final, ${esc(L.venue)}.</span>`;
   const rec=r=>`${r.w}-${r.l}${r.d?"-"+r.d:""}`;
   const close=()=>{el.hidden=true;document.body.classList.remove("landing-open");const t=document.querySelector('.tab[aria-selected="true"]');if(t)t.focus({preventScroll:true});};
