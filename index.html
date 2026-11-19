@@ -216,7 +216,7 @@ body.landing-open{overflow:hidden}
   font-size:clamp(46px,10.5vw,124px);line-height:.88;letter-spacing:-.005em}
 .np-head span{display:block}
 .np-deck{max-width:760px;margin:14px auto 0;text-align:center;font-size:clamp(17px,2.1vw,22px);line-height:1.35;font-style:italic}
-.np-rule{height:0;border:0;border-top:1px solid var(--rule);margin:22px 0}
+.np-rule{height:0;border:0;border-top:1px solid var(--rule);margin:22px 0 0}
 .np-body{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:0;align-items:start}
 .np-col{padding:0 20px;border-left:1px solid rgba(42,32,48,.35)}
 .np-col:first-child{padding-left:0;border-left:0}.np-col:last-child{padding-right:0}
@@ -287,9 +287,6 @@ footer .fm-logo{display:block;width:120px;height:auto;margin:0 auto 10px;opacity
     <h2 class="np-head" id="npHead"><span>Playoffs</span><span>11/19 at 7:50 PM</span></h2>
     <p class="np-deck" id="npDeck"></p>
     <hr class="np-rule">
-    <div class="np-body" id="npBody"></div>
-    <div class="np-cta"><button class="np-btn" type="button" data-continue autofocus>Continue to site <span aria-hidden="true">→</span></button>
-      <small>Standings, fixtures &amp; the squad inside.</small></div>
   </article>
 </div>
 
@@ -665,34 +662,12 @@ function renderLanding(){
   document.getElementById("npDateline").innerHTML=`<span>Vol. I · No. 10</span><span>${fmtDate(L.date,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</span><span>New York · Price: One Pint</span>`;
   document.getElementById("npDeck").innerHTML=`${esc(L.deck||"")}<span style="display:block;margin-top:8px;font-size:.8em;font-style:normal">${ord(seed(US))}-placed Beer Street FC take on top seed ${esc(opp)} for a place in the final, ${esc(L.venue)}.</span>`;
   const rec=r=>`${r.w}-${r.l}${r.d?"-"+r.d:""}`;
-  document.getElementById("npBody").innerHTML=`
-    <div class="np-col">
-      <h3>The Matchup</h3>
-      <p class="first">The regular season is done and the stakes are simple: win and play for the title at 8:40. Beer Street finished ${ord(seed(US))} on ${us.pts} points (${rec(us)}, ${us.gf} scored, ${us.ga} conceded); ${esc(opp)} topped the table on ${them.pts} points (${rec(them)}, ${them.gf} scored).</p>
-      ${pv?`<p>The good news: these sides have met once already. Week ${prev.round}, ${fmtDate(prev.date,{month:"short",day:"numeric"})}: Beer Street ${pv.r==="W"?"won":pv.r==="L"?"lost":"drew"} ${pv.f}–${pv.a}${pv.r==="W"?". The Ballers will remember.":"."}</p>`:""}
-      <p>Kick-off is ${L.time} on ${L.field}. Arrive thirsty.</p>
-    </div>
-    <div class="np-col">
-      <figure style="margin:0"><div class="np-photo"><img id="npLogo" src="" alt="Beer Street New York logo"></div>
-      <figcaption class="np-cap">The kit, pressed and ready. Black and plum, as ever.</figcaption></figure>
-      <h3>Form Guide</h3>
-      <ul class="np-list">${last3.map(m=>{const v=view(m);return `<li><span>${v.home?"vs":"@"} ${esc(v.opp)}</span><b>${v.r} ${v.f}–${v.a}</b></li>`}).join("")}</ul>
-    </div>
-    <div class="np-col">
-      <h3>Tonight's Card</h3>
-      <ul class="np-list">${semis.map(m=>{const tbd=m.home==="TBD";const mine=m.home===US||m.away===US;
-        return `<li class="${mine?"us":""}"><span>${tbd?esc(m.label.split(" · ")[0]):`${esc(m.away)} v ${esc(m.home)}`}</span><b>${esc(m.time)}</b></li>`}).join("")}</ul>
-      ${DATA.motm&&DATA.motm.name?`<h3>Last Week's Star</h3><p>${esc(DATA.motm.name)} took the honours against ${esc(DATA.motm.opponent)}${DATA.motm.blurb?": "+esc(DATA.motm.blurb.replace(/\.$/,"").toLowerCase()):""}.</p>`:""}
-      <div class="np-quote">Up the Street.</div>
-    </div>`;
-  document.getElementById("npLogo").src=document.querySelector(".wordmark .logo").src;
   const close=()=>{el.hidden=true;document.body.classList.remove("landing-open");const t=document.querySelector('.tab[aria-selected="true"]');if(t)t.focus({preventScroll:true});};
   el.querySelectorAll("[data-continue]").forEach(b=>b.onclick=close);
   el.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
   // deep links (e.g. beerstreetfc.com/#about) go straight to the site
   if(location.hash&&TABS.includes(location.hash.slice(1))) return false;
   el.hidden=false; document.body.classList.add("landing-open");
-  setTimeout(()=>{const b=el.querySelector(".np-btn"); if(b) b.focus({preventScroll:true});},50);
   return true;
 }
 
