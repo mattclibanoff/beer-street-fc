@@ -420,8 +420,47 @@ function teamSummary(season){
   </div>`;
 }
 
-function motmCard(){
+/* ---------- (Wo)man of the Match: picked from each game's stats (manual picks always win) ---------- */
+const spct=p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return f?Math.round((p.saves||0)/f*100):null;};
+function motmScore(p){
+  const sp=spct(p);
+  return (p.goals||0)*3 + (p.assists||0)*2 + (p.plusMinus||0) + (p.saves||0)*1.0
+       + (sp!=null&&(p.saves||0)>=5&&sp>=70?3:0) - (p.goalsAgainst||0)*0.2
+       - (p.yellow||0)*2 - (p.red||0)*5;
+}
+function statLine(p){
+  const bits=[], pl=(n,w)=>`${n} ${w}${n===1?"":"s"}`;
+  if(p.goals) bits.push(pl(p.goals,"goal")); if(p.assists) bits.push(pl(p.assists,"assist"));
+  if(p.saves) bits.push(`${pl(p.saves,"save")}${spct(p)!=null?` (${spct(p)}%)`:""}`);
+  if(!bits.length&&p.plusMinus>0) bits.push(`+${p.plusMinus} on the pitch`);
+  return bits.length?bits.join(", ").replace(/, ([^,]*)$/," and $1")+".":"";
+}
+const _byTime=(a,b)=>a.date.localeCompare(b.date)||(a.time||"").localeCompare(b.time||"");
+function motmPicks(s){                 // {date: {name, auto, line}} for one season, in order
+  const picks={}, seq=[];
+  ourMatches(s).filter(m=>!m.bye&&m.hs!=null).sort(_byTime).forEach(g=>{
+    const manual=(DATA.motmLog||[]).find(x=>x.date===g.date);
+    if(manual){picks[g.date]={name:manual.name,auto:false,line:manual.blurb||""};seq.push(manual.name);return;}
+    const gs=(s.gameStats||{})[g.date]; if(!gs||!gs.length) return;
+    const recent=seq.slice(-3), count=(arr,n)=>arr.filter(x=>x===n).length;
+    const ranked=gs.filter(p=>motmScore(p)>0)
+      .map(p=>({p,sc:motmScore(p)-3*count(recent,p.name)-1*count(seq,p.name)}))   // variety: dock recent & repeat winners
+      .sort((a,b)=>b.sc-a.sc||count(seq,a.p.name)-count(seq,b.p.name)||a.p.name.localeCompare(b.p.name));
+    if(ranked.length){const w=ranked[0].p;picks[g.date]={name:w.name,auto:true,line:statLine(w)};seq.push(w.name);}
+  });
+  return picks;
+}
+function latestMotm(){                  // newest pick across current season, else the manual card
+  const s=current, picks=motmPicks(s), dates=Object.keys(picks).sort(), d=dates[dates.length-1];
   const m=DATA.motm;
+  if(d&&!(m&&m.date&&m.date>d)){
+    const g=ourMatches(s).find(x=>x.date===d&&!x.bye&&x.hs!=null), v=g&&view(g);
+    return {name:picks[d].name,date:d,opponent:g?(g.home===US?g.away:g.home):"",score:v?`${v.r} ${v.f}–${v.a}`:"",blurb:picks[d].line};
+  }
+  return m&&m.name?m:null;
+}
+function motmCard(){
+  const m=latestMotm();
   const wo=m&&m.name&&(DATA.womanOfMatch||[]).includes(m.name);
   const head=`<div class="k"><svg><use href="#star"/></svg>This Week's ${wo?"(Wo)man":"Man"} of the Match</div>`;
   if(!m||!m.name) return `<div class="motm tbd">${head}<div class="row"><div class="shirt">?</div>
@@ -684,7 +723,7 @@ function seasonWrap(s){
   lead("goals","Top scorer"); lead("assists","Assists");
   const keepers=ps.filter(p=>(p.saves||0)+(p.goalsAgainst||0)>=10).sort((a,b)=>savePct(b)-savePct(a));
   if(keepers.length) stats.push(["Best save %",`${nm(keepers[0].name)} ${savePct(keepers[0])}%`]);
-  const first=played[0].date, tally={}; (DATA.motmLog||[]).filter(x=>x.date>=first&&x.date<=lastDate).forEach(x=>tally[x.name]=(tally[x.name]||0)+1);
+  const tally={}; Object.values(motmPicks(s)).forEach(x=>tally[x.name]=(tally[x.name]||0)+1);
   const best=Object.entries(tally).sort((a,b)=>b[1]-a[1]);
   if(best.length){const top=best.filter(x=>x[1]===best[0][1]).map(x=>x[0]);
     stats.push([`Most ${top.every(n=>(DATA.womanOfMatch||[]).includes(n))?"(Wo)man":"Man"} of the Match awards`,`${top.map(nm).join(" & ")} (${best[0][1]})`]);}
@@ -744,7 +783,7 @@ function setFront(edition,kicker,headLines,dateline,deck,sub,stats){
 /* helpers for the stats strip */
 const nm=n=>esc(n);
 const motmTitle=n=>(DATA.womanOfMatch||[]).includes(n)?"(Wo)man of the Match":"Man of the Match";
-function motmFor(date){ const log=DATA.motmLog||[]; const hit=log.find(x=>x.date===date); if(hit) return hit.name;
+function motmFor(date){ const p=motmPicks(current)[date]; if(p) return p.name;
   return DATA.motm&&DATA.motm.date===date?DATA.motm.name:null; }
 const listTop=(arr,key,fmt)=>arr.filter(p=>(p[key]||0)>0).sort((a,b)=>b[key]-a[key]).map(p=>`${nm(p.name)} ${fmt?fmt(p):p[key]}`).join(", ");
 const savePct=p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return f?Math.round((p.saves||0)/f*100):null;};
