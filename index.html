@@ -213,7 +213,7 @@ body.landing-open{overflow:hidden}
   font-size:13px;letter-spacing:.12em;text-transform:uppercase}
 .np-kicker{margin:22px 0 4px;text-align:center;font-family:"Barlow Condensed";font-weight:700;font-size:15px;letter-spacing:.3em;text-transform:uppercase;color:#5b4455}
 .np-head{margin:0;text-align:center;font-family:"Barlow Condensed";font-style:italic;font-weight:800;text-transform:uppercase;
-  font-size:clamp(46px,10.5vw,124px);line-height:.88;letter-spacing:-.005em}
+  font-size:clamp(38px,9.6vw,124px);line-height:.9;overflow-wrap:anywhere;letter-spacing:-.005em}
 .np-head span{display:block}
 .np-deck{max-width:760px;margin:14px auto 0;text-align:center;font-size:clamp(17px,2.1vw,22px);line-height:1.35;font-style:italic}
 .np-rule{height:0;border:0;border-top:1px solid var(--rule);margin:22px 0 0}
@@ -280,7 +280,7 @@ footer .fm-logo{display:block;width:120px;height:auto;margin:0 auto 10px;opacity
 
 <div class="landing" id="landing" role="dialog" aria-modal="true" aria-labelledby="npHead" hidden>
   <article class="paper">
-    <div class="np-top"><span>Special Playoff Edition</span><button class="np-skip" type="button" data-continue>Continue to site →</button></div>
+    <div class="np-top"><span id="npEdition">Special Edition</span><button class="np-skip" type="button" data-continue>Continue to site →</button></div>
     <div class="np-mast"><h1>The Beer Street Gazette</h1><span class="np-tagline">Amateur footballers. Professional drunks.</span></div>
     <div class="np-dateline" id="npDateline"></div>
     <div class="np-kicker" id="npKicker"></div>
@@ -650,6 +650,34 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
 addEventListener("hashchange",()=>show(location.hash.slice(1)));
 
 /* ---------- landing (newspaper) ---------- */
+/* Season-review front page: shown once Beer Street have no games left this season. */
+function seasonWrap(s){
+  const ms=ourMatches(s).filter(m=>!m.bye), played=ms.filter(m=>m.hs!=null);
+  if(!played.length) return null;
+  const rows=standings(s), pos=rows.findIndex(r=>r.team===US)+1, us=rows[pos-1]; if(!us) return null;
+  const po=ms.filter(m=>m.stage), poPlayed=po.filter(m=>m.hs!=null), lastPo=poPlayed[poPlayed.length-1], lv=lastPo&&view(lastPo);
+  const isFinal=m=>(m.label||"").toLowerCase().startsWith("championship");
+  const pending=po.some(m=>m.hs==null);                    // playoff score not posted yet
+  let head, kick=`${esc(s.name)} ${s.year} · Season Review`, poLine="";
+  const oppOf=m=>esc(m.home===US?m.away:m.home);
+  const finalPlayed=lv&&isFinal(lastPo);
+  if(finalPlayed&&lv.r==="W"){head=["Champions!",`${esc(s.name)} ${s.year}`];poLine=`Then they beat ${oppOf(lastPo)} ${lv.f}–${lv.a} in the final to lift the trophy.`;}
+  else if(finalPlayed){head=["Runners-Up",`${esc(s.name)} ${s.year}`];poLine=`Then a ${lv.a}–${lv.f} defeat to ${oppOf(lastPo)} in the final, so close.`;}
+  else if(lv&&lv.r!=="W"){head=[`Finished ${ord(pos)}`,"Semifinalists"];poLine=`The playoff run ended in the semifinal with a ${lv.a}–${lv.f} ${lv.r==="D"?"draw":"defeat"} to ${oppOf(lastPo)}.`;}
+  else if(lv&&lv.r==="W"){head=[`Finished ${ord(pos)}`,"Into the Final"];poLine=`They beat ${oppOf(lastPo)} ${lv.f}–${lv.a} in the semifinal. Final result to come.`;}
+  else if(po.length){head=[`Finished ${ord(pos)}`,"Playoffs Bound"];poLine="Playoff result to come.";}
+  else {head=[`Finished ${ord(pos)}`,`of ${rows.length}`];}
+  const rec=`${us.w}-${us.l}${us.d?"-"+us.d:""}`;
+  const summary=`Beer Street FC finish the ${esc(s.name)} ${s.year} regular season ${ord(pos)} of ${rows.length} with ${us.pts} points (${rec}), scoring ${us.gf} and conceding ${us.ga}.`;
+  // compare with the previous season, if there is one
+  const prevS=past[0]; let cmp="";
+  if(prevS){const pr=standings(prevS), pp=pr.findIndex(r=>r.team===US)+1, pu=pr[pp-1];
+    if(pu){ if(pp>pos) cmp=`A big step up from ${ord(pp)} place${pu.w===0?" and a winless campaign":""} in ${esc(prevS.name)}.`;
+            else if(pp<pos) cmp=`A dip from ${ord(pp)} place in ${esc(prevS.name)}. Next season, lads.`;
+            else cmp=`Same spot as ${esc(prevS.name)}: consistency is a virtue.`; }}
+  const lastDate=played[played.length-1].date;
+  return {kick,head,deck:cmp,sub:[summary,poLine].filter(Boolean).join(" "),date:lastDate};
+}
 /* Auto-written subheadline for the front page: reads the form guide and the table. */
 function autoTagline(g,s){
   const played=ourMatches(s).filter(m=>!m.bye&&m.hs!=null&&m.date<=g.date&&m!==g);
@@ -691,7 +719,18 @@ function renderLanding(){
   if(!L.show) return false;
   const s=current, ms=ourMatches(s);
   const upcoming=ms.filter(m=>!m.bye&&m.hs==null&&m.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date)||(a.time||"").localeCompare(b.time||""));
-  const g=upcoming[0]; if(!g) return false;               // no fixture scheduled: go straight to the site
+  const g=upcoming[0];
+  if(!g){                                                   // season over: show the season review instead
+    const w=seasonWrap(s); if(!w) return false;
+    const custom=(L.decks||{})["wrap-"+s.id];
+    document.getElementById("npEdition").textContent="Season Review Edition";
+    document.getElementById("npKicker").innerHTML=w.kick;
+    document.getElementById("npHead").innerHTML=w.head.map(x=>`<span>${x}</span>`).join("");
+    document.getElementById("npDateline").innerHTML=`<span>Vol. I · Season Review</span><span>${fmtDate(w.date,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</span>`;
+    const dk=custom||w.deck;
+    document.getElementById("npDeck").innerHTML=`${esc(dk)}<span style="display:block;${dk?"margin-top:8px;font-size:.8em;":""}font-style:normal">${w.sub}</span>`;
+    return openLanding(el);
+  }
   const rows=standings(s), hasTable=rows.some(r=>r.p>0), seed=team=>hasTable?rows.findIndex(r=>r.team===team)+1:0;
   const home=g.home===US, oppName=home?g.away:g.home, known=oppName&&oppName!=="TBD";
   const label=(g.label||"").toLowerCase(), isFinal=label.startsWith("championship"), isSemi=label.startsWith("semifinal");
@@ -703,10 +742,14 @@ function renderLanding(){
   const stakes=isFinal?"with the title on the line":isSemi?"for a place in the final":g.stage?"in the playoffs":"";
   const sub=`${us?ord(us)+"-placed ":""}Beer Street FC ${g.stage?"take on":home?"host":"visit"} ${oppTxt}${stakes?" "+stakes:""}, ${fmtDate(g.date,{weekday:"long"})} at ${g.time} on ${esc(g.field||"the pitch")}.`;
   const deck=(L.decks||{})[g.date]||autoTagline(g,s);        // custom line for this game, else auto-written
+  document.getElementById("npEdition").textContent=isFinal?"Championship Edition":g.stage?"Special Playoff Edition":"Matchday Edition";
   document.getElementById("npKicker").innerHTML=kicker;
   document.getElementById("npHead").innerHTML=`<span>${word}</span><span>${when}</span>`;
   document.getElementById("npDateline").innerHTML=`<span>Vol. I · No. ${g.round}</span><span>${fmtDate(g.date,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</span>`;
   document.getElementById("npDeck").innerHTML=`${esc(deck)}<span style="display:block;${deck?"margin-top:8px;font-size:.8em;":""}font-style:normal">${sub}</span>`;
+  return openLanding(el);
+}
+function openLanding(el){
   const close=()=>{el.hidden=true;document.body.classList.remove("landing-open");const tb=document.querySelector('.tab[aria-selected="true"]');if(tb)tb.focus({preventScroll:true});};
   el.querySelectorAll("[data-continue]").forEach(b=>b.onclick=close);
   el.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
