@@ -650,6 +650,41 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
 addEventListener("hashchange",()=>show(location.hash.slice(1)));
 
 /* ---------- landing (newspaper) ---------- */
+/* Auto-written subheadline for the front page: reads the form guide and the table. */
+function autoTagline(g,s){
+  const played=ourMatches(s).filter(m=>!m.bye&&m.hs!=null&&m.date<=g.date&&m!==g);
+  const res=played.map(m=>({m,v:view(m)}));
+  const rows=standings(s), seed=t=>rows.findIndex(r=>r.team===t)+1, row=t=>rows.find(r=>r.team===t);
+  const home=g.home===US, opp=home?g.away:g.home, known=opp&&opp!=="TBD";
+  const label=(g.label||"").toLowerCase(), isFinal=label.startsWith("championship"), isSemi=label.startsWith("semifinal");
+  const out=[];
+  // 1) the occasion / form line
+  const last=res[res.length-1];
+  let streak=0; for(let i=res.length-1;i>=0&&last&&res[i].v.r===last.v.r;i--) streak++;
+  const lastTxt=last?`${last.v.f}–${last.v.a} ${last.v.r==="W"?"win over":last.v.r==="L"?"loss to":"draw with"} ${esc(last.v.opp)}`:"";
+  if(isFinal) out.push("One game from glory: win this and the trophy comes home to Beer Street.");
+  else if(isSemi) out.push(last&&last.v.r==="L"?`Shaking off last week's ${lastTxt}, Beer Street are one win from the final.`:"Win and they're in the final. Lose and it's a long winter of pints and regret.");
+  else if(!res.length) out.push(`Season opener! A fresh ${esc(s.name)} campaign kicks off for Beer Street FC.`);
+  else if(last.v.r==="W"&&streak>=3) out.push(`Red-hot Beer Street go for ${streak+1} in a row after a ${lastTxt}.`);
+  else if(last.v.r==="W"&&streak===2) out.push(`Two straight wins and counting: Beer Street look to extend the streak after a ${lastTxt}.`);
+  else if(last.v.r==="W") out.push(`Riding high after last week's ${lastTxt}, Beer Street look to make it two in a row.`);
+  else if(last.v.r==="L"&&streak>=2) out.push(`${streak} straight defeats. Beer Street need a response, and they need it now.`);
+  else if(last.v.r==="L") out.push(`Looking to find their footing after a tough ${lastTxt}.`);
+  else out.push(`After sharing the points in a ${lastTxt}, Beer Street want all three this time.`);
+  // 2) the opponent / table line
+  if(known){
+    const prev=[...res].reverse().find(x=>x.v.opp===opp||x.m.home===opp||x.m.away===opp);
+    const hasTable=rows.some(r=>r.p>0);
+    const us=row(US), them=row(opp), so=hasTable?seed(opp):0, gap=hasTable&&us&&them?Math.abs(us.pts-them.pts):99;
+    if(prev) out.push(prev.v.r==="W"?`Beer Street won the first meeting ${prev.v.f}–${prev.v.a}. Can they do it again?`
+      :prev.v.r==="L"?`Revenge is on the menu: ${esc(opp)} won the first meeting ${prev.v.a}–${prev.v.f}.`
+      :`The first meeting ended ${prev.v.f}–${prev.v.a}. Someone has to blink this time.`);
+    else if(!g.stage&&so===1) out.push(`Next up: the league leaders, ${esc(opp)}.`);
+    else if(!g.stage&&so===rows.length) out.push(`Bottom-placed ${esc(opp)} come in hungry. Anything less than a win would sting.`);
+    else if(!g.stage&&gap<=3&&res.length) out.push(`Only ${gap} point${gap===1?"":"s"} separate the sides: a proper six-pointer.`);
+  }
+  return out.join(" ");
+}
 function renderLanding(){
   // Front page for Beer Street's NEXT game — rebuilt automatically each week from the fixtures.
   const L=DATA.landing||{}; const el=document.getElementById("landing");
@@ -657,7 +692,7 @@ function renderLanding(){
   const s=current, ms=ourMatches(s);
   const upcoming=ms.filter(m=>!m.bye&&m.hs==null&&m.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date)||(a.time||"").localeCompare(b.time||""));
   const g=upcoming[0]; if(!g) return false;               // no fixture scheduled: go straight to the site
-  const rows=standings(s), seed=team=>rows.findIndex(r=>r.team===team)+1;
+  const rows=standings(s), hasTable=rows.some(r=>r.p>0), seed=team=>hasTable?rows.findIndex(r=>r.team===team)+1:0;
   const home=g.home===US, oppName=home?g.away:g.home, known=oppName&&oppName!=="TBD";
   const label=(g.label||"").toLowerCase(), isFinal=label.startsWith("championship"), isSemi=label.startsWith("semifinal");
   const md=fmtDate(g.date,{month:"numeric",day:"numeric"}), when=`${md} at ${g.time}`;
@@ -667,7 +702,7 @@ function renderLanding(){
   const oppTxt=known?`${them===1?"top seed ":them?ord(them)+"-placed ":""}${esc(oppName)}`:"an opponent still to be decided";
   const stakes=isFinal?"with the title on the line":isSemi?"for a place in the final":g.stage?"in the playoffs":"";
   const sub=`${us?ord(us)+"-placed ":""}Beer Street FC ${g.stage?"take on":home?"host":"visit"} ${oppTxt}${stakes?" "+stakes:""}, ${fmtDate(g.date,{weekday:"long"})} at ${g.time} on ${esc(g.field||"the pitch")}.`;
-  const deck=(L.decks||{})[g.date]||"";                      // optional custom line for this game
+  const deck=(L.decks||{})[g.date]||autoTagline(g,s);        // custom line for this game, else auto-written
   document.getElementById("npKicker").innerHTML=kicker;
   document.getElementById("npHead").innerHTML=`<span>${word}</span><span>${when}</span>`;
   document.getElementById("npDateline").innerHTML=`<span>Vol. I · No. ${g.round}</span><span>${fmtDate(g.date,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</span>`;
