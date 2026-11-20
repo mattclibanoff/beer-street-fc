@@ -453,8 +453,10 @@ function standingsTable(season){
     </tr>`}).join("")}</tbody></table></div>`;
 }
 
+/* minutes past midnight from "7:50 PM" (first time if a range); for newest-first ordering within a day */
+const tmin=s=>{const m=/(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(s||"");if(!m)return 0;let h=+m[1]%12;if((m[3]||"").toUpperCase()==="PM")h+=12;return h*60+ +m[2];};
 function fixtureList(season){
-  const ms=ourMatches(season).sort((a,b)=>b.date.localeCompare(a.date)||(a.time||"").localeCompare(b.time||"")); const nextIdx=(()=>{let k=-1;ms.forEach((m,i)=>{if(!m.bye&&m.hs==null&&m.date>=TODAY&&(k<0||m.date<ms[k].date||(m.date===ms[k].date&&(m.time||"")<(ms[k].time||""))))k=i});return k})();
+  const ms=ourMatches(season).sort((a,b)=>b.date.localeCompare(a.date)||tmin(b.time)-tmin(a.time)); const nextIdx=(()=>{let k=-1;ms.forEach((m,i)=>{if(!m.bye&&m.hs==null&&m.date>=TODAY&&(k<0||m.date<ms[k].date||(m.date===ms[k].date&&(m.time||"")<(ms[k].time||""))))k=i});return k})();
   if(!ms.length) return `<div class="empty" style="padding:24px 20px">Game-by-game results aren't available for this season yet.${season.source?`<br><a href="${esc(season.source)}" style="color:var(--cream-2)">View on NYC Footy ↗</a>`:""}</div>`;
   return `<div class="scroll"><ul class="fx">${ms.map((m,i)=>{
     const d=`<div class="d">${fmtDate(m.date,{month:"short"})}<b>${fmtDate(m.date,{day:"numeric"})}</b></div>`;
@@ -532,7 +534,7 @@ function motmCard(){
     ${m.blurb?`<p class="blurb">${esc(m.blurb)}</p>`:""}</div>`;
 }
 function leagueList(season){
-  const L=(season.leagueMatches||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)||a.time.localeCompare(b.time));
+  const L=(season.leagueMatches||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)||tmin(b.time)-tmin(a.time));
   if(!L.length) return `<div class="empty" style="padding:24px 20px">No league games yet.</div>`;
   let out="",wk=null;
   L.forEach(m=>{
