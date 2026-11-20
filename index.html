@@ -780,16 +780,14 @@ function seasonWrap(s){
   const lastDate=played[played.length-1].date;
   const ps=s.players||[], stats=[];
   const lead=(key,lab,fmt)=>{const top=ps.filter(p=>(p[key]||0)>0).sort((a,b)=>b[key]-a[key]); if(top.length) stats.push([lab,`${nm(top[0].name)} ${fmt?fmt(top[0]):top[0][key]}`]);};
-  lead("goals","Top scorer"); lead("assists","Assists");
-  const keepers=ps.filter(p=>(p.saves||0)+(p.goalsAgainst||0)>=10).sort((a,b)=>savePct(b)-savePct(a));
+  lead("goals","Goals leader"); lead("assists","Assists leader");
+  lead("plusMinus","+/- leader",p=>`+${p.plusMinus}`);
+  const keepers=ps.filter(p=>(p.saves||0)+(p.goalsAgainst||0)>=20).sort((a,b)=>savePct(b)-savePct(a));
   if(keepers.length) stats.push(["Best save %",`${nm(keepers[0].name)} ${savePct(keepers[0])}%`]);
-  const picks=motmPicks(s), tally={}; Object.values(picks).forEach(x=>tally[x.name]=(tally[x.name]||0)+1);
   // playoff (wo)man of the match, with the reason
+  const picks=motmPicks(s);
   const poPick=po.map(m=>picks[m.date]).filter(Boolean).pop();
   if(poPick) stats.push([`${(DATA.womanOfMatch||[]).includes(poPick.name)?"(Wo)man":"Man"} of the Playoffs`,`${nm(poPick.name)}${poPick.line?`: ${esc(poPick.line.replace(/\.$/,""))}`:""}`]);
-  const best=Object.entries(tally).sort((a,b)=>b[1]-a[1]);
-  if(best.length&&best[0][1]>1){const top=best.filter(x=>x[1]===best[0][1]).map(x=>x[0]);
-    stats.push([`Most ${top.every(n=>(DATA.womanOfMatch||[]).includes(n))?"(Wo)man":"Man"} of the Match awards`,`${top.map(nm).join(" & ")} (${best[0][1]})`]);}
   return {kick,head,deck:cmp,sub:[summary,poLine].filter(Boolean).join(" "),date:lastDate,stats};
 }
 /* Auto-written subheadline for the front page: reads the form guide and the table. */
