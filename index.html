@@ -1675,8 +1675,9 @@ function fixtureList(season){
 
 /* overall record = league table + Beer Street's playoff results */
 function seasonRecord(season){
-  const row=standings(season).find(r=>r.team===US)||{w:0,d:0,l:0}, r={w:row.w,d:row.d,l:row.l,po:0};
-  ourMatches(season).filter(m=>m.stage&&!m.bye&&m.hs!=null).forEach(m=>{const v=view(m);r.po++;if(v.r==="W")r.w++;else if(v.r==="L")r.l++;else r.d++;});
+  const row=standings(season).find(r=>r.team===US)||{w:0,d:0,l:0,gf:0,ga:0}, r={w:row.w,d:row.d,l:row.l,gf:row.gf,ga:row.ga,po:0};
+  ourMatches(season).filter(m=>m.stage&&!m.bye&&m.hs!=null).forEach(m=>{const v=view(m);r.po++;r.gf+=v.f;r.ga+=v.a;if(v.r==="W")r.w++;else if(v.r==="L")r.l++;else r.d++;});
+  r.gd=r.gf-r.ga;
   return r;
 }
 function teamSummary(season){
@@ -1686,7 +1687,8 @@ function teamSummary(season){
     <div><div class="k">Position</div><div class="v">${ord(pos)}<small>of ${standings(season).length}</small></div></div>
     <div><div class="k">Points</div><div class="v">${row.pts}</div></div>
     <div><div class="k">Record</div><div class="v">${rec.w}-${rec.d}-${rec.l}<small>W-D-L${rec.po?" · incl. playoffs":""}</small></div></div>
-    <div><div class="k">Goals</div><div class="v">${row.gf}<small>for</small> ${row.ga}<small>ag</small></div></div>
+    <div><div class="k">Goals</div><div class="v">${rec.gf}<small>for</small> ${rec.ga}<small>ag</small></div></div>
+    <div><div class="k">Goal Diff</div><div class="v">${rec.gd>0?"+":""}${rec.gd}${rec.po?"<small>incl. playoffs</small>":""}</div></div>
     <div><div class="k">Clean Sheets</div><div class="v">${cs}</div></div>
   </div>`;
 }
@@ -2003,7 +2005,7 @@ function seasonWrap(s){
   else if(po.length){head=[`Finished ${ord(pos)}`,"Playoffs Bound"];poLine="Playoff result to come.";}
   else {head=[`Finished ${ord(pos)}`,`of ${rows.length}`];}
   const sr=seasonRecord(s), rec=`${sr.w}-${sr.l}${sr.d?"-"+sr.d:""}`;
-  const summary=`Beer Street FC finish the ${esc(s.name)} ${s.year} regular season ${ord(pos)} of ${rows.length} with ${us.pts} points, scoring ${us.gf} and conceding ${us.ga}. Overall record${sr.po?", playoffs included":""}: ${rec}.`;
+  const summary=`Beer Street FC finish the ${esc(s.name)} ${s.year} regular season ${ord(pos)} of ${rows.length} with ${us.pts} points. Overall${sr.po?", playoffs included":""}: a ${rec} record, ${sr.gf} goals scored and ${sr.ga} conceded (${sr.gd>0?"+":""}${sr.gd}).`;
   // compare with the previous season, if there is one
   const prevS=past[0]; let cmp="";
   if(prevS){const pr=standings(prevS), pp=pr.findIndex(r=>r.team===US)+1, pu=pr[pp-1];
