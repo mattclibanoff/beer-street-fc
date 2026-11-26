@@ -4,6 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Beer Street FC</title>
+<meta name="description" content="Beer Street FC, NYC Footy rec soccer. Standings, fixtures, results and player stats. Amateur footballers. Professional drunks.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Beer Street FC">
+<meta property="og:title" content="Beer Street FC">
+<meta property="og:description" content="Standings, fixtures, results and player stats. Amateur footballers. Professional drunks.">
+<meta property="og:url" content="https://beerstreetfc.com/">
+<meta property="og:image" content="https://beerstreetfc.com/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Beer Street New York Football Club crest on black and plum stripes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://beerstreetfc.com/og.jpg">
+<meta name="theme-color" content="#120d18">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -318,6 +331,50 @@ body.on-about{font-family:"Barlow",system-ui,sans-serif;font-size:15px}
 .fifa.gold{background:linear-gradient(160deg,#f3dc8b,#c79a2e)}.fifa.silver{background:linear-gradient(160deg,#eef0f2,#9aa3ab)}.fifa.bronze{background:linear-gradient(160deg,#e7b48a,#9c5b31)}
 .tally-link{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;margin-top:6px;background:var(--plum);color:var(--cream);font:italic 800 16px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.03em;text-decoration:none;transform:rotate(-2deg);box-shadow:3px 3px 0 var(--cream);transition:transform .15s}
 .tally-link:hover{transform:rotate(0)}
+
+/* form guide, calendar, highlights, player pages */
+.strip .form i{width:20px;height:22px;font-size:13px}
+.res-up{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+details.cal{position:relative;font-family:"Barlow",system-ui,sans-serif}
+details.cal summary{list-style:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--cream-2);border:1px solid rgba(var(--cream-rgb),.3);padding:4px 8px;white-space:nowrap}
+details.cal summary::-webkit-details-marker{display:none}
+details.cal[open] summary{background:var(--cream);color:var(--ink)}
+.cal-pop{margin-top:4px;min-width:180px;background:var(--ink-3);border:1px solid rgba(var(--cream-rgb),.35);box-shadow:0 10px 24px rgba(0,0,0,.45);display:flex;flex-direction:column}
+.cal-pop a,.cal-pop button{display:block;text-align:left;padding:11px 14px;color:var(--cream);text-decoration:none;background:none;border:0;font:600 14px "Barlow",system-ui,sans-serif;cursor:pointer}
+.cal-pop a:hover,.cal-pop button:hover{background:var(--plum)}
+.when details.cal{margin-top:8px;display:inline-block}
+.linkish{background:none;border:0;padding:0;color:var(--cream-2);font:inherit;text-decoration:underline;cursor:pointer}
+.hl-card{margin-top:24px}
+.hl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:18px;padding:4px 20px 20px}
+.hl{margin:0}
+.hl-vid{position:relative;aspect-ratio:16/9;background:#000;border:1px solid rgba(var(--cream-rgb),.2);overflow:hidden;display:block}
+.hl-vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.hl-link{display:grid;place-items:center;align-content:center;gap:6px;color:var(--cream);text-decoration:none;background:repeating-linear-gradient(90deg,var(--ink) 0 26px,var(--plum) 26px 52px);font:italic 800 18px "Barlow Condensed",sans-serif;text-transform:uppercase}
+.hl-link span{font-size:40px;font-style:normal}
+.hl figcaption{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding-top:8px}
+.hl figcaption b{font-size:16px}.hl figcaption small{grid-column:1;color:var(--muted);font-size:13px}
+.hl figcaption small a{color:var(--cream-2)}
+.hl-out{grid-column:2;grid-row:1/span 2;align-self:center;color:var(--cream-2);font-size:13px}
+a.plink{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(var(--cream-rgb),.45)}
+a.plink:hover{border-bottom-style:solid;color:var(--cream)}
+.back{display:inline-block;margin:4px 0 18px;color:var(--cream-2);text-decoration:none;font-size:15px}
+.pp-hero{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:28px;align-items:end;margin-bottom:28px}
+.pp-photo{position:relative;aspect-ratio:4/5;overflow:hidden;border:3px double rgba(var(--cream-rgb),.4);background:repeating-linear-gradient(90deg,var(--ink) 0 30px,var(--plum) 30px 60px)}
+.pp-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pp-ph{display:none}
+.pp-photo.nophoto .pp-ph{display:grid;place-items:center;position:absolute;inset:0;font:italic 800 clamp(80px,16vw,140px)/1 "Barlow Condensed",sans-serif;color:var(--cream);text-shadow:4px 4px 0 rgba(0,0,0,.35)}
+.pp-num{font:italic 800 28px "Barlow Condensed",sans-serif;color:var(--cream-2)}
+.pp-name{font-size:clamp(40px,7vw,64px);line-height:1;margin:2px 0 8px}
+.pp-pos{color:var(--muted);font-size:17px;letter-spacing:.04em}
+.pp-bio{max-width:60ch;margin-top:12px}
+.pp-h{margin:6px 0 12px}
+#player{scroll-margin-top:110px}#player .strip{margin-bottom:24px}#player .card{margin-bottom:24px}
+.pp-aw{list-style:none;margin:0;padding:4px 20px 16px}
+.pp-aw li{display:grid;grid-template-columns:22px 1fr;gap:12px;padding:10px 0;border-top:1px solid rgba(var(--plum-rgb),.35)}
+.pp-aw li:first-child{border-top:0}
+.pp-aw svg{width:20px;height:20px;color:var(--cream);margin-top:2px}
+.pp-aw b{display:block}.pp-aw small{color:var(--muted)}.pp-aw p{margin:4px 0 0}
+@media (max-width:600px){.pp-hero{grid-template-columns:1fr;gap:16px}.pp-photo{max-width:260px}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -397,6 +454,7 @@ body.on-about{font-family:"Barlow",system-ui,sans-serif;font-size:15px}
   <section class="panel" id="current-stats" role="tabpanel"></section>
   <section class="panel" id="past-standings" role="tabpanel"></section>
   <section class="panel" id="past-stats" role="tabpanel"></section>
+  <section class="panel" id="player" aria-live="polite"></section>
   <section class="panel" id="about" role="tabpanel">
     <div class="about"><p>Amateur footballers.<br>Professional drunks.</p></div>
     <section class="memoriam" aria-labelledby="memHead">
@@ -420,1177 +478,7 @@ body.on-about{font-family:"Barlow",system-ui,sans-serif;font-size:15px}
    Each season: matches (scores null = not yet played) + player totals.
    Standings are calculated automatically from match scores.
    ===================================================================== */
-const DATA = {
-"team": "Beer Street FC",
-"league": "NYC Footy",
-"current": "fall-2026",
-"seasons": [
-{
-"id": "summer-2026",
-"name": "Summer",
-"year": 2026,
-"matches": [
-{
-"round": 1,
-"date": "2026-06-29",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "Club Sporting BK",
-"hs": 6,
-"as": 15
-},
-{
-"round": 2,
-"date": "2026-07-06",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FC Clementine",
-"away": "Beer Street FC",
-"hs": 17,
-"as": 2
-},
-{
-"round": 3,
-"date": "2026-07-13",
-"bye": true
-},
-{
-"round": 4,
-"date": "2026-07-20",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FC Kick Kick",
-"hs": 5,
-"as": 15
-},
-{
-"round": 5,
-"date": "2026-07-27",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "FA The Kicks and Stones",
-"away": "Beer Street FC",
-"hs": 16,
-"as": 4
-},
-{
-"round": 6,
-"date": "2026-08-03",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "Club Sporting BK",
-"away": "Beer Street FC",
-"hs": 10,
-"as": 5
-},
-{
-"round": 7,
-"date": "2026-08-10",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FC Clementine",
-"hs": 4,
-"as": 14
-},
-{
-"round": 8,
-"date": "2026-08-17",
-"time": "8:40 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FA The Kicks and Stones",
-"hs": 6,
-"as": 11
-},
-{
-"round": 9,
-"date": "2026-08-24",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FC Kick Kick",
-"hs": 4,
-"as": 9
-}
-],
-"players": [],
-"league": "2026 Summer | Mondays | Prospect Heights (Chelsea Piers Field House) | 5v5 Coed | P3",
-"source": "https://nycfooty.leagueapps.com/leagues/4979384/standings",
-"standings": [
-{
-"team": "FC Clementine",
-"gp": 8,
-"w": 7,
-"l": 1,
-"t": 0,
-"ps": 95,
-"psa": 32,
-"pts": 21
-},
-{
-"team": "FC Kick Kick",
-"gp": 8,
-"w": 6,
-"l": 2,
-"t": 0,
-"ps": 68,
-"psa": 57,
-"pts": 18
-},
-{
-"team": "Club Sporting BK",
-"gp": 8,
-"w": 4,
-"l": 4,
-"t": 0,
-"ps": 73,
-"psa": 67,
-"pts": 12
-},
-{
-"team": "FA The Kicks and Stones",
-"gp": 8,
-"w": 3,
-"l": 5,
-"t": 0,
-"ps": 65,
-"psa": 74,
-"pts": 9
-},
-{
-"team": "Beer Street FC",
-"gp": 8,
-"w": 0,
-"l": 8,
-"t": 0,
-"ps": 36,
-"psa": 107,
-"pts": 0
-}
-],
-"final": true,
-"leagueMatches": [
-{
-"round": 1,
-"date": "2026-06-29",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "Club Sporting BK",
-"hs": 6,
-"as": 15
-},
-{
-"round": 1,
-"date": "2026-06-29",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "FC Clementine",
-"away": "FC Kick Kick",
-"hs": 7,
-"as": 8
-},
-{
-"round": 2,
-"date": "2026-07-06",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FC Clementine",
-"away": "Beer Street FC",
-"hs": 17,
-"as": 2
-},
-{
-"round": 2,
-"date": "2026-07-06",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "Club Sporting BK",
-"away": "FA The Kicks and Stones",
-"hs": 11,
-"as": 7
-},
-{
-"round": 3,
-"date": "2026-07-13",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FA The Kicks and Stones",
-"away": "FC Kick Kick",
-"hs": 7,
-"as": 10
-},
-{
-"round": 3,
-"date": "2026-07-13",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "Club Sporting BK",
-"away": "FC Clementine",
-"hs": 7,
-"as": 9
-},
-{
-"round": 4,
-"date": "2026-07-20",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FC Clementine",
-"away": "FA The Kicks and Stones",
-"hs": 14,
-"as": 3
-},
-{
-"round": 4,
-"date": "2026-07-20",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FC Kick Kick",
-"hs": 5,
-"as": 15
-},
-{
-"round": 5,
-"date": "2026-07-27",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FC Kick Kick",
-"away": "Club Sporting BK",
-"hs": 14,
-"as": 10
-},
-{
-"round": 5,
-"date": "2026-07-27",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "FA The Kicks and Stones",
-"away": "Beer Street FC",
-"hs": 16,
-"as": 4
-},
-{
-"round": 6,
-"date": "2026-08-03",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FC Kick Kick",
-"away": "FC Clementine",
-"hs": 2,
-"as": 8
-},
-{
-"round": 6,
-"date": "2026-08-03",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "Club Sporting BK",
-"away": "Beer Street FC",
-"hs": 10,
-"as": 5
-},
-{
-"round": 7,
-"date": "2026-08-10",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FA The Kicks and Stones",
-"away": "Club Sporting BK",
-"hs": 11,
-"as": 8
-},
-{
-"round": 7,
-"date": "2026-08-10",
-"time": "8:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FC Clementine",
-"hs": 4,
-"as": 14
-},
-{
-"round": 8,
-"date": "2026-08-17",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FC Clementine",
-"away": "Club Sporting BK",
-"hs": 12,
-"as": 2
-},
-{
-"round": 8,
-"date": "2026-08-17",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "FC Kick Kick",
-"away": "FA The Kicks and Stones",
-"hs": 7,
-"as": 6
-},
-{
-"round": 8,
-"date": "2026-08-17",
-"time": "8:40 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FA The Kicks and Stones",
-"hs": 6,
-"as": 11
-},
-{
-"round": 9,
-"date": "2026-08-24",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FC Kick Kick",
-"hs": 4,
-"as": 9
-},
-{
-"round": 9,
-"date": "2026-08-24",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "FA The Kicks and Stones",
-"away": "FC Clementine",
-"hs": 4,
-"as": 14
-},
-{
-"round": 9,
-"date": "2026-08-24",
-"time": "8:40 PM",
-"field": "Field 1",
-"home": "Club Sporting BK",
-"away": "FC Kick Kick",
-"hs": 10,
-"as": 3
-},
-{
-"round": 10,
-"date": "2026-08-31",
-"time": "7:00 PM",
-"field": "Field 1",
-"stage": "Playoffs",
-"label": "Semifinal · Club Sporting BK advanced",
-"home": "FC Kick Kick",
-"away": "Club Sporting BK",
-"hs": 7,
-"as": 7
-},
-{
-"round": 10,
-"date": "2026-08-31",
-"time": "8:00 PM",
-"field": "Field 1",
-"stage": "Playoffs",
-"label": "Championship",
-"home": "FC Clementine",
-"away": "Club Sporting BK",
-"hs": 11,
-"as": 2
-}
-],
-"schedule": "https://nycfooty.leagueapps.com/leagues/4979384/schedule"
-},
-{
-"id": "fall-2026",
-"name": "Fall",
-"year": 2026,
-"matches": [
-{
-"round": 1,
-"date": "2026-09-17",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "BBQ 🍗 Ballers",
-"away": "Beer Street FC",
-"hs": 10,
-"as": 15
-},
-{
-"round": 2,
-"date": "2026-09-24",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "Beer Street FC",
-"away": "We Don't Bite",
-"hs": 9,
-"as": 3
-},
-{
-"round": 3,
-"date": "2026-10-01",
-"bye": true
-},
-{
-"round": 4,
-"date": "2026-10-08",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "Beer Street FC",
-"away": "ABCDE FC",
-"hs": 8,
-"as": 10
-},
-{
-"round": 5,
-"date": "2026-10-15",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "Beer Street FC",
-"away": "Sloppy Shots",
-"hs": 11,
-"as": 2
-},
-{
-"round": 6,
-"date": "2026-10-22",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FA FC Ya Later (n)",
-"hs": 4,
-"as": 10
-},
-{
-"round": 7,
-"date": "2026-10-29",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "FA Glove Shack",
-"away": "Beer Street FC",
-"hs": 2,
-"as": 11
-},
-{
-"round": 8,
-"date": "2026-11-05",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "FA Fear on the Pier",
-"away": "Beer Street FC",
-"hs": 1,
-"as": 5
-},
-{
-"round": 9,
-"date": "2026-11-12",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "Cappello FC",
-"away": "Beer Street FC",
-"hs": 12,
-"as": 4
-},
-{
-"round": 10,
-"date": "2026-11-19",
-"time": "7:50 PM",
-"field": "Field 1",
-"stage": "Playoffs",
-"label": "Semifinal vs BBQ 🍗 Ballers",
-"home": "BBQ 🍗 Ballers",
-"away": "Beer Street FC",
-"hs": 5,
-"as": 7
-},
-{
-"round": 10,
-"date": "2026-11-19",
-"time": "8:40 PM",
-"field": "Field 1",
-"stage": "Playoffs",
-"label": "Championship vs Cappello FC",
-"home": "Beer Street FC",
-"away": "Cappello FC",
-"hs": 3,
-"as": 17
-}
-],
-"players": [],
-"final": true,
-"updated": "2026-11-20",
-"league": "2026 Fall | Thursdays | Prospect Heights (Chelsea Piers Field House) | 5v5 Coed | P4",
-"source": "https://nycfooty.leagueapps.com/leagues/5086019/standings",
-"standings": [
-{
-"team": "BBQ 🍗 Ballers",
-"gp": 8,
-"w": 7,
-"l": 1,
-"t": 0,
-"ps": 98,
-"psa": 58,
-"pts": 21
-},
-{
-"team": "ABCDE FC",
-"gp": 8,
-"w": 7,
-"l": 1,
-"t": 0,
-"ps": 75,
-"psa": 52,
-"pts": 21
-},
-{
-"team": "Cappello FC",
-"gp": 8,
-"w": 6,
-"l": 2,
-"t": 0,
-"ps": 77,
-"psa": 35,
-"pts": 18
-},
-{
-"team": "Beer Street FC",
-"gp": 8,
-"w": 5,
-"l": 3,
-"t": 0,
-"ps": 67,
-"psa": 50,
-"pts": 15
-},
-{
-"team": "FA Hard Pass",
-"gp": 8,
-"w": 4,
-"l": 4,
-"t": 0,
-"ps": 33,
-"psa": 47,
-"pts": 12
-},
-{
-"team": "FA FC Ya Later (n)",
-"gp": 8,
-"w": 3,
-"l": 3,
-"t": 2,
-"ps": 55,
-"psa": 57,
-"pts": 11
-},
-{
-"team": "We Don't Bite",
-"gp": 8,
-"w": 2,
-"l": 5,
-"t": 1,
-"ps": 45,
-"psa": 61,
-"pts": 7
-},
-{
-"team": "FA Fear on the Pier",
-"gp": 8,
-"w": 1,
-"l": 6,
-"t": 1,
-"ps": 43,
-"psa": 67,
-"pts": 4
-},
-{
-"team": "FA Glove Shack",
-"gp": 8,
-"w": 1,
-"l": 6,
-"t": 1,
-"ps": 40,
-"psa": 69,
-"pts": 4
-},
-{
-"team": "Sloppy Shots",
-"gp": 8,
-"w": 1,
-"l": 6,
-"t": 1,
-"ps": 31,
-"psa": 68,
-"pts": 4
-}
-],
-"schedule": "https://nycfooty.leagueapps.com/leagues/5086019/schedule",
-"leagueMatches": [
-{
-"round": 1,
-"date": "2026-09-17",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "We Don't Bite",
-"away": "Sloppy Shots",
-"hs": 4,
-"as": 4
-},
-{
-"round": 1,
-"date": "2026-09-17",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "Cappello FC",
-"away": "ABCDE FC",
-"hs": 5,
-"as": 9
-},
-{
-"round": 1,
-"date": "2026-09-17",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "BBQ 🍗 Ballers",
-"away": "Beer Street FC",
-"hs": 10,
-"as": 15
-},
-{
-"round": 1,
-"date": "2026-09-17",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "FA Fear on the Pier",
-"away": "FA Glove Shack",
-"hs": 10,
-"as": 8
-},
-{
-"round": 2,
-"date": "2026-09-24",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FA Glove Shack",
-"away": "Sloppy Shots",
-"hs": 9,
-"as": 5
-},
-{
-"round": 2,
-"date": "2026-09-24",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "BBQ 🍗 Ballers",
-"away": "Cappello FC",
-"hs": 8,
-"as": 5
-},
-{
-"round": 2,
-"date": "2026-09-24",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "FA Hard Pass",
-"away": "FA FC Ya Later (n)",
-"hs": 2,
-"as": 5
-},
-{
-"round": 2,
-"date": "2026-09-24",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "Beer Street FC",
-"away": "We Don't Bite",
-"hs": 9,
-"as": 3
-},
-{
-"round": 3,
-"date": "2026-10-01",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "Sloppy Shots",
-"away": "FA Fear on the Pier",
-"hs": 10,
-"as": 4
-},
-{
-"round": 3,
-"date": "2026-10-01",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "ABCDE FC",
-"away": "FA FC Ya Later (n)",
-"hs": 9,
-"as": 2
-},
-{
-"round": 3,
-"date": "2026-10-01",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "FA Hard Pass",
-"away": "We Don't Bite",
-"hs": 3,
-"as": 2
-},
-{
-"round": 3,
-"date": "2026-10-01",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "FA Glove Shack",
-"away": "BBQ 🍗 Ballers",
-"hs": 6,
-"as": 13
-},
-{
-"round": 4,
-"date": "2026-10-08",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FA FC Ya Later (n)",
-"away": "FA Fear on the Pier",
-"hs": 7,
-"as": 7
-},
-{
-"round": 4,
-"date": "2026-10-08",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "Beer Street FC",
-"away": "ABCDE FC",
-"hs": 8,
-"as": 10
-},
-{
-"round": 4,
-"date": "2026-10-08",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "Cappello FC",
-"away": "We Don't Bite",
-"hs": 10,
-"as": 2
-},
-{
-"round": 4,
-"date": "2026-10-08",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "FA Hard Pass",
-"away": "FA Glove Shack",
-"hs": 6,
-"as": 2
-},
-{
-"round": 5,
-"date": "2026-10-15",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "ABCDE FC",
-"away": "FA Hard Pass",
-"hs": 8,
-"as": 6
-},
-{
-"round": 5,
-"date": "2026-10-15",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "FA FC Ya Later (n)",
-"away": "BBQ 🍗 Ballers",
-"hs": 10,
-"as": 11
-},
-{
-"round": 5,
-"date": "2026-10-15",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "Cappello FC",
-"away": "FA Fear on the Pier",
-"hs": 12,
-"as": 7
-},
-{
-"round": 5,
-"date": "2026-10-15",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "Beer Street FC",
-"away": "Sloppy Shots",
-"hs": 11,
-"as": 2
-},
-{
-"round": 6,
-"date": "2026-10-22",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "Beer Street FC",
-"away": "FA FC Ya Later (n)",
-"hs": 4,
-"as": 10
-},
-{
-"round": 6,
-"date": "2026-10-22",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "Cappello FC",
-"away": "FA Hard Pass",
-"hs": 11,
-"as": 1
-},
-{
-"round": 6,
-"date": "2026-10-22",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "Sloppy Shots",
-"away": "BBQ 🍗 Ballers",
-"hs": 6,
-"as": 11
-},
-{
-"round": 6,
-"date": "2026-10-22",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "FA Glove Shack",
-"away": "ABCDE FC",
-"hs": 7,
-"as": 8
-},
-{
-"round": 6,
-"date": "2026-10-22",
-"time": "8:40 PM",
-"field": "Field 1",
-"home": "We Don't Bite",
-"away": "FA Fear on the Pier",
-"hs": 11,
-"as": 8
-},
-{
-"round": 7,
-"date": "2026-10-29",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "FA Hard Pass",
-"away": "BBQ 🍗 Ballers",
-"hs": 6,
-"as": 17
-},
-{
-"round": 7,
-"date": "2026-10-29",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "FA Glove Shack",
-"away": "Beer Street FC",
-"hs": 2,
-"as": 11
-},
-{
-"round": 7,
-"date": "2026-10-29",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "FA Fear on the Pier",
-"away": "ABCDE FC",
-"hs": 6,
-"as": 8
-},
-{
-"round": 7,
-"date": "2026-10-29",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "We Don't Bite",
-"away": "FA FC Ya Later (n)",
-"hs": 8,
-"as": 13
-},
-{
-"round": 7,
-"date": "2026-10-29",
-"time": "8:40 PM",
-"field": "Field 1",
-"home": "Sloppy Shots",
-"away": "Cappello FC",
-"hs": 0,
-"as": 10
-},
-{
-"round": 8,
-"date": "2026-11-05",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "We Don't Bite",
-"away": "FA Glove Shack",
-"hs": 12,
-"as": 2
-},
-{
-"round": 8,
-"date": "2026-11-05",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "FA Fear on the Pier",
-"away": "Beer Street FC",
-"hs": 1,
-"as": 5
-},
-{
-"round": 8,
-"date": "2026-11-05",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "Sloppy Shots",
-"away": "FA Hard Pass",
-"hs": 2,
-"as": 3
-},
-{
-"round": 8,
-"date": "2026-11-05",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "Cappello FC",
-"away": "FA FC Ya Later (n)",
-"hs": 12,
-"as": 4
-},
-{
-"round": 8,
-"date": "2026-11-05",
-"time": "8:40 PM",
-"field": "Field 1",
-"home": "ABCDE FC",
-"away": "BBQ 🍗 Ballers",
-"hs": 7,
-"as": 16
-},
-{
-"round": 9,
-"date": "2026-11-12",
-"time": "7:00 PM",
-"field": "Field 1",
-"home": "BBQ 🍗 Ballers",
-"away": "We Don't Bite",
-"hs": 12,
-"as": 3
-},
-{
-"round": 9,
-"date": "2026-11-12",
-"time": "7:00 PM",
-"field": "Field 2",
-"home": "FA Fear on the Pier",
-"away": "FA Hard Pass",
-"hs": 0,
-"as": 6
-},
-{
-"round": 9,
-"date": "2026-11-12",
-"time": "7:50 PM",
-"field": "Field 1",
-"home": "Cappello FC",
-"away": "Beer Street FC",
-"hs": 12,
-"as": 4
-},
-{
-"round": 9,
-"date": "2026-11-12",
-"time": "7:50 PM",
-"field": "Field 2",
-"home": "ABCDE FC",
-"away": "Sloppy Shots",
-"hs": 16,
-"as": 2
-},
-{
-"round": 9,
-"date": "2026-11-12",
-"time": "8:40 PM",
-"field": "Field 1",
-"home": "FA FC Ya Later (n)",
-"away": "FA Glove Shack",
-"hs": 4,
-"as": 4
-},
-{
-"round": 10,
-"date": "2026-11-19",
-"time": "7:00 PM",
-"field": "Field 1",
-"stage": "Playoffs",
-"label": "Semifinal · #2 v #3",
-"home": "ABCDE FC",
-"away": "Cappello FC",
-"hs": 5,
-"as": 12
-},
-{
-"round": 10,
-"date": "2026-11-19",
-"time": "7:50 PM",
-"field": "Field 1",
-"stage": "Playoffs",
-"label": "Semifinal · #1 v #4",
-"home": "BBQ 🍗 Ballers",
-"away": "Beer Street FC",
-"hs": 5,
-"as": 7
-},
-{
-"round": 10,
-"date": "2026-11-19",
-"time": "8:40 PM",
-"field": "Field 1",
-"stage": "Playoffs",
-"label": "Championship",
-"home": "Beer Street FC",
-"away": "Cappello FC",
-"hs": 3,
-"as": 17
-}
-]
-}
-],
-"roster": [
-{
-"num": 69,
-"name": "James C.",
-"pos": "GK"
-},
-{
-"num": 20,
-"name": "Pat U.",
-"pos": "DF"
-},
-{
-"num": 8,
-"name": "Ben M.",
-"pos": "DF"
-},
-{
-"num": 2,
-"name": "Connor B.",
-"pos": "DF"
-},
-{
-"num": 0,
-"name": "Shaydah G.",
-"pos": "MF"
-},
-{
-"num": 7,
-"name": "Mia R.",
-"pos": "FW/GK"
-},
-{
-"num": 12,
-"name": "Becca T.",
-"pos": "MF"
-},
-{
-"num": 13,
-"name": "Matt C.",
-"pos": "FW"
-},
-{
-"num": 11,
-"name": "Tucker T.",
-"pos": "MF"
-},
-{
-"num": 9,
-"name": "Gabi G.",
-"pos": "FW"
-},
-{
-"num": 4,
-"name": "Dave K.",
-"pos": "FW/GK"
-},
-{
-"num": null,
-"name": "Ciaran W.",
-"pos": "Alternate"
-},
-{
-"num": null,
-"name": "Brad S.",
-"pos": "Alternate"
-},
-{
-"num": null,
-"name": "DJ M.",
-"pos": "Retired"
-},
-{
-"num": null,
-"name": "Nathan J.",
-"pos": "Alternate"
-}
-],
-"statsStart": "Winter 2027",
-"motm": {
-"name": "Ben M.",
-"opponent": "BBQ 🍗 Ballers",
-"date": "2026-11-19",
-"score": "Semis win",
-"blurb": "Five goals in the semis to pull Beer Street into the final."
-},
-"womanOfMatch": [
-"Gabi G.",
-"Becca T.",
-"Shaydah G.",
-"Mia R."
-],
-"landing": {
-"show": true,
-"decks": {
-"2026-11-19": "Short-handed squad attempts to defy the odds and make a championship run."
-}
-},
-"motmLog": [
-{
-"date": "2026-11-12",
-"name": "Pat U.",
-"opponent": "Cappello FC"
-},
-{
-"date": "2026-11-19",
-"name": "Ben M.",
-"opponent": "BBQ 🍗 Ballers",
-"blurb": "Five goals in the semis to pull Beer Street into the final."
-}
-],
-"matchupNames": {
-"derbies": {
-"Cappello FC": "The Prospect Heights Derby"
-},
-"rematches": {
-"winter-2027": {
-"BBQ 🍗 Ballers": "Semifinal Rematch",
-"Cappello FC": "Championship Rematch"
-}
-}
-},
-"playoffMvp": {
-"fall-2026": {
-"name": "Ben M.",
-"blurb": "Five goals in the semis to pull Beer Street into the final."
-}
-}
-};
+const DATA = {"team": "Beer Street FC", "league": "NYC Footy", "current": "fall-2026", "seasons": [{"id": "summer-2026", "name": "Summer", "year": 2026, "matches": [{"round": 1, "date": "2026-06-29", "time": "7:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "Club Sporting BK", "hs": 6, "as": 15}, {"round": 2, "date": "2026-07-06", "time": "7:00 PM", "field": "Field 1", "home": "FC Clementine", "away": "Beer Street FC", "hs": 17, "as": 2}, {"round": 3, "date": "2026-07-13", "bye": true}, {"round": 4, "date": "2026-07-20", "time": "8:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FC Kick Kick", "hs": 5, "as": 15}, {"round": 5, "date": "2026-07-27", "time": "8:00 PM", "field": "Field 1", "home": "FA The Kicks and Stones", "away": "Beer Street FC", "hs": 16, "as": 4}, {"round": 6, "date": "2026-08-03", "time": "8:00 PM", "field": "Field 1", "home": "Club Sporting BK", "away": "Beer Street FC", "hs": 10, "as": 5}, {"round": 7, "date": "2026-08-10", "time": "8:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FC Clementine", "hs": 4, "as": 14}, {"round": 8, "date": "2026-08-17", "time": "8:40 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FA The Kicks and Stones", "hs": 6, "as": 11}, {"round": 9, "date": "2026-08-24", "time": "7:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FC Kick Kick", "hs": 4, "as": 9}], "players": [], "league": "2026 Summer | Mondays | Prospect Heights (Chelsea Piers Field House) | 5v5 Coed | P3", "source": "https://nycfooty.leagueapps.com/leagues/4979384/standings", "standings": [{"team": "FC Clementine", "gp": 8, "w": 7, "l": 1, "t": 0, "ps": 95, "psa": 32, "pts": 21}, {"team": "FC Kick Kick", "gp": 8, "w": 6, "l": 2, "t": 0, "ps": 68, "psa": 57, "pts": 18}, {"team": "Club Sporting BK", "gp": 8, "w": 4, "l": 4, "t": 0, "ps": 73, "psa": 67, "pts": 12}, {"team": "FA The Kicks and Stones", "gp": 8, "w": 3, "l": 5, "t": 0, "ps": 65, "psa": 74, "pts": 9}, {"team": "Beer Street FC", "gp": 8, "w": 0, "l": 8, "t": 0, "ps": 36, "psa": 107, "pts": 0}], "final": true, "leagueMatches": [{"round": 1, "date": "2026-06-29", "time": "7:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "Club Sporting BK", "hs": 6, "as": 15}, {"round": 1, "date": "2026-06-29", "time": "8:00 PM", "field": "Field 1", "home": "FC Clementine", "away": "FC Kick Kick", "hs": 7, "as": 8}, {"round": 2, "date": "2026-07-06", "time": "7:00 PM", "field": "Field 1", "home": "FC Clementine", "away": "Beer Street FC", "hs": 17, "as": 2}, {"round": 2, "date": "2026-07-06", "time": "8:00 PM", "field": "Field 1", "home": "Club Sporting BK", "away": "FA The Kicks and Stones", "hs": 11, "as": 7}, {"round": 3, "date": "2026-07-13", "time": "7:00 PM", "field": "Field 1", "home": "FA The Kicks and Stones", "away": "FC Kick Kick", "hs": 7, "as": 10}, {"round": 3, "date": "2026-07-13", "time": "8:00 PM", "field": "Field 1", "home": "Club Sporting BK", "away": "FC Clementine", "hs": 7, "as": 9}, {"round": 4, "date": "2026-07-20", "time": "7:00 PM", "field": "Field 1", "home": "FC Clementine", "away": "FA The Kicks and Stones", "hs": 14, "as": 3}, {"round": 4, "date": "2026-07-20", "time": "8:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FC Kick Kick", "hs": 5, "as": 15}, {"round": 5, "date": "2026-07-27", "time": "7:00 PM", "field": "Field 1", "home": "FC Kick Kick", "away": "Club Sporting BK", "hs": 14, "as": 10}, {"round": 5, "date": "2026-07-27", "time": "8:00 PM", "field": "Field 1", "home": "FA The Kicks and Stones", "away": "Beer Street FC", "hs": 16, "as": 4}, {"round": 6, "date": "2026-08-03", "time": "7:00 PM", "field": "Field 1", "home": "FC Kick Kick", "away": "FC Clementine", "hs": 2, "as": 8}, {"round": 6, "date": "2026-08-03", "time": "8:00 PM", "field": "Field 1", "home": "Club Sporting BK", "away": "Beer Street FC", "hs": 10, "as": 5}, {"round": 7, "date": "2026-08-10", "time": "7:00 PM", "field": "Field 1", "home": "FA The Kicks and Stones", "away": "Club Sporting BK", "hs": 11, "as": 8}, {"round": 7, "date": "2026-08-10", "time": "8:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FC Clementine", "hs": 4, "as": 14}, {"round": 8, "date": "2026-08-17", "time": "7:00 PM", "field": "Field 1", "home": "FC Clementine", "away": "Club Sporting BK", "hs": 12, "as": 2}, {"round": 8, "date": "2026-08-17", "time": "7:50 PM", "field": "Field 1", "home": "FC Kick Kick", "away": "FA The Kicks and Stones", "hs": 7, "as": 6}, {"round": 8, "date": "2026-08-17", "time": "8:40 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FA The Kicks and Stones", "hs": 6, "as": 11}, {"round": 9, "date": "2026-08-24", "time": "7:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FC Kick Kick", "hs": 4, "as": 9}, {"round": 9, "date": "2026-08-24", "time": "7:50 PM", "field": "Field 1", "home": "FA The Kicks and Stones", "away": "FC Clementine", "hs": 4, "as": 14}, {"round": 9, "date": "2026-08-24", "time": "8:40 PM", "field": "Field 1", "home": "Club Sporting BK", "away": "FC Kick Kick", "hs": 10, "as": 3}, {"round": 10, "date": "2026-08-31", "time": "7:00 PM", "field": "Field 1", "stage": "Playoffs", "label": "Semifinal · Club Sporting BK advanced", "home": "FC Kick Kick", "away": "Club Sporting BK", "hs": 7, "as": 7}, {"round": 10, "date": "2026-08-31", "time": "8:00 PM", "field": "Field 1", "stage": "Playoffs", "label": "Championship", "home": "FC Clementine", "away": "Club Sporting BK", "hs": 11, "as": 2}], "schedule": "https://nycfooty.leagueapps.com/leagues/4979384/schedule"}, {"id": "fall-2026", "name": "Fall", "year": 2026, "matches": [{"round": 1, "date": "2026-09-17", "time": "7:50 PM", "field": "Field 1", "home": "BBQ 🍗 Ballers", "away": "Beer Street FC", "hs": 10, "as": 15}, {"round": 2, "date": "2026-09-24", "time": "7:50 PM", "field": "Field 2", "home": "Beer Street FC", "away": "We Don't Bite", "hs": 9, "as": 3}, {"round": 3, "date": "2026-10-01", "bye": true}, {"round": 4, "date": "2026-10-08", "time": "7:00 PM", "field": "Field 2", "home": "Beer Street FC", "away": "ABCDE FC", "hs": 8, "as": 10}, {"round": 5, "date": "2026-10-15", "time": "7:50 PM", "field": "Field 2", "home": "Beer Street FC", "away": "Sloppy Shots", "hs": 11, "as": 2}, {"round": 6, "date": "2026-10-22", "time": "7:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FA FC Ya Later (n)", "hs": 4, "as": 10}, {"round": 7, "date": "2026-10-29", "time": "7:00 PM", "field": "Field 2", "home": "FA Glove Shack", "away": "Beer Street FC", "hs": 2, "as": 11}, {"round": 8, "date": "2026-11-05", "time": "7:00 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "Beer Street FC", "hs": 1, "as": 5}, {"round": 9, "date": "2026-11-12", "time": "7:50 PM", "field": "Field 1", "home": "Cappello FC", "away": "Beer Street FC", "hs": 12, "as": 4}, {"round": 10, "date": "2026-11-19", "time": "7:50 PM", "field": "Field 1", "stage": "Playoffs", "label": "Semifinal vs BBQ 🍗 Ballers", "home": "BBQ 🍗 Ballers", "away": "Beer Street FC", "hs": 5, "as": 7}, {"round": 10, "date": "2026-11-19", "time": "8:40 PM", "field": "Field 1", "stage": "Playoffs", "label": "Championship vs Cappello FC", "home": "Beer Street FC", "away": "Cappello FC", "hs": 3, "as": 17}], "players": [], "final": true, "updated": "2026-11-20", "league": "2026 Fall | Thursdays | Prospect Heights (Chelsea Piers Field House) | 5v5 Coed | P4", "source": "https://nycfooty.leagueapps.com/leagues/5086019/standings", "standings": [{"team": "BBQ 🍗 Ballers", "gp": 8, "w": 7, "l": 1, "t": 0, "ps": 98, "psa": 58, "pts": 21}, {"team": "ABCDE FC", "gp": 8, "w": 7, "l": 1, "t": 0, "ps": 75, "psa": 52, "pts": 21}, {"team": "Cappello FC", "gp": 8, "w": 6, "l": 2, "t": 0, "ps": 77, "psa": 35, "pts": 18}, {"team": "Beer Street FC", "gp": 8, "w": 5, "l": 3, "t": 0, "ps": 67, "psa": 50, "pts": 15}, {"team": "FA Hard Pass", "gp": 8, "w": 4, "l": 4, "t": 0, "ps": 33, "psa": 47, "pts": 12}, {"team": "FA FC Ya Later (n)", "gp": 8, "w": 3, "l": 3, "t": 2, "ps": 55, "psa": 57, "pts": 11}, {"team": "We Don't Bite", "gp": 8, "w": 2, "l": 5, "t": 1, "ps": 45, "psa": 61, "pts": 7}, {"team": "FA Fear on the Pier", "gp": 8, "w": 1, "l": 6, "t": 1, "ps": 43, "psa": 67, "pts": 4}, {"team": "FA Glove Shack", "gp": 8, "w": 1, "l": 6, "t": 1, "ps": 40, "psa": 69, "pts": 4}, {"team": "Sloppy Shots", "gp": 8, "w": 1, "l": 6, "t": 1, "ps": 31, "psa": 68, "pts": 4}], "schedule": "https://nycfooty.leagueapps.com/leagues/5086019/schedule", "leagueMatches": [{"round": 1, "date": "2026-09-17", "time": "7:00 PM", "field": "Field 1", "home": "We Don't Bite", "away": "Sloppy Shots", "hs": 4, "as": 4}, {"round": 1, "date": "2026-09-17", "time": "7:00 PM", "field": "Field 2", "home": "Cappello FC", "away": "ABCDE FC", "hs": 5, "as": 9}, {"round": 1, "date": "2026-09-17", "time": "7:50 PM", "field": "Field 1", "home": "BBQ 🍗 Ballers", "away": "Beer Street FC", "hs": 10, "as": 15}, {"round": 1, "date": "2026-09-17", "time": "7:50 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "FA Glove Shack", "hs": 10, "as": 8}, {"round": 2, "date": "2026-09-24", "time": "7:00 PM", "field": "Field 1", "home": "FA Glove Shack", "away": "Sloppy Shots", "hs": 9, "as": 5}, {"round": 2, "date": "2026-09-24", "time": "7:00 PM", "field": "Field 2", "home": "BBQ 🍗 Ballers", "away": "Cappello FC", "hs": 8, "as": 5}, {"round": 2, "date": "2026-09-24", "time": "7:50 PM", "field": "Field 1", "home": "FA Hard Pass", "away": "FA FC Ya Later (n)", "hs": 2, "as": 5}, {"round": 2, "date": "2026-09-24", "time": "7:50 PM", "field": "Field 2", "home": "Beer Street FC", "away": "We Don't Bite", "hs": 9, "as": 3}, {"round": 3, "date": "2026-10-01", "time": "7:00 PM", "field": "Field 1", "home": "Sloppy Shots", "away": "FA Fear on the Pier", "hs": 10, "as": 4}, {"round": 3, "date": "2026-10-01", "time": "7:00 PM", "field": "Field 2", "home": "ABCDE FC", "away": "FA FC Ya Later (n)", "hs": 9, "as": 2}, {"round": 3, "date": "2026-10-01", "time": "7:50 PM", "field": "Field 1", "home": "FA Hard Pass", "away": "We Don't Bite", "hs": 3, "as": 2}, {"round": 3, "date": "2026-10-01", "time": "7:50 PM", "field": "Field 2", "home": "FA Glove Shack", "away": "BBQ 🍗 Ballers", "hs": 6, "as": 13}, {"round": 4, "date": "2026-10-08", "time": "7:00 PM", "field": "Field 1", "home": "FA FC Ya Later (n)", "away": "FA Fear on the Pier", "hs": 7, "as": 7}, {"round": 4, "date": "2026-10-08", "time": "7:00 PM", "field": "Field 2", "home": "Beer Street FC", "away": "ABCDE FC", "hs": 8, "as": 10}, {"round": 4, "date": "2026-10-08", "time": "7:50 PM", "field": "Field 1", "home": "Cappello FC", "away": "We Don't Bite", "hs": 10, "as": 2}, {"round": 4, "date": "2026-10-08", "time": "7:50 PM", "field": "Field 2", "home": "FA Hard Pass", "away": "FA Glove Shack", "hs": 6, "as": 2}, {"round": 5, "date": "2026-10-15", "time": "7:00 PM", "field": "Field 1", "home": "ABCDE FC", "away": "FA Hard Pass", "hs": 8, "as": 6}, {"round": 5, "date": "2026-10-15", "time": "7:00 PM", "field": "Field 2", "home": "FA FC Ya Later (n)", "away": "BBQ 🍗 Ballers", "hs": 10, "as": 11}, {"round": 5, "date": "2026-10-15", "time": "7:50 PM", "field": "Field 1", "home": "Cappello FC", "away": "FA Fear on the Pier", "hs": 12, "as": 7}, {"round": 5, "date": "2026-10-15", "time": "7:50 PM", "field": "Field 2", "home": "Beer Street FC", "away": "Sloppy Shots", "hs": 11, "as": 2}, {"round": 6, "date": "2026-10-22", "time": "7:00 PM", "field": "Field 1", "home": "Beer Street FC", "away": "FA FC Ya Later (n)", "hs": 4, "as": 10}, {"round": 6, "date": "2026-10-22", "time": "7:00 PM", "field": "Field 2", "home": "Cappello FC", "away": "FA Hard Pass", "hs": 11, "as": 1}, {"round": 6, "date": "2026-10-22", "time": "7:50 PM", "field": "Field 2", "home": "Sloppy Shots", "away": "BBQ 🍗 Ballers", "hs": 6, "as": 11}, {"round": 6, "date": "2026-10-22", "time": "7:50 PM", "field": "Field 1", "home": "FA Glove Shack", "away": "ABCDE FC", "hs": 7, "as": 8}, {"round": 6, "date": "2026-10-22", "time": "8:40 PM", "field": "Field 1", "home": "We Don't Bite", "away": "FA Fear on the Pier", "hs": 11, "as": 8}, {"round": 7, "date": "2026-10-29", "time": "7:00 PM", "field": "Field 1", "home": "FA Hard Pass", "away": "BBQ 🍗 Ballers", "hs": 6, "as": 17}, {"round": 7, "date": "2026-10-29", "time": "7:00 PM", "field": "Field 2", "home": "FA Glove Shack", "away": "Beer Street FC", "hs": 2, "as": 11}, {"round": 7, "date": "2026-10-29", "time": "7:50 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "ABCDE FC", "hs": 6, "as": 8}, {"round": 7, "date": "2026-10-29", "time": "7:50 PM", "field": "Field 1", "home": "We Don't Bite", "away": "FA FC Ya Later (n)", "hs": 8, "as": 13}, {"round": 7, "date": "2026-10-29", "time": "8:40 PM", "field": "Field 1", "home": "Sloppy Shots", "away": "Cappello FC", "hs": 0, "as": 10}, {"round": 8, "date": "2026-11-05", "time": "7:00 PM", "field": "Field 1", "home": "We Don't Bite", "away": "FA Glove Shack", "hs": 12, "as": 2}, {"round": 8, "date": "2026-11-05", "time": "7:00 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "Beer Street FC", "hs": 1, "as": 5}, {"round": 8, "date": "2026-11-05", "time": "7:50 PM", "field": "Field 1", "home": "Sloppy Shots", "away": "FA Hard Pass", "hs": 2, "as": 3}, {"round": 8, "date": "2026-11-05", "time": "7:50 PM", "field": "Field 2", "home": "Cappello FC", "away": "FA FC Ya Later (n)", "hs": 12, "as": 4}, {"round": 8, "date": "2026-11-05", "time": "8:40 PM", "field": "Field 1", "home": "ABCDE FC", "away": "BBQ 🍗 Ballers", "hs": 7, "as": 16}, {"round": 9, "date": "2026-11-12", "time": "7:00 PM", "field": "Field 1", "home": "BBQ 🍗 Ballers", "away": "We Don't Bite", "hs": 12, "as": 3}, {"round": 9, "date": "2026-11-12", "time": "7:00 PM", "field": "Field 2", "home": "FA Fear on the Pier", "away": "FA Hard Pass", "hs": 0, "as": 6}, {"round": 9, "date": "2026-11-12", "time": "7:50 PM", "field": "Field 1", "home": "Cappello FC", "away": "Beer Street FC", "hs": 12, "as": 4}, {"round": 9, "date": "2026-11-12", "time": "7:50 PM", "field": "Field 2", "home": "ABCDE FC", "away": "Sloppy Shots", "hs": 16, "as": 2}, {"round": 9, "date": "2026-11-12", "time": "8:40 PM", "field": "Field 1", "home": "FA FC Ya Later (n)", "away": "FA Glove Shack", "hs": 4, "as": 4}, {"round": 10, "date": "2026-11-19", "time": "7:00 PM", "field": "Field 1", "stage": "Playoffs", "label": "Semifinal · #2 v #3", "home": "ABCDE FC", "away": "Cappello FC", "hs": 5, "as": 12}, {"round": 10, "date": "2026-11-19", "time": "7:50 PM", "field": "Field 1", "stage": "Playoffs", "label": "Semifinal · #1 v #4", "home": "BBQ 🍗 Ballers", "away": "Beer Street FC", "hs": 5, "as": 7}, {"round": 10, "date": "2026-11-19", "time": "8:40 PM", "field": "Field 1", "stage": "Playoffs", "label": "Championship", "home": "Beer Street FC", "away": "Cappello FC", "hs": 3, "as": 17}]}], "roster": [{"num": 69, "name": "James C.", "pos": "GK"}, {"num": 20, "name": "Pat U.", "pos": "DF"}, {"num": 8, "name": "Ben M.", "pos": "DF"}, {"num": 2, "name": "Connor B.", "pos": "DF"}, {"num": 0, "name": "Shaydah G.", "pos": "MF"}, {"num": 7, "name": "Mia R.", "pos": "FW/GK"}, {"num": 12, "name": "Becca T.", "pos": "MF"}, {"num": 13, "name": "Matt C.", "pos": "FW"}, {"num": 11, "name": "Tucker T.", "pos": "MF"}, {"num": 9, "name": "Gabi G.", "pos": "FW"}, {"num": 4, "name": "Dave K.", "pos": "FW/GK"}, {"num": null, "name": "Ciaran W.", "pos": "Alternate"}, {"num": null, "name": "Brad S.", "pos": "Alternate"}, {"num": null, "name": "DJ M.", "pos": "Retired"}, {"num": null, "name": "Nathan J.", "pos": "Alternate"}], "statsStart": "Winter 2027", "motm": {"name": "Ben M.", "opponent": "BBQ 🍗 Ballers", "date": "2026-11-19", "score": "Semis win", "blurb": "Five goals in the semis to pull Beer Street into the final."}, "womanOfMatch": ["Gabi G.", "Becca T.", "Shaydah G.", "Mia R."], "landing": {"show": true, "decks": {"2026-11-19": "Short-handed squad attempts to defy the odds and make a championship run."}}, "motmLog": [{"date": "2026-11-12", "name": "Pat U.", "opponent": "Cappello FC"}, {"date": "2026-11-19", "name": "Ben M.", "opponent": "BBQ 🍗 Ballers", "blurb": "Five goals in the semis to pull Beer Street into the final."}], "matchupNames": {"derbies": {"Cappello FC": "The Prospect Heights Derby"}, "rematches": {"winter-2027": {"BBQ 🍗 Ballers": "Semifinal Rematch", "Cappello FC": "Championship Rematch"}}}, "playoffMvp": {"fall-2026": {"name": "Ben M.", "blurb": "Five goals in the semis to pull Beer Street into the final."}}};
 
 const US = DATA.team;
 const SEASON_ORDER = ["Winter","Spring","Summer","Fall"];
@@ -1646,23 +534,61 @@ function matchupNames(m,season){
 }
 
 /* ---------- renderers ---------- */
+/* last results for any team, oldest → newest, from every scored league game (playoffs included) */
+function formOf(season,team){
+  const src=(season.leagueMatches||[]).length?season.leagueMatches:(season.matches||[]);
+  return src.filter(m=>!m.bye&&m.hs!=null&&m.as!=null&&(m.home===team||m.away===team))
+    .sort((a,b)=>a.date.localeCompare(b.date)||tmin(a.time)-tmin(b.time))
+    .map(m=>{const f=m.home===team?m.hs:m.as,a=m.home===team?m.as:m.hs;return f>a?"W":f<a?"L":"D"});
+}
+const formChips=f=>f.length?`<span class="form" title="Last ${Math.min(5,f.length)} results, oldest to newest">${f.slice(-5).map(x=>`<i class="${x}">${x}</i>`).join("")}</span>`:`<span class="zero">–</span>`;
 function standingsTable(season){
   const rows=standings(season), done=isComplete(season);
   return `<div class="tbl-wrap"><table>
     <thead><tr><th>#</th><th class="l">Club</th><th>P</th><th>W</th><th>D</th><th>L</th>
-      <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th>GD</th><th>Pts</th>${season.standings?"":`<th class="l hide-sm">Form</th>`}</tr></thead>
+      <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th>GD</th><th>Pts</th><th class="l hide-sm">Form</th></tr></thead>
     <tbody>${rows.map((r,i)=>{const ch=done&&r.team===seasonChampion(season);return `<tr class="${r.team===US?"us":""} ${ch?"champ":""}">
       <td class="pos">${i+1}</td>
       <td class="l team">${esc(r.team)}${ch?`<svg class="trophy" style="color:var(--cream)"><use href="#cup"/></svg>`:""}</td>
       <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
       <td class="hide-sm">${r.gf}</td><td class="hide-sm">${r.ga}</td>
       <td>${r.gd>0?"+":""}${r.gd}</td><td class="pts">${r.pts}</td>
-      ${season.standings?"":`<td class="l hide-sm"><span class="form">${r.form.slice(-5).map(x=>`<i class="${x}">${x}</i>`).join("")}</span></td>`}
+      <td class="l hide-sm">${formChips(season.standings?formOf(season,r.team):r.form)}</td>
     </tr>`}).join("")}</tbody></table></div>`;
 }
 
 /* minutes past midnight from "7:50 PM" (first time if a range); for newest-first ordering within a day */
 const tmin=s=>{const m=/(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(s||"");if(!m)return 0;let h=+m[1]%12;if((m[3]||"").toUpperCase()==="PM")h+=12;return h*60+ +m[2];};
+/* ---------- add to calendar: Google link + .ics (Apple / Outlook) ---------- */
+const venueOf=s=>DATA.venue||((s.league||"").split("|")[2]||"").trim()||"NYC Footy";
+function calEvent(m,s){
+  const t=tmin(m.time)||19*60, st=`${m.date.replace(/-/g,"")}T${String(Math.floor(t/60)).padStart(2,"0")}${String(t%60).padStart(2,"0")}00`,
+    e=t+50, en=`${m.date.replace(/-/g,"")}T${String(Math.floor(e/60)).padStart(2,"0")}${String(e%60).padStart(2,"0")}00`, v=view(m);
+  const title=m.stage?`Beer Street FC: ${m.label||m.stage}`:`Beer Street FC ${v.home?"vs":"@"} ${v.opp}`;
+  const extra=matchupNames(m,s).join(" · ");
+  const desc=[extra,m.stage?"":`${label(s)} · Week ${m.round}`,"beerstreetfc.com"].filter(Boolean).join(" · ");
+  return {title,st,en,loc:venueOf(s)+(m.field?` · ${m.field}`:""),desc,uid:`${m.date}-${tmin(m.time)}@beerstreetfc.com`};
+}
+const gcalUrl=ev=>"https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(ev.title)+"&dates="+ev.st+"/"+ev.en+"&ctz=America/New_York&location="+encodeURIComponent(ev.loc)+"&details="+encodeURIComponent(ev.desc);
+const icsText=evs=>{const x=t=>String(t).replace(/[\\,;]/g,c=>"\\"+c);
+  return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Beer Street FC//Fixtures//EN","CALSCALE:GREGORIAN",
+  ...evs.flatMap(ev=>["BEGIN:VEVENT","UID:"+ev.uid,"DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z",
+    "DTSTART;TZID=America/New_York:"+ev.st,"DTEND;TZID=America/New_York:"+ev.en,"SUMMARY:"+x(ev.title),"LOCATION:"+x(ev.loc),"DESCRIPTION:"+x(ev.desc),"END:VEVENT"]),
+  "END:VCALENDAR"].join("\r\n");};
+function downloadIcs(evs,name){
+  try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([icsText(evs)],{type:"text/calendar"}));a.download=name;document.body.appendChild(a);a.click();a.remove();}catch(e){}
+}
+const upcoming=s=>ourMatches(s).filter(m=>!m.bye&&m.hs==null&&m.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date)||tmin(a.time)-tmin(b.time));
+const CAL={};   // id -> [match, season]
+function calMenu(m,s){const id="c"+Object.keys(CAL).length;CAL[id]=[m,s];
+  return `<details class="cal"><summary aria-label="Add to calendar">+ Calendar</summary><div class="cal-pop">
+    <a href="${esc(gcalUrl(calEvent(m,s)))}" target="_blank" rel="noopener">Google Calendar</a>
+    <button type="button" data-ics="${id}">Apple / Outlook (.ics)</button></div></details>`;}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-ics]"); if(b){const [m,s]=CAL[b.dataset.ics];downloadIcs([calEvent(m,s)],`beer-street-${m.date}.ics`);return;}
+  const all=e.target.closest("[data-ics-all]"); if(all){const s=byId[all.dataset.icsAll];downloadIcs(upcoming(s).map(m=>calEvent(m,s)),`beer-street-${s.id}.ics`);return;}
+  document.querySelectorAll("details.cal[open]").forEach(d=>{if(!d.contains(e.target))d.open=false});
+});
 function fixtureList(season){
   const ms=ourMatches(season).sort((a,b)=>b.date.localeCompare(a.date)||tmin(b.time)-tmin(a.time)); const nextIdx=(()=>{let k=-1;ms.forEach((m,i)=>{if(!m.bye&&m.hs==null&&m.date>=TODAY&&(k<0||m.date<ms[k].date||(m.date===ms[k].date&&(m.time||"")<(ms[k].time||""))))k=i});return k})();
   if(!ms.length) return `<div class="empty" style="padding:24px 20px">Game-by-game results aren't available for this season yet.${season.source?`<br><a href="${esc(season.source)}" style="color:var(--cream-2)">View on NYC Footy ↗</a>`:""}</div>`;
@@ -1671,7 +597,7 @@ function fixtureList(season){
     if(m.bye) return `<li style="opacity:.6">${d}<div class="opp">Bye week<small>Wk ${m.round}</small></div><span></span></li>`;
     const v=view(m);
     const right=v.played?`<div class="res">${v.f}–${v.a}<i class="${v.r}">${v.r}</i></div>`
-      :`<span class="tag">${i===nextIdx?"Next":m.date<TODAY?"No score":esc(m.time)}</span>`;
+      :`<div class="res-up"><span class="tag">${i===nextIdx?"Next":m.date<TODAY?"No score":esc(m.time)}</span>${m.date>=TODAY?calMenu(m,season):""}</div>`;
     return `<li class="${i===nextIdx?"next":""}">${d}
     <div class="opp">${m.stage?esc(m.stage)+": "+esc(v.opp):`${v.home?"vs":"@"} ${esc(v.opp)}`}<small>${matchupNames(m,season).map(x=>`<b style="font-weight:700;color:var(--cream-2)">${esc(x)}</b> · `).join("")}${m.stage?"":`Wk ${m.round} · `}${esc(m.time||"")} · ${esc(m.field)}</small></div>
     ${right}</li>`}).join("")}</ul></div>`;
@@ -1694,6 +620,7 @@ function teamSummary(season){
     <div><div class="k">Goals</div><div class="v">${rec.gf}<small>for</small> ${rec.ga}<small>ag</small></div></div>
     <div><div class="k">Goal Diff</div><div class="v">${rec.gd>0?"+":""}${rec.gd}${rec.po?"<small>incl. playoffs</small>":""}</div></div>
     <div><div class="k">Clean Sheets</div><div class="v">${cs}</div></div>
+    <div><div class="k">Form</div><div class="v">${formChips(formOf(season,US))}</div></div>
   </div>`;
 }
 
@@ -1748,7 +675,7 @@ function motmCard(){
   const num=m.num??p.num;
   const meta=[m.opponent?`vs ${esc(m.opponent)}`:"",m.date?fmtDate(m.date,{month:"short",day:"numeric"}):"",m.score?esc(m.score):""].filter(Boolean).join(" · ");
   return `<div class="motm">${head}<div class="row"><div class="shirt">${num!=null?num:"★"}</div>
-    <div><div class="name">${esc(m.name)}</div>${meta?`<div class="meta">${meta}</div>`:""}</div></div>
+    <div><div class="name">${plink(m.name)}</div>${meta?`<div class="meta">${meta}</div>`:""}</div></div>
     ${m.blurb?`<p class="blurb">${esc(m.blurb)}</p>`:""}</div>`;
 }
 function leagueList(season){
@@ -1774,7 +701,8 @@ function leagueList(season){
   return `<div class="scroll"><ul class="lg">${out}</ul></div>`;
 }
 function fixturePanels(s){
-  return `<div class="card flush"><h3>Our Fixtures &amp; Results</h3>${fixtureList(s)}</div>
+  const up=upcoming(s).length;
+  return `<div class="card flush"><h3>Our Fixtures &amp; Results</h3>${fixtureList(s)}${up?`<div class="card-foot"><button type="button" class="linkish" data-ics-all="${s.id}">Add all ${up} upcoming game${up>1?"s":""} to your calendar (.ics)</button></div>`:""}</div>
         ${s.leagueMatches?`<div class="card flush"><h3>League Fixtures &amp; Results</h3>${leagueList(s)}${s.schedule?`<div class="card-foot"><a href="${esc(s.schedule)}">Official league schedule ↗</a></div>`:""}</div>`:""}`;
 }
 function renderCurrentStandings(){
@@ -1787,7 +715,7 @@ function renderCurrentStandings(){
     ${next?`<div class="next-match"><div class="inner">
       <div><div class="tag" style="display:inline-block;margin-bottom:8px">${next.stage?"Up next":"Next match · Wk "+next.round}${matchupNames(next,s).map(x=>" · "+esc(x)).join("")}</div>
         <div class="vs">${next.stage?esc(next.stage)+`<span>·</span>`+esc(next.label):`Beer Street FC<span>${view(next).home?"vs":"@"}</span>${esc(view(next).opp)}`}</div></div>
-      <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}</div>
+      <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}${next.date>=TODAY?calMenu(next,s):""}</div>
     </div></div>`:""}
     ${teamSummary(s)}
     <div class="grid">
@@ -1839,6 +767,8 @@ function leaderTile(players,key,labelText,ghost,filter){
     <div class="runners">${ranked.slice(1,3).map(p=>`<div><span>${esc(p.name)}</span><span>${key==="plusMinus"?"+":""}${p[key]}</span></div>`).join("")}</div></div>`;
 }
 /* which table(s) a player belongs in: GK in their position → goalkeepers; any outfield position → outfield (both if both) */
+const playerSlug=n=>"player-"+String(n).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const plink=n=>(DATA.roster||[]).some(r=>r.name===n)?`<a class="plink" href="#${playerSlug(n)}">${esc(n)}</a>`:esc(n);
 const posOf=p=>((DATA.roster||[]).find(r=>r.name===p.name)||{}).pos||p.pos||"";
 const isGK=p=>/\bGK\b/.test(posOf(p))||(p.saves||0)+(p.goalsAgainst||0)>0;
 const isOut=p=>/\b(DF|MF|FW)\b/.test(posOf(p))||!/\bGK\b/.test(posOf(p))||(p.goals||0)+(p.assists||0)+(p.shots||0)+(p.takeaways||0)>0;
@@ -1878,7 +808,7 @@ function playerTable(players,tableId,showSeasons,kind){
     <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.takeaways)}${z(p.giveaways)}${z(p.blocks)}${z(p.fouls)}
     <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:var(--zero)">0</span>`}</td>${ratingBadge(p.rating)}`;
   return `<div class="card flush" style="margin-bottom:18px"><h3>${gk?"Goalkeeping":"Outfield"}</h3><div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
-    <td class="l team"><span class="num-badge">${p.num??"–"}</span>${esc(p.name)}</td>
+    <td class="l team"><span class="num-badge">${p.num??"–"}</span>${plink(p.name)}</td>
     <td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${cells(p)}
   </tr>`).join("")}</tbody></table></div></div>`;
 }
@@ -1891,7 +821,7 @@ function noStats(id){
       return (st.key==="num"?rank(a)-rank(b):0)||(st.asc?c:-c)||rank(a)-rank(b)||(a.num??999)-(b.num??999);});
     const th=(k,l)=>`<th class="sortable l ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${tid}" tabindex="0" aria-sort="${st.key===k?(st.asc?"ascending":"descending"):"none"}">${l}</th>`;
     return r.length?`<div class="card flush" style="margin-bottom:18px"><h3>${title}</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}${labels.map(l=>`<th>${l}</th>`).join("")}</tr></thead><tbody>
-      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${esc(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(labels.length)}</tr>`).join("")}
+      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${plink(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(labels.length)}</tr>`).join("")}
     </tbody></table></div></div>`:"";};
   return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
       <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
@@ -1911,12 +841,32 @@ function statsBody(players,tableId,showSeasons){
     ${playerTable(players,tableId+"-gk",showSeasons,"gk")}
     <p class="note">Season totals include playoff games. Players who play two positions appear in both tables. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · Shots = shots taken · +/- = team goals scored minus goals conceded while the player was on the field · Takeaways = possession won from an opponent · Giveaways = possession lost to an opponent · Blocks = opponent shots blocked · Fouls = fouls committed · Cards = yellow / red cards · Apps in Goal = games spent in goal · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Clean Sheets = games in goal without conceding · Rating = FIFA-style 1–99 score built from every stat across the season, per game played: goals, assists, shots, +/-, takeaways and blocks push it up; giveaways, fouls and cards pull it down. Forwards get extra credit for goals and assists, midfielders for assists and +/-, defenders for +/-, takeaways and blocks. Keepers are rated on save %, saves, goals against and clean sheets. Gold 75+, silver 65–74, bronze under 65.</p>`;
 }
+/* ---------- highlight videos: DATA.highlights[seasonId] = [{title, url, date?, players?: [names]}] ---------- */
+function videoEmbed(u){
+  let m=/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/.exec(u||"");
+  if(m) return `https://www.youtube-nocookie.com/embed/${m[1]}`;
+  m=/vimeo\.com\/(?:video\/)?(\d+)/.exec(u||""); if(m) return `https://player.vimeo.com/video/${m[1]}`;
+  m=/drive\.google\.com\/file\/d\/([\w-]+)/.exec(u||""); if(m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+  return null;
+}
+const hostOf=u=>{try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return "link"}};
+function highlightCard(h){
+  const src=videoEmbed(h.url), meta=[h.date?fmtDate(h.date,{month:"short",day:"numeric",year:"numeric"}):"",(h.players||[]).map(n=>`<a href="#${playerSlug(n)}">${esc(n)}</a>`).join(", ")].filter(Boolean).join(" · ");
+  return `<figure class="hl">${src?`<div class="hl-vid"><iframe src="${esc(src)}" title="${esc(h.title||"Highlight")}" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+      :`<a class="hl-vid hl-link" href="${esc(h.url)}" target="_blank" rel="noopener"><span>▶</span>Watch on ${esc(hostOf(h.url))}</a>`}
+    <figcaption><b>${esc(h.title||"Highlight")}</b>${meta?`<small>${meta}</small>`:""}<a class="hl-out" href="${esc(h.url)}" target="_blank" rel="noopener">Open ↗</a></figcaption></figure>`;
+}
+function highlightsSection(s){
+  const hs=((DATA.highlights||{})[s.id]||[]).slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  return `<div class="card hl-card"><h3>Highlights · ${esc(label(s))}</h3>${hs.length?`<div class="hl-grid">${hs.map(highlightCard).join("")}</div>`
+    :`<div class="empty" style="padding:22px 20px">No highlights yet this season.</div>`}</div>`;
+}
 function renderCurrentStats(){
   const s=current;
   document.getElementById("current-stats").innerHTML=`
     <div class="section-head"><h2><span class="sub">Beer Street FC · Player stats</span>${label(s)}</h2>
       <a class="tally-link" href="https://beerstreetfc.com/tally/" target="_blank" rel="noopener">Open the tally app →</a></div>
-    ${teamSummary(s)}${statsBody(seasonPlayers(s),"cur",false)}`;
+    ${teamSummary(s)}${statsBody(seasonPlayers(s),"cur",false)}${highlightsSection(s)}`;
 }
 
 /* --- past-season picker --- */
@@ -1971,7 +921,7 @@ function renderPastStats(){
       <div><div class="k">Goals scored</div><div class="v">${past.reduce((a,s)=>a+(standings(s).find(r=>r.team===US)?.gf||0),0)}</div></div>
       <div><div class="k">Squad</div><div class="v">${(DATA.roster||[]).length}</div></div>
     </div>`:teamSummary(s)}
-    ${statsBody(players,all?"all":"past",all)}
+    ${statsBody(players,all?"all":"past",all)}${all?"":highlightsSection(s)}
     ${all&&titles.length?`<p class="note">Titles: ${titles.join(" · ")}</p>`:""}`;
   bindPicker(root,pstState,renderPastStats);
 }
@@ -1997,9 +947,61 @@ document.addEventListener("change",e=>{
   rerenderFor(id)(); refocus(`[data-sortsel="${id}"]`);
 });
 
+/* ---------- player pages: #player-ben-m ---------- */
+const POS_NAME={GK:"Goalkeeper",DF:"Defender",MF:"Midfielder",FW:"Forward"};
+const posWords=p=>p?p.split("/").map(x=>POS_NAME[x]||x).join(" / "):"";
+function renderPlayer(slug){
+  const r=(DATA.roster||[]).find(x=>playerSlug(x.name)===slug), root=document.getElementById("player");
+  if(!r){root.innerHTML=`<div class="empty">Player not found. <a href="#current-stats" style="color:var(--cream-2)">Back to the squad</a></div>`;return}
+  const wo=(DATA.womanOfMatch||[]).includes(r.name);
+  const rows=seasons.slice().reverse().map(s=>({s,p:seasonPlayers(s).find(x=>x.name===r.name)})).filter(x=>x.p&&((x.p.apps||0)||(x.p.gkApps||0)));
+  const cur=rows.find(x=>x.s.id===current.id);
+  const gk=/\bGK\b/.test(r.pos||"")||rows.some(x=>(x.p.saves||0)+(x.p.goalsAgainst||0)>0);
+  const outf=!/^GK$/.test(r.pos||"")||rows.some(x=>(x.p.goals||0)+(x.p.assists||0)>0);
+  const tile=(k,v)=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  const pmS=v=>`${v>0?"+":""}${v}`;
+  const spc=p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return f?((p.saves||0)/f*100).toFixed(1)+"%":"–"};
+  const badge=v=>v==null?"–":`<span class="fifa ${v>=75?"gold":v>=65?"silver":"bronze"}">${v}</span>`;
+  const curBlock=cur?`<div class="strip">${outf?tile("Rating",badge(fifaRating(cur.p,false)))+tile("Apps",cur.p.apps||0)+tile("Goals",cur.p.goals||0)+tile("Assists",cur.p.assists||0)+tile("+/-",pmS(cur.p.plusMinus||0))+tile("Takeaways",cur.p.takeaways||0):""}
+      ${gk&&(cur.p.gkApps||0)?tile("Keeper rating",badge(fifaRating(cur.p,true)))+tile("Saves",cur.p.saves||0)+tile("Save %",spc(cur.p))+tile("Clean sheets",cur.p.cleanSheets||0):""}</div>`
+    :`<div class="card"><div class="empty" style="padding:22px 20px">No ${esc(label(current))} stats yet${DATA.statsStart?` · player stats start ${esc(DATA.statsStart)}`:""}.</div></div>`;
+  const hist=rows.length?`<div class="card flush"><h3>Season by season</h3><div class="tbl-wrap"><table><thead><tr><th class="l">Season</th>
+      ${outf?"<th>Apps</th><th>Goals</th><th>Assists</th><th>+/-</th><th>Rating</th>":""}${gk?"<th>In goal</th><th>Saves</th><th>Save %</th><th>GK rating</th>":""}</tr></thead><tbody>
+      ${rows.map(({s,p})=>`<tr><td class="l">${esc(label(s))}</td>${outf?`<td>${p.apps||0}</td><td>${p.goals||0}</td><td>${p.assists||0}</td><td>${pmS(p.plusMinus||0)}</td><td>${badge(fifaRating(p,false))}</td>`:""}${gk?`<td>${p.gkApps||0}</td><td>${p.saves||0}</td><td>${spc(p)}</td><td>${badge(fifaRating(p,true))}</td>`:""}</tr>`).join("")}
+    </tbody></table></div></div>`:"";
+  const awards=[];
+  seasons.forEach(s=>{const pk=motmPicks(s);Object.entries(pk).forEach(([d,x])=>{if(x.name!==r.name)return;const g=ourMatches(s).find(m=>m.date===d&&!m.bye),v=g&&view(g);
+      awards.push({d,t:`${wo?"(Wo)man":"Man"} of the Match`,sub:`${g?(g.stage?esc(g.label||g.stage):`vs ${esc(oppOfGame(g))}`):""}${v&&v.played?` · ${v.r} ${v.f}–${v.a}`:""}`,line:x.line})});
+    const po=ourMatches(s).filter(m=>m.stage), mv=po.length?playoffMvp(s,po):null;
+    if(mv&&mv.name===r.name) awards.push({d:po[po.length-1].date,t:`${wo?"(Wo)man":"Man"} of the Playoffs`,sub:esc(label(s)),line:mv.line});
+    if(isComplete(s)&&seasonChampion(s)===US&&rows.some(x=>x.s.id===s.id)) awards.push({d:s.updated||"",t:"Champion",sub:esc(label(s)),line:""});
+  });
+  awards.sort((a,b)=>b.d.localeCompare(a.d));
+  awards.forEach((a,i)=>{if(a.line&&awards.slice(i+1).some(b=>b.line===a.line))a.line="";});   // same blurb twice: show it once
+  const hls=Object.entries(DATA.highlights||{}).flatMap(([,a])=>a).filter(h=>(h.players||[]).includes(r.name));
+  const photo=r.photo?`<img src="${esc(r.photo)}" alt="${esc(r.name)}" onerror="this.parentNode.classList.add('nophoto');this.remove()">`:"";
+  root.innerHTML=`<a class="back" href="#current-stats">← Squad &amp; stats</a>
+    <div class="pp-hero">
+      <div class="pp-photo ${photo?"":"nophoto"}">${photo}<span class="pp-ph">${r.num??"★"}</span></div>
+      <div class="pp-id"><div class="pp-num">${r.num!=null?"#"+r.num:""}</div><h2 class="pp-name">${esc(r.name)}</h2>
+        <div class="pp-pos">${esc(posWords(r.pos))}${r.pos==="Retired"||r.pos==="Alternate"?"":" · Beer Street FC"}</div>
+        ${r.bio?`<p class="pp-bio">${esc(r.bio)}</p>`:""}</div>
+    </div>
+    <h3 class="pp-h">${esc(label(current))}</h3>${curBlock}
+    ${hist}
+    <div class="card"><h3>Awards</h3>${awards.length?`<ul class="pp-aw">${awards.map(a=>`<li><svg><use href="#star"/></svg><div><b>${a.t}</b><small>${a.sub}${a.d&&a.t!=="Champion"?" · "+fmtDate(a.d,{month:"short",day:"numeric",year:"numeric"}):""}</small>${a.line?`<p>${esc(a.line)}</p>`:""}</div></li>`).join("")}</ul>`:`<div class="empty" style="padding:18px">No awards yet.</div>`}</div>
+    ${hls.length?`<div class="card hl-card"><h3>Highlights</h3><div class="hl-grid">${hls.map(highlightCard).join("")}</div></div>`:""}`;
+  document.title=`${r.name} · Beer Street FC`;
+}
+
 /* ---------- tabs + hash routing ---------- */
 const TABS=["current-standings","current-stats","past-standings","past-stats","about"];
 function show(id){
+  const isPlayer=/^player-/.test(id);
+  if(isPlayer){renderPlayer(id);document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",false));
+    document.querySelectorAll(".panel").forEach(p=>p.hidden=p.id!=="player");document.body.classList.remove("on-about");
+    const pl=document.getElementById("player");if(pl&&pl.getBoundingClientRect().top<0)pl.scrollIntoView();return;}
+  document.title="Beer Street FC";
   if(!TABS.includes(id)) id=TABS[0];
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===id));
   document.querySelectorAll(".panel").forEach(p=>p.hidden=p.id!==id);
@@ -2198,7 +1200,7 @@ function openLanding(el){
   el.querySelectorAll("[data-continue]").forEach(b=>b.onclick=close);
   el.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
   // deep links (e.g. beerstreetfc.com/#about) go straight to the site
-  if(location.hash&&TABS.includes(location.hash.slice(1))) return false;
+  if(location.hash&&(TABS.includes(location.hash.slice(1))||/^#player-/.test(location.hash))) return false;
   el.hidden=false; document.body.classList.add("landing-open");
   return true;
 }
