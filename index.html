@@ -368,6 +368,7 @@ a.plink:hover{border-bottom-style:solid;color:var(--cream)}
 .pp-pos{color:var(--muted);font-size:17px;letter-spacing:.04em}
 .pp-bio{max-width:60ch;margin-top:12px}
 .pp-h{margin:6px 0 12px}
+.career-row td{font-weight:700;border-top:2px solid rgba(var(--cream-rgb),.35)}
 #player{scroll-margin-top:110px}#player .strip{margin-bottom:24px}#player .card{margin-bottom:24px}
 .pp-aw{list-style:none;margin:0;padding:4px 20px 16px}
 .pp-aw li{display:grid;grid-template-columns:22px 1fr;gap:12px;padding:10px 0;border-top:1px solid rgba(var(--plum-rgb),.35)}
@@ -965,9 +966,17 @@ function renderPlayer(slug){
   const curBlock=cur?`<div class="strip">${outf?tile("Rating",badge(fifaRating(cur.p,false)))+tile("Apps",cur.p.apps||0)+tile("Goals",cur.p.goals||0)+tile("Assists",cur.p.assists||0)+tile("+/-",pmS(cur.p.plusMinus||0))+tile("Takeaways",cur.p.takeaways||0):""}
       ${gk&&(cur.p.gkApps||0)?tile("Keeper rating",badge(fifaRating(cur.p,true)))+tile("Saves",cur.p.saves||0)+tile("Save %",spc(cur.p))+tile("Clean sheets",cur.p.cleanSheets||0):""}</div>`
     :`<div class="card"><div class="empty" style="padding:22px 20px">No ${esc(label(current))} stats yet${DATA.statsStart?` · player stats start ${esc(DATA.statsStart)}`:""}.</div></div>`;
+  const K=["apps","gkApps","cleanSheets","goals","assists","shots","plusMinus","takeaways","giveaways","blocks","fouls","saves","goalsAgainst","yellow","red"];
+  const car={name:r.name}; K.forEach(k=>car[k]=rows.reduce((a,x)=>a+(x.p[k]||0),0));
+  const motmN=seasons.reduce((a,s)=>a+Object.values(motmPicks(s)).filter(x=>x.name===r.name).length,0);
+  const careerBlock=rows.length?`<h3 class="pp-h">Career</h3><div class="strip">${tile("Seasons",rows.length)}
+      ${outf?tile("Rating",badge(fifaRating(car,false)))+tile("Apps",car.apps)+tile("Goals",car.goals)+tile("Assists",car.assists)+tile("G+A",car.goals+car.assists)+tile("+/-",pmS(car.plusMinus))+tile("Takeaways",car.takeaways)+tile("Blocks",car.blocks):""}
+      ${gk&&car.gkApps?tile("Keeper rating",badge(fifaRating(car,true)))+tile("Apps in goal",car.gkApps)+tile("Saves",car.saves)+tile("Save %",spc(car))+tile("Clean sheets",car.cleanSheets):""}
+      ${tile(`${wo?"(Wo)man":"Man"} of the Match`,motmN)}</div>`
+    :`<h3 class="pp-h">Career</h3><div class="card"><div class="empty" style="padding:22px 20px">Career stats start ${esc(DATA.statsStart||"soon")}${motmN?` · ${motmN} ${wo?"(Wo)man":"Man"} of the Match award${motmN>1?"s":""} so far`:""}.</div></div>`;
   const hist=rows.length?`<div class="card flush"><h3>Season by season</h3><div class="tbl-wrap"><table><thead><tr><th class="l">Season</th>
       ${outf?"<th>Apps</th><th>Goals</th><th>Assists</th><th>+/-</th><th>Rating</th>":""}${gk?"<th>In goal</th><th>Saves</th><th>Save %</th><th>GK rating</th>":""}</tr></thead><tbody>
-      ${rows.map(({s,p})=>`<tr><td class="l">${esc(label(s))}</td>${outf?`<td>${p.apps||0}</td><td>${p.goals||0}</td><td>${p.assists||0}</td><td>${pmS(p.plusMinus||0)}</td><td>${badge(fifaRating(p,false))}</td>`:""}${gk?`<td>${p.gkApps||0}</td><td>${p.saves||0}</td><td>${spc(p)}</td><td>${badge(fifaRating(p,true))}</td>`:""}</tr>`).join("")}
+      ${[...rows,{s:null,p:car}].map(({s,p})=>`<tr class="${s?"":"career-row"}"><td class="l">${s?esc(label(s)):"Career"}</td>${outf?`<td>${p.apps||0}</td><td>${p.goals||0}</td><td>${p.assists||0}</td><td>${pmS(p.plusMinus||0)}</td><td>${badge(fifaRating(p,false))}</td>`:""}${gk?`<td>${p.gkApps||0}</td><td>${p.saves||0}</td><td>${spc(p)}</td><td>${badge(fifaRating(p,true))}</td>`:""}</tr>`).join("")}
     </tbody></table></div></div>`:"";
   const awards=[];
   seasons.forEach(s=>{const pk=motmPicks(s);Object.entries(pk).forEach(([d,x])=>{if(x.name!==r.name)return;const g=ourMatches(s).find(m=>m.date===d&&!m.bye),v=g&&view(g);
@@ -988,6 +997,7 @@ function renderPlayer(slug){
         ${r.bio?`<p class="pp-bio">${esc(r.bio)}</p>`:""}</div>
     </div>
     <h3 class="pp-h">${esc(label(current))}</h3>${curBlock}
+    ${careerBlock}
     ${hist}
     <div class="card"><h3>Awards</h3>${awards.length?`<ul class="pp-aw">${awards.map(a=>`<li><svg><use href="#star"/></svg><div><b>${a.t}</b><small>${a.sub}${a.d&&a.t!=="Champion"?" · "+fmtDate(a.d,{month:"short",day:"numeric",year:"numeric"}):""}</small>${a.line?`<p>${esc(a.line)}</p>`:""}</div></li>`).join("")}</ul>`:`<div class="empty" style="padding:18px">No awards yet.</div>`}</div>
     ${hls.length?`<div class="card hl-card"><h3>Highlights</h3><div class="hl-grid">${hls.map(highlightCard).join("")}</div></div>`:""}`;
