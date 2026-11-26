@@ -642,10 +642,6 @@ body.hungover *{transition-duration:.9s!important}
 .odds h3 small{font-size:.7em;color:var(--muted)}
 .odds-t{width:100%;margin:0 0 10px}.odds-t td{padding:7px 20px}.odds-t td:last-child{text-align:right}
 .odds-t b{font:800 18px "Barlow Condensed",sans-serif;color:var(--cream)}
-/* pigeons */
-body.pigeons .pp-photo img,body.pigeons .tc-photo img,body.pigeons .motm .ph img{opacity:0}
-body.pigeons .pp-photo,body.pigeons .tc-photo{background:#6f8a9c url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cellipse cx='30' cy='42' rx='18' ry='13' fill='%239a93a3'/%3E%3Cellipse cx='33' cy='40' rx='10' ry='7' fill='%23b7b0bf'/%3E%3Ccircle cx='44' cy='24' r='9' fill='%238e879a'/%3E%3Cpath d='M39 30q5 4 0 10' stroke='%235aa58c' stroke-width='4' fill='none'/%3E%3Ccircle cx='47' cy='21' r='2.2' fill='%23f6b23c'/%3E%3Ccircle cx='47' cy='21' r='1' fill='%23111'/%3E%3Cpath d='M52 24l9 3-9 3z' fill='%233a3338'/%3E%3Cpath d='M14 40L2 36l3 11z' fill='%237d7686'/%3E%3C/svg%3E") center 70%/80% no-repeat!important}
-body.pigeons .pp-photo .pp-ph{display:none!important}
 /* brad's ghost */
 .ghost-msg{opacity:0;margin-top:10px;font:italic 400 18px "IM Fell English",serif;color:var(--cream-2);transition:opacity 1.4s ease}
 .memoriam .mem-frame img{transition:opacity 1.4s ease,filter 1.4s ease}
@@ -2030,13 +2026,9 @@ function pourPint(){
   if(/^(input|textarea|select)$/i.test(e.target.tagName)) return;
   buf=(buf+(e.key||"").toLowerCase()).slice(-12);
   if(buf.endsWith("beer")){buf="";pourPint();}
-  if(buf.endsWith("pigeon")){buf="";pigeonTakeover();}
 });
   let last=0;addEventListener("devicemotion",e=>{const a=e.accelerationIncludingGravity;if(!a)return;
     const f=Math.abs(a.x||0)+Math.abs(a.y||0)+Math.abs(a.z||0);if(f>42&&Date.now()-last>6000){last=Date.now();pourPint()}});
-  // Konami code turns everyone into pigeons
-  const K=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];let ki=0;
-  document.addEventListener("keydown",e=>{ki=(e.key===K[ki]||e.key.toLowerCase()===K[ki])?ki+1:(e.key===K[0]?1:0);if(ki===K.length){ki=0;pigeonTakeover();}});
 })();
 
 /* 4. fake betting odds on match previews (no money, obviously) */
@@ -2064,14 +2056,6 @@ function oddsBoard(s,m,opp){
   fetch("https://api.open-meteo.com/v1/forecast?latitude=40.68&longitude=-73.97&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=America%2FNew_York")
     .then(r=>r.json()).then(j=>{const c=j.current;if(!c)return;el.textContent=`${Math.round(c.temperature_2m)}°F, ${(W[c.weather_code]||"weather").toLowerCase()}. `}).catch(()=>{});
 })();
-
-/* 6. pigeon takeover: Konami code, typing "pigeon", or holding down on the pigeon */
-function pigeonTakeover(){const on=!document.body.classList.contains("pigeons");document.body.classList.toggle("pigeons",on);say(on?"Coo. The pigeons have taken over.":"The humans are back.");}
-(function(){const b=document.getElementById("eggBird");let t=null,long=false;
-  b.addEventListener("pointerdown",()=>{long=false;t=setTimeout(()=>{long=true;pigeonTakeover()},700)});
-  ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>clearTimeout(t)));
-  b.addEventListener("click",e=>{if(long){e.stopImmediatePropagation();e.preventDefault();long=false}},true);
-  b.addEventListener("contextmenu",e=>e.preventDefault());})();
 
 /* 7. an original 8-bit walk-out jingle for every player, generated from their shirt number */
 let AC=null;
