@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beer Street Tally</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,800&family=Barlow:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a touchline clipboard: fast, chunky, no fuss.
+   IDEA: the club's striped home shirt, worn as the scoreboard.
+   PICTURE: the live scoreboard and player cards are the picture.
+   COLOUR and TYPE: shirt black + plum stripes, cream lettering, one gold accent; Barlow Condensed numbers.
+   LAYOUT: sticky scoreboard, then one column of player cards with big +/− buttons. */
+:root{color-scheme:dark;--bg:#120d18;--card:#1d1622;--line:#3a2d3a;--plum:#5b4455;--cream:#efe3cc;--muted:#a8969f;--gold:#e5b94e;--win:#8fc79a;--loss:#e98b7f}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--cream);font:16px/1.4 Barlow,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.cond{font-family:"Barlow Condensed",sans-serif}
+header{position:sticky;top:0;z-index:5;background:repeating-linear-gradient(90deg,#120d18 0 34px,var(--plum) 34px 68px);border-bottom:3px solid var(--cream);padding:8px max(3vw,8px) 8px;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.meta input{background:rgba(18,13,24,.85);border:1px solid var(--line);color:var(--cream);border-radius:6px;padding:8px 10px;font-size:16px;min-height:40px}
+.meta input[type=text]{flex:1 1 160px}
+.board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:rgba(18,13,24,.88);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.side{display:grid;grid-template-columns:auto auto;grid-template-areas:"lab lab" "sc bt";align-items:center;justify-content:center;column-gap:10px;row-gap:2px;text-align:center}.side b{grid-area:lab}.side .score{grid-area:sc}.side .btn{grid-area:bt;padding:0 10px}
+.side b{font:800 13px/1 "Barlow Condensed";letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.score{font:800 clamp(34px,10vw,52px)/1 "Barlow Condensed";font-style:italic}
+.dash{font:800 32px/1 "Barlow Condensed";color:var(--muted)}
+.btn{border:0;border-radius:8px;min-height:44px;padding:0 14px;font-weight:600;background:var(--plum)}
+.btn.gold{background:var(--gold);color:#1b1410;font-weight:700}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.loss{background:#7d3a34}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.bar .grow{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--cream);background:rgba(18,13,24,.85);border:1px solid var(--line);border-radius:8px;min-height:44px;padding:0 12px}
+.toggle[aria-pressed=true]{background:var(--cream);color:#120d18;font-weight:600}
+main{padding:14px max(3vw,10px) 120px;max-width:980px;margin:0 auto}
+h2{font:800 22px/1.1 "Barlow Condensed";font-style:italic;text-transform:uppercase;margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:2px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;transition:border-color .2s}
+.card.on{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.num{display:grid;place-items:center;width:38px;height:38px;border-radius:6px;background:var(--plum);font:800 20px/1 "Barlow Condensed"}
+.name{flex:1;font:800 22px/1.05 "Barlow Condensed";font-style:italic}
+.name input{width:100%;background:transparent;border:0;border-bottom:1px dashed var(--line);color:var(--cream);font:inherit;padding:2px 0}
+.onbtn{border:1px solid var(--line);background:transparent;border-radius:999px;min-height:40px;padding:0 14px;font-size:14px;font-weight:600}
+.card.on .onbtn{background:var(--gold);color:#1b1410;border-color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.st{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;background:#15101a;border-radius:8px;overflow:hidden}
+.st button{height:48px;border:0;background:transparent;font-size:24px;line-height:1}
+.st button.p{background:var(--plum)}
+.st button:active{background:var(--gold);color:#1b1410}
+.st div{text-align:center;padding:2px 0}
+.st i{display:block;font:600 11px/1.1 Barlow;font-style:normal;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st b{display:block;font:800 22px/1 "Barlow Condensed"}
+.st b.z{color:#5d4f5a}
+.pm{font:800 15px/1 "Barlow Condensed";color:var(--muted);margin-left:auto;white-space:nowrap}
+.pm .up{color:var(--win)}.pm .dn{color:var(--loss)}
+.fold{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;width:100%;margin:28px 0 10px;padding:12px 14px;background:transparent;border:1px dashed var(--line);border-radius:10px;text-align:left}.fold span{font:800 22px/1.1 "Barlow Condensed";font-style:italic;text-transform:uppercase}.fold small{color:var(--muted);font-size:14px}.fold[aria-expanded=true]{border-style:solid}
+.hint{color:var(--muted);font-size:14px;margin:6px 0 0}
+dialog{background:var(--card);color:var(--cream);border:1px solid var(--line);border-radius:12px;max-width:min(560px,94vw);width:100%}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+textarea{width:100%;min-height:220px;background:#15101a;color:var(--cream);border:1px solid var(--line);border-radius:8px;font:13px/1.45 ui-monospace,Menlo,monospace;padding:10px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--cream);color:#120d18;font-weight:600;padding:10px 16px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+@media(max-width:600px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.st{grid-template-columns:38px 1fr 38px}.st i{font-size:10px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<header>
+  <div class="board">
+    <div class="side"><b>Beer Street</b><div class="score" id="us">0</div><button class="btn ghost" id="og" title="Goal with no Beer Street scorer, e.g. an own goal">+ Other</button></div>
+    <div class="dash">–</div>
+    <div class="side"><b id="oppLabel">Them</b><div class="score" id="them">0</div><button class="btn loss" id="theyScored">They scored</button></div>
+  </div>
+  <div class="bar">
+    <button class="toggle" id="onlyOn" aria-pressed="false">On field only</button>
+    <span class="grow"></span>
+    <button class="btn ghost" id="undo">↶ Undo</button>
+    <button class="btn gold" id="done">Full time</button>
+  </div>
+</header>
+<main>
+  <div class="meta">
+    <input id="date" type="date" aria-label="Game date">
+    <input id="opp" type="text" placeholder="Opponent" aria-label="Opponent">
+  </div>
+  <p class="hint">Tap a player's <b>On field</b> when they go on and off. A goal gives every Beer Street player on the field a +, and "They scored" gives them a −, plus a GA to whoever is on in goal. Tap ↶ Undo to take back the last tap. Everything is saved on this phone as you go.</p>
+  <div id="groups"></div>
+  <p style="margin-top:28px"><button class="btn ghost" id="reset">Start a new game</button></p>
+</main>
+<dialog id="dlg"><h3 class="cond" style="font-size:24px;margin:0 0 6px" id="dlgTitle"></h3><div id="dlgBody"></div></dialog>
+<div class="toast" id="toast"></div>
+<script>
+{
+const FIELD=[["Becca T.",12,"MF"],["Ben M.",8,"DF"],["Connor B.",2,"DF"],["Dave K.",4,"FW"],["Gabi G.",9,"FW"],["Matt C.",13,"FW"],["Mia R.",7,"FW"],["Pat U.",20,"DF"],["Shaydah G.",0,"MF"],["Tucker T.",11,"MF"]];
+const GUESTS=[["Brad S."],["Ciaran W."],["Nathan J."],["Guest"],["Guest"]];
+const KEEPERS=[["Dave K.",4],["James C.",69],["Mia R.",7],["Other"]];
+const FSTATS=[["goals","Goals"],["assists","Assists"],["shots","Shots"],["takeaways","Takeaways","Takes"],["giveaways","Giveaways","Gives"],["blocks","Blocks"],["fouls","Fouls"],["yellow","Yellow"],["red","Red"],["plus","+"],["minus","−"]];
+const KSTATS=[["saves","Saves"],["ga","GA"]];
+const KEY="bsfc-tally-v1";
+const blank=()=>({date:new Date().toLocaleDateString("en-CA"),opp:"",other:0,them:0,onlyOn:false,log:[],
+  players:[...FIELD.map((p,i)=>({id:"f"+i,g:"field",name:p[0],num:p[1],on:false,played:false,s:{}})),
+           ...GUESTS.map((p,i)=>({id:"g"+i,g:"guest",name:p[0],num:null,on:false,played:false,s:{}})),
+           ...KEEPERS.map((p,i)=>({id:"k"+i,g:"keeper",name:p[0],num:p[1]??null,on:false,played:false,s:{}}))]});
+let S; try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){} if(!S||!S.players) S=blank();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const P=id=>S.players.find(p=>p.id===id);
+const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const v=(p,k)=>p.s[k]||0;
+const ourScore=()=>S.other+S.players.filter(p=>p.g!=="keeper").reduce((a,p)=>a+v(p,"goals"),0);
+const toastEl=document.getElementById("toast");let tt;
+const toast=m=>{toastEl.textContent=m;toastEl.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>toastEl.classList.remove("show"),1600)};
+/* every change is a list of deltas so Undo can reverse it exactly */
+function apply(d,sign=1){for(const x of d){
+  if(x.t==="stat"){const p=P(x.id);p.s[x.k]=Math.max(0,v(p,x.k)+sign*x.n);if(sign>0&&x.n>0)p.played=true}
+  else if(x.t==="team")S[x.k]=Math.max(0,S[x.k]+sign*x.n);
+  else if(x.t==="on"){const p=P(x.id);p.on=sign>0?x.to:!x.to;if(p.on)p.played=true}}}
+function act(d,label){if(!d.length)return;apply(d);S.log.push({d,label});if(S.log.length>300)S.log.shift();save();render();if(label)toast(label)}
+const onField=()=>S.players.filter(p=>p.on&&p.g!=="keeper");
+const inGoal=()=>S.players.filter(p=>p.on&&p.g==="keeper");
+function bump(id,k,n){const p=P(id),d=[{t:"stat",id,k,n}];let label="";
+  if(n<0&&!v(p,k))return;
+  if(k==="goals"&&n>0){onField().forEach(q=>d.push({t:"stat",id:q.id,k:"plus",n:1}));label=`Goal ${p.name}! + for ${onField().length} on field`}
+  act(d,label)}
+function chip(p,[k,l,sh]){const x=v(p,k);return `<div class="st"><button data-b="${p.id}|${k}|-1" aria-label="${esc(l)} minus one for ${esc(p.name)}">−</button><div><i>${esc(sh||l)}</i><b class="${x?"":"z"}">${x}</b></div><button class="p" data-b="${p.id}|${k}|1" aria-label="${esc(l)} plus one for ${esc(p.name)}">+</button></div>`}
+function card(p){const keeper=p.g==="keeper",pm=v(p,"plus")-v(p,"minus");
+  const nm=p.g==="guest"||p.name==="Other"?`<span class="name"><input data-n="${p.id}" value="${esc(p.name)}" aria-label="Player name"></span>`:`<span class="name">${esc(p.name)}</span>`;
+  return `<div class="card ${p.on?"on":""}"><div class="top"><span class="num">${p.num??"–"}</span>${nm}
+    ${keeper?"":`<span class="pm">+/- <span class="${pm>0?"up":pm<0?"dn":""}">${pm>0?"+":""}${pm}</span></span>`}
+    <button class="onbtn" data-on="${p.id}" aria-pressed="${p.on}">${p.on?(keeper?"In goal":"On field"):(keeper?"Put in goal":"Put on")}</button></div>
+    <div class="stats">${(keeper?KSTATS:FSTATS).map(s=>chip(p,s)).join("")}</div></div>`}
+function render(){
+  document.getElementById("us").textContent=ourScore();
+  document.getElementById("them").textContent=S.them;
+  document.getElementById("oppLabel").textContent=S.opp||"Them";
+  document.getElementById("date").value=S.date||"";document.getElementById("opp").value=S.opp||"";
+  const ob=document.getElementById("onlyOn");ob.setAttribute("aria-pressed",S.onlyOn);
+  document.getElementById("undo").disabled=!S.log.length;document.getElementById("undo").style.opacity=S.log.length?1:.4;
+  const show=p=>!S.onlyOn||p.on;
+  const grp=(t,g)=>{const ps=S.players.filter(p=>p.g===g&&show(p));return ps.length?`<h2>${t}</h2><div class="cards">${ps.map(card).join("")}</div>`:""};
+  /* frequent guests live in their own fold at the bottom; anyone from it who is on the field stays visible */
+  const gs=S.players.filter(p=>p.g==="guest"&&show(p)), gShow=gs.filter(p=>S.guestsOpen||p.on);
+  const guests=gs.length?`<button class="fold" id="guestFold" aria-expanded="${!!S.guestsOpen}"><span>Frequent guests</span><small>${S.guestsOpen?"Hide":"Show"} Brad, Ciaran, Nathan &amp; guests</small></button>${gShow.length?`<div class="cards">${gShow.map(card).join("")}</div>`:""}`:"";
+  const html=grp("Field players","field")+grp("Keepers","keeper")+guests;
+  document.getElementById("groups").innerHTML=html||`<p class="hint">Nobody is on the field. Turn off "On field only" to pick who's playing.</p>`}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-b]");if(b){const [id,k,n]=b.dataset.b.split("|");bump(id,k,+n);return}
+  const o=e.target.closest("[data-on]");if(o){const p=P(o.dataset.on);act([{t:"on",id:p.id,to:!p.on}],"");return}
+});
+document.addEventListener("change",e=>{const n=e.target.dataset&&e.target.dataset.n;if(n){P(n).name=e.target.value.trim()||"Guest";save()}});
+document.getElementById("theyScored").onclick=()=>{const d=[{t:"team",k:"them",n:1}];
+  onField().forEach(q=>d.push({t:"stat",id:q.id,k:"minus",n:1}));inGoal().forEach(q=>d.push({t:"stat",id:q.id,k:"ga",n:1}));
+  act(d,`Goal against: − for ${onField().length} on field${inGoal().length?", GA for "+inGoal().map(q=>q.name).join(" & "):""}`)};
+document.getElementById("og").onclick=()=>{const d=[{t:"team",k:"other",n:1}];onField().forEach(q=>d.push({t:"stat",id:q.id,k:"plus",n:1}));act(d,"Goal (no scorer) + for those on field")};
+document.getElementById("undo").onclick=()=>{const l=S.log.pop();if(!l)return;apply(l.d,-1);save();render();toast("Undone")};
+document.addEventListener("click",e=>{if(e.target.closest("#guestFold")){S.guestsOpen=!S.guestsOpen;save();render()}});
+document.getElementById("onlyOn").onclick=()=>{S.onlyOn=!S.onlyOn;save();render()};
+document.getElementById("date").onchange=e=>{S.date=e.target.value;save()};
+document.getElementById("opp").oninput=e=>{S.opp=e.target.value;save();document.getElementById("oppLabel").textContent=S.opp||"Them"};
+const dlg=document.getElementById("dlg");
+function openDlg(title,body){document.getElementById("dlgTitle").textContent=title;document.getElementById("dlgBody").innerHTML=body;dlg.showModal()}
+function summary(){const pad=(t,n)=>String(t).padEnd(n),L=[];
+  L.push(`Beer Street FC ${ourScore()}–${S.them} ${S.opp||"(opponent)"} · ${S.date||""}`);
+  const used=p=>p.played||Object.values(p.s).some(x=>x);
+  const f=S.players.filter(p=>p.g!=="keeper"&&used(p));
+  L.push("","FIELD: Player | Goals | Assists | Shots | + | − | Takeaways | Giveaways | Blocks | Fouls | Yellow | Red");
+  f.forEach(p=>L.push([p.name,...["goals","assists","shots","plus","minus","takeaways","giveaways","blocks","fouls","yellow","red"].map(k=>v(p,k))].join(" | ")));
+  if(S.other)L.push(`Other goals (no scorer): ${S.other}`);
+  const k=S.players.filter(p=>p.g==="keeper"&&used(p));
+  L.push("","KEEPERS: Player | Saves | GA");k.forEach(p=>L.push([p.name,v(p,"saves"),v(p,"ga")].join(" | ")));
+  return L.join("\n")}
+document.getElementById("done").onclick=()=>{const t=summary();
+  openDlg("Full time",`<p class="hint" style="margin-top:0">Copy this and paste it to Claude to update the site.</p><textarea readonly id="sumTxt">${esc(t)}</textarea>
+  <div class="row" style="margin-top:10px;justify-content:flex-end"><button class="btn ghost" id="x">Close</button><button class="btn gold" id="cp">Copy</button></div>`);
+  document.getElementById("x").onclick=()=>dlg.close();
+  document.getElementById("cp").onclick=async()=>{const ta=document.getElementById("sumTxt");
+    try{await navigator.clipboard.writeText(t);toast("Copied")}catch(e){ta.focus();ta.select();toast("Selected: tap Copy in the menu")}}};
+document.getElementById("reset").onclick=()=>{openDlg("Start a new game?",`<p>This clears every tally on this phone. Copy the Full time summary first if you still need it.</p>
+  <div class="row" style="justify-content:flex-end"><button class="btn ghost" id="x">Keep this game</button><button class="btn loss" id="y">Clear and start new</button></div>`);
+  document.getElementById("x").onclick=()=>dlg.close();
+  document.getElementById("y").onclick=()=>{S=blank();save();render();dlg.close();toast("New game")}};
+render();
+}
+</script></body></html>
