@@ -412,6 +412,38 @@ td .cflag::after{bottom:auto;top:calc(100% + 8px)}
 .cap::after{content:attr(data-city);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translate(-50%,4px);white-space:nowrap;background:var(--cream);color:var(--ink);font:600 13px/1 "Barlow",system-ui,sans-serif;padding:6px 9px;box-shadow:3px 3px 0 rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:30}
 .cap:hover::after,.cap:focus::after{opacity:1;transform:translate(-50%,0)}
 td .cap::after{bottom:auto;top:calc(100% + 8px)}
+
+/* in / out */
+.att{margin:-8px 0 24px;border:3px double rgba(var(--cream-rgb),.32);background:var(--ink-2);padding:16px 20px}
+.att-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px;margin-bottom:12px}
+.att-head h3{margin:0}
+.att-count{font-size:15px;color:var(--muted)}.att-count b{font:800 22px "Barlow Condensed",sans-serif;color:var(--cream);margin:0 3px 0 10px}
+.att-count b.in,.rsvp-sum b.in{color:var(--win)}.att-count b.out,.rsvp-sum b.out{color:var(--loss)}
+.att-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 18px;font-size:15px;line-height:1.7}
+.att-k{font:italic 800 14px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.att-k.in{color:var(--win)}.att-k.out{color:var(--loss)}
+.att .muted{color:var(--muted)}
+.rsvp{max-width:560px;margin:0 auto;text-align:center;padding:8px 0 30px}
+.rsvp h2{margin:0}.rsvp-when{color:var(--cream-2);margin:8px 0 22px}
+.rsvp-pick{font:italic 800 20px "Barlow Condensed",sans-serif;text-transform:uppercase;margin:6px 0 12px}
+.rsvp-names{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;text-align:left}
+.rn{display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 10px;background:var(--ink-2);border:1px solid rgba(var(--cream-rgb),.25);color:var(--cream);font:600 16px "Barlow",system-ui,sans-serif;cursor:pointer}
+.rn:hover,.rn:focus-visible{border-color:var(--cream)}
+.rsvp-me{border:3px double rgba(var(--cream-rgb),.32);background:var(--ink-2);padding:20px}
+.rsvp-hi{font:italic 800 30px "Barlow Condensed",sans-serif;text-transform:uppercase;margin-bottom:14px}
+.pill-in,.pill-out{font:600 13px "Barlow",sans-serif;text-transform:none;vertical-align:middle;padding:3px 8px;margin-left:6px}
+.pill-in{background:rgba(143,199,154,.2);color:var(--win)}.pill-out{background:rgba(233,139,127,.18);color:var(--loss)}
+.rsvp-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.rb{min-height:64px;font:italic 800 26px "Barlow Condensed",sans-serif;text-transform:uppercase;border:2px solid;background:transparent;cursor:pointer}
+.rb.in{color:var(--win);border-color:var(--win)}.rb.out{color:var(--loss);border-color:var(--loss)}
+.rb.in.on{background:var(--win);color:#10210f}.rb.out.on{background:var(--loss);color:#2a0d0a}
+.rsvp-msg{min-height:1.5em;margin:12px 0;color:var(--cream-2)}
+.rsvp-sum{font-size:15px;color:var(--muted)}.rsvp-sum b{font:800 20px "Barlow Condensed",sans-serif;color:var(--cream)}
+.rsvp-list{margin-top:6px;color:var(--cream-2)}
+@media (max-width:600px){.att-cols{grid-template-columns:1fr 1fr}.att-cols>div:last-child{grid-column:1/-1}}
+body.on-rsvp .hero,body.on-rsvp nav.tabs{display:none}
+body.on-rsvp main{padding-top:28px}
+.rsvp-crest{display:block;margin:0 auto 14px;font:italic 800 15px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-2);text-decoration:none}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -493,6 +525,7 @@ td .cap::after{bottom:auto;top:calc(100% + 8px)}
   <section class="panel" id="past-standings" role="tabpanel"></section>
   <section class="panel" id="past-stats" role="tabpanel"></section>
   <section class="panel" id="player" aria-live="polite"></section>
+  <section class="panel" id="rsvp" aria-live="polite"></section>
   <section class="panel" id="records" role="tabpanel"></section>
   <section class="panel" id="about" role="tabpanel">
     <div class="about"><p>Amateur footballers.<br>Professional drunks.</p></div>
@@ -755,7 +788,7 @@ function renderCurrentStandings(){
       <div><div class="tag" style="display:inline-block;margin-bottom:8px">${next.stage?"Up next":"Next match · Wk "+next.round}${matchupNames(next,s).map(x=>" · "+esc(x)).join("")}</div>
         <div class="vs">${next.stage?esc(next.stage)+`<span>·</span>`+esc(next.label):`Beer Street FC<span>${view(next).home?"vs":"@"}</span>${esc(view(next).opp)}`}</div></div>
       <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}${next.date>=TODAY?calMenu(next,s):""}</div>
-    </div></div>`:""}
+    </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:""}
     ${teamSummary(s)}
     <div class="grid">
       <div class="card flush">${standingsTable(s)}</div>
@@ -763,6 +796,63 @@ function renderCurrentStandings(){
         ${fixturePanels(s)}
       </div>
     </div>`;
+}
+
+/* ---------- In / Out for the next game ---------- */
+const attGame=()=>{const ms=ourMatches(current).filter(m=>!m.bye&&m.hs==null&&m.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date)||tmin(a.time)-tmin(b.time));return ms[0]||null};
+const attSquad=()=>(DATA.roster||[]).filter(r=>r.pos!=="Retired");
+async function attLoad(date){try{const r=await fetch("/api/attendance?date="+date,{cache:"no-store"});const j=await r.json();return j.ok?j.answers:null}catch(e){return null}}
+function attLists(ans){const sq=attSquad(),inn=[],out=[],none=[];
+  sq.forEach(r=>{const a=ans[r.name];(a?(a.s==="in"?inn:out):none).push(r)});
+  Object.keys(ans).filter(n=>!sq.some(r=>r.name===n)).forEach(n=>(ans[n].s==="in"?inn:out).push({name:n}));
+  return {inn,out,none};}
+const attName=r=>(DATA.roster||[]).some(x=>x.name===r.name)?plink(r.name):esc(r.name);
+async function renderAttWidget(){
+  const el=document.getElementById("attWidget"), g=attGame(); if(!el||!g) return;
+  const ans=await attLoad(g.date); if(!ans) return;   // no storage here (e.g. the Claude preview): keep it hidden
+  const {inn,out,none}=attLists(ans);
+  el.innerHTML=`<div class="att-head"><h3>Who's in · ${fmtDate(g.date,{weekday:"short",month:"short",day:"numeric"})}</h3>
+      <div class="att-count"><b class="in">${inn.length}</b> in <b class="out">${out.length}</b> out <b>${none.length}</b> no reply</div></div>
+    <div class="att-cols">
+      <div><div class="att-k in">In</div>${inn.length?inn.map(r=>`<div>${attName(r)}</div>`).join(""):`<div class="muted">Nobody yet</div>`}</div>
+      <div><div class="att-k out">Out</div>${out.length?out.map(r=>`<div>${attName(r)}</div>`).join(""):`<div class="muted">–</div>`}</div>
+      <div><div class="att-k">No reply</div>${none.map(r=>`<div class="muted">${esc(r.name)}</div>`).join("")||`<div class="muted">–</div>`}</div>
+    </div>`;
+  el.hidden=false;
+}
+/* the private page: beerstreetfc.com/#in-<key> (the key never reaches the server's address logs) */
+const ME_KEY="bsfc-me";
+function renderRsvp(key){
+  const root=document.getElementById("rsvp"), g=attGame();
+  let me="";try{me=localStorage.getItem(ME_KEY)||""}catch(e){}
+  if(!g){root.innerHTML=`<div class="rsvp"><h2>Are you in?</h2><div class="empty">No game on the schedule yet. Check back when the ${esc(DATA.nextSeason||"next")} schedule is out.</div></div>`;return}
+  const head=`<a class="rsvp-crest" href="#current-standings">Beer Street FC</a><div class="tag" style="display:inline-block;margin-bottom:10px">${g.stage?esc(g.label||g.stage):"Week "+g.round}${matchupNames(g,current).map(x=>" · "+esc(x)).join("")}</div>
+    <h2>${g.stage?esc(g.label||g.stage):`vs ${esc(view(g).opp)}`}</h2>
+    <p class="rsvp-when">${fmtDate(g.date,{weekday:"long",month:"long",day:"numeric"})} · ${esc(g.time)}${g.field?" · "+esc(g.field):""}</p>`;
+  const draw=(ans,msg)=>{const {inn,out,none}=attLists(ans||{}), mine=ans&&me?ans[me]:null;
+    root.innerHTML=`<div class="rsvp">${head}
+      ${me?`<div class="rsvp-me"><div class="rsvp-hi">${esc(me)}${mine?` <span class="pill-${mine.s}">${mine.s==="in"?"You're in":"You're out"}</span>`:""}</div>
+          <div class="rsvp-btns"><button class="rb in ${mine&&mine.s==="in"?"on":""}" data-rs="in">I'm in</button><button class="rb out ${mine&&mine.s==="out"?"on":""}" data-rs="out">I'm out</button></div>
+          <button class="linkish" data-rs-switch>Not ${esc(me)}?</button></div>`
+        :`<p class="rsvp-pick">Tap your name</p><div class="rsvp-names">${attSquad().map(r=>`<button class="rn" data-rs-me="${esc(r.name)}"><span class="num-badge">${r.num??"–"}</span>${esc(r.name)}</button>`).join("")}</div>`}
+      <p class="rsvp-msg" role="status">${msg||""}</p>
+      <div class="rsvp-sum"><b class="in">${inn.length}</b> in · <b class="out">${out.length}</b> out · <b>${none.length}</b> no reply
+        ${inn.length?`<div class="rsvp-list"><span class="att-k in">In</span> ${inn.map(r=>esc(r.name)).join(", ")}</div>`:""}
+        ${out.length?`<div class="rsvp-list"><span class="att-k out">Out</span> ${out.map(r=>esc(r.name)).join(", ")}</div>`:""}</div>
+      <p class="note">Change your answer any time before the game.</p></div>`;};
+  draw(null,"Loading…");
+  let cur={};
+  attLoad(g.date).then(a=>{if(a===null){draw({},"Couldn't load answers right now.");return}cur=a;draw(cur,"")});
+  root.onclick=async e=>{
+    const pick=e.target.closest("[data-rs-me]");if(pick){me=pick.dataset.rsMe;try{localStorage.setItem(ME_KEY,me)}catch(_){};draw(cur,"");return}
+    if(e.target.closest("[data-rs-switch]")){me="";try{localStorage.removeItem(ME_KEY)}catch(_){};draw(cur,"");return}
+    const b=e.target.closest("[data-rs]");if(!b||!me)return;
+    draw(cur,"Saving…");
+    try{const r=await fetch("/api/attendance",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({key,date:g.date,name:me,status:b.dataset.rs})});
+      const j=await r.json().catch(()=>({}));
+      if(r.ok&&j.ok){cur=j.answers;draw(cur,b.dataset.rs==="in"?"See you there.":"Got it. Thanks for letting us know.")}
+      else draw(cur,j.error||"Couldn't save. Try again.");
+    }catch(_){draw(cur,"No connection. Try again.")}};
 }
 
 /* --- stats --- */
@@ -1129,6 +1219,9 @@ function renderPlayer(slug){
 /* ---------- tabs + hash routing ---------- */
 const TABS=["current-standings","current-stats","records","past-standings","past-stats","about"];
 function show(id){
+  if(/^in-/.test(id)){renderRsvp(id.slice(3));document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",false));
+    document.querySelectorAll(".panel").forEach(p=>p.hidden=p.id!=="rsvp");document.body.classList.remove("on-about");document.body.classList.add("on-rsvp");scrollTo(0,0);document.title="Are you in? · Beer Street FC";return;}
+  document.body.classList.remove("on-rsvp");
   const isPlayer=/^player-/.test(id);
   if(isPlayer){renderPlayer(id);document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",false));
     document.querySelectorAll(".panel").forEach(p=>p.hidden=p.id!=="player");document.body.classList.remove("on-about");
@@ -1332,7 +1425,7 @@ function openLanding(el){
   el.querySelectorAll("[data-continue]").forEach(b=>b.onclick=close);
   el.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
   // deep links (e.g. beerstreetfc.com/#about) go straight to the site
-  if(location.hash&&(TABS.includes(location.hash.slice(1))||/^#player-/.test(location.hash))) return false;
+  if(location.hash&&(TABS.includes(location.hash.slice(1))||/^#(player|in)-/.test(location.hash))) return false;
   el.hidden=false; document.body.classList.add("landing-open");
   return true;
 }
@@ -1349,7 +1442,7 @@ document.querySelectorAll("img.logo, img.fm-logo").forEach(im=>{
 document.getElementById("livePill").hidden=isComplete(current);
 const curRow=standings(current), curPos=curRow.findIndex(r=>r.team===US)+1;
 document.getElementById("heroMeta").innerHTML=`<small>${esc(DATA.league)}</small>${label(current)} · ${ord(curPos)} place`;
-renderCurrentStandings();renderCurrentStats();renderPastStandings();renderPastStats();renderRecords();
+renderCurrentStandings();renderCurrentStats();renderPastStandings();renderPastStats();renderRecords();renderAttWidget();
 show(location.hash.slice(1));
 renderLanding();
 </script>
