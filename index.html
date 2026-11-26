@@ -512,6 +512,36 @@ html.theme-green .tcard.founders{background:repeating-linear-gradient(90deg,#0f1
 .np-cols section:first-child p:first-of-type::first-letter{float:left;font-family:"Playfair Display",serif;font-weight:900;font-size:3.1em;line-height:.8;margin:4px 6px 0 0}
 .np-small{margin-top:14px;text-align:center;font-family:"IM Fell English",serif;font-style:italic;font-size:13px;opacity:.75}
 @media (max-width:700px){.np-cols{grid-template-columns:1fr}.np-cols section{border-left:0;padding:10px 0;border-top:1px solid var(--rule)}.np-top-r{gap:10px}}
+
+/* easter eggs */
+.badges{pointer-events:none;z-index:5}
+.egg{pointer-events:auto;background:none;border:0;padding:0;cursor:pointer;line-height:0;transition:transform .2s}
+.egg:hover{transform:rotate(-8deg) scale(1.08)}.egg:focus-visible{outline:2px solid var(--cream);outline-offset:4px}
+#eggGlass[aria-pressed="true"] svg{transform:rotate(-24deg)}
+.ttx[hidden]{display:none}
+.ttx{position:fixed;inset:0;z-index:200;background:#000;display:grid;place-items:center;padding:12px}
+.ttx::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 2px,transparent 2px 4px)}
+.ttx-tv{padding:clamp(10px,2.4vw,26px) clamp(12px,3vw,30px);border-radius:24px;box-shadow:0 0 0 12px #262626,0 0 80px rgba(0,180,255,.12) inset;background:#000;max-width:100%}
+.ttx-scr{font:700 min(26px,calc((100vw - 90px)/24.2))/1.2 "DejaVu Sans Mono",Menlo,Consolas,ui-monospace,monospace;white-space:pre;color:#fff;text-shadow:0 0 5px rgba(255,255,255,.35)}
+.tw{color:#fff}.ty{color:#ff0}.tc{color:#0ff}.tg{color:#0f0}.tm{color:#f0f}.tr{color:#f33}.tbg{background:#00f}
+.tdh{display:inline-block;transform:scaleY(2);transform-origin:top}
+.ttx-fast button{background:none;border:0;padding:0 .9em 0 0;font:inherit;cursor:pointer;text-shadow:inherit}
+.ttx-fast button:hover{text-decoration:underline}
+body.ttx-open{overflow:hidden}
+.hic{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:150;background:var(--cream);color:var(--ink);font:italic 800 20px "Barlow Condensed",sans-serif;padding:8px 16px;box-shadow:4px 4px 0 rgba(0,0,0,.4);opacity:0;pointer-events:none}
+.hic.show{animation:hic 2.6s ease forwards}
+@keyframes hic{0%{opacity:0;transform:translate(-50%,10px) rotate(-3deg)}12%{opacity:1;transform:translate(-50%,0) rotate(2deg)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-6px) rotate(-2deg)}}
+body.drunk main,body.drunk nav.tabs,body.drunk .hero-inner{animation:sway 5.5s ease-in-out infinite;transform-origin:50% 30%}
+body.drunk main{animation-duration:6.5s;animation-delay:-1.3s}
+@keyframes sway{0%,100%{transform:rotate(-1.1deg) translateX(-8px)}50%{transform:rotate(1.1deg) translateX(8px)}}
+body.drunk h1,body.drunk h2,body.drunk h3,body.drunk td,body.drunk .tab,body.drunk .v,body.drunk p{text-shadow:4px 3px 0 rgba(var(--cream-rgb),.28),-3px -2px 0 rgba(var(--plum-rgb),.6)}
+body.drunk .card,body.drunk .strip,body.drunk .next-match{animation:wob 3.7s ease-in-out infinite}
+body.drunk .card:nth-child(2n){animation-delay:-1.7s;animation-duration:4.3s}
+@keyframes wob{0%,100%{transform:rotate(-.6deg)}50%{transform:rotate(.8deg) translateY(3px)}}
+body.drunk main{filter:blur(.35px)}
+body.drunk .fifa,body.drunk .num-badge{animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){body.drunk *,body.drunk main{animation:none!important}body.drunk main{transform:rotate(-1deg)}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -566,8 +596,8 @@ html.theme-green .tcard.founders{background:repeating-linear-gradient(90deg,#0f1
 
 <header class="hero">
   <div class="badges">
-    <svg style="color:var(--cream)"><use href="#glass"/></svg>
-    <svg style="color:var(--cream)"><use href="#crest"/></svg>
+    <button type="button" class="egg" id="eggGlass" aria-label="Have another" aria-pressed="false"><svg style="color:var(--cream)"><use href="#glass"/></svg></button>
+    <button type="button" class="egg" id="eggBird" aria-label="Teletext"><svg style="color:var(--cream)"><use href="#crest"/></svg></button>
   </div>
   <div class="hero-inner">
     <div class="wordmark">
@@ -578,6 +608,8 @@ html.theme-green .tcard.founders{background:repeating-linear-gradient(90deg,#0f1
   </div>
   <div class="hero-meta" id="heroMeta"></div>
 </header>
+<div class="ttx" id="ttx" role="dialog" aria-modal="true" aria-label="Teletext" hidden><div class="ttx-tv"><div class="ttx-scr" id="ttxScr"></div></div></div>
+<div class="hic" id="hic" aria-live="polite"></div>
 
 <nav class="tabs" aria-label="Sections">
   <div class="tabs-inner" role="tablist">
@@ -1661,6 +1693,66 @@ function tearPaper(){
   for(let i=n-1;i>0;i--) pts.push(`${(r()*5).toFixed(1)}px ${(i/n*100).toFixed(2)}%`);
   p.style.clipPath=`polygon(${pts.join(",")})`;
 }
+/* ---------- Easter egg 1: the pigeon turns the site into teletext ---------- */
+const TTX={page:302,timer:null};
+function ttxPad(t,n,right){t=String(t??"");t=t.length>n?t.slice(0,n):t;return right?t.padStart(n," "):t.padEnd(n," ")}
+const ttxClean=t=>String(t).replace(/[^\x20-\x7E’–]/g,"").replace(/\s+/g," ").replace(/’/g,"'").replace(/–/g,"-").trim();
+function ttxRender(){
+  const L=[], c=(cls,t)=>`<span class="t${cls}">${esc(t)}</span>`, now=new Date();
+  const clock=now.toLocaleTimeString("en-GB",{hour12:false}), day=now.toLocaleDateString("en-GB",{weekday:"short",day:"2-digit",month:"short"}).replace(",","");
+  L.push(c("w",`P${TTX.page} `)+c("y","BSFC")+c("w",`  ${TTX.page} `)+c("c",day+" ")+c("y",clock));
+  const title=TTX.page===302?"BEER STREET FC":TTX.page===303?"RESULTS":"THE SQUAD";
+  L.push(`<span class="tdh">${c("bg"," ")}${c("y"," "+title)}</span>`);L.push("");
+  if(TTX.page===302){
+    const st=standings(current);
+    L.push(c("c",ttxClean(` NYC FOOTY  ${label(current).toUpperCase()}  ${isComplete(current)?"FINAL TABLE":"TABLE"}`)));
+    L.push(c("g","    TEAM               P  W  D  L PTS"));
+    st.forEach((r,i)=>{const us=r.team===US, gp=r.gp??(r.w+r.d+r.l), d=r.d??r.t??0;
+      L.push(c("c",ttxPad(i+1,3,1)+" ")+c(us?"y":"w",ttxPad(ttxClean(r.team),17))+c("w",ttxPad(gp,3,1)+ttxPad(r.w,3,1)+ttxPad(d,3,1)+ttxPad(r.l,3,1))+c(us?"y":"g",ttxPad(r.pts,4,1)))});
+    L.push("");
+    const po=ourMatches(current).filter(m=>m.stage&&m.hs!=null);
+    po.forEach((m,i)=>{const v=view(m);L.push(c("m",(i?"          ":" PLAYOFFS ")+ttxPad(/semi/i.test(m.stage+(m.label||""))?"SF":"F",3)+" BEER ST "+ttxPad(`${v.f}-${v.a}`,5,1)+"  "+ttxClean(oppOfGame(m)).toUpperCase().slice(0,14)))});
+    const mv=po.length?playoffMvp(current,po):null, lm=latestMotm&&latestMotm();
+    if(mv) {L.push("");L.push(c("y"," MAN OF THE PLAYOFFS  ")+c("w",ttxClean(mv.name).toUpperCase()));}
+    else if(lm) {L.push("");L.push(c("y"," MAN OF THE MATCH  ")+c("w",ttxClean(lm.name).toUpperCase()));}
+    const nx=ourMatches(current).filter(m=>!m.bye&&m.hs==null&&m.date>=TODAY)[0];
+    L.push(c("c",nx?ttxClean(` NEXT  ${fmtDate(nx.date,{weekday:"short",day:"numeric",month:"short"})} ${nx.time}  ${oppOfGame(nx)}`).toUpperCase():ttxClean(` ${(DATA.nextSeason&&DATA.nextSeason.name)||"WINTER 2027"} SCHEDULE  COMING SOON`).toUpperCase()));
+  } else if(TTX.page===303){
+    const gs=allGames().filter(g=>view(g.m).played).reverse().slice(0,15);
+    L.push(c("g","  DATE    RESULT  OPPONENT"));
+    gs.forEach(g=>{const v=view(g.m);L.push(c("c"," "+ttxPad(fmtDate(g.m.date,{day:"2-digit",month:"short"}).toUpperCase(),7))+c(v.r==="W"?"g":v.r==="L"?"r":"y"," "+v.r+" ")+c("w",ttxPad(`${v.f}-${v.a}`,5,1)+"  "+ttxPad(ttxClean(oppOfGame(g.m)).toUpperCase(),20)))});
+  } else {
+    L.push(c("g","   NO  PLAYER       POS  FROM"));
+    (DATA.roster||[]).filter(r=>r.pos!=="Retired").slice().sort((a,b)=>(a.num??999)-(b.num??999)).forEach(r=>
+      L.push(c("y",ttxPad(r.num??"",5,1)+"  ")+c("w",ttxPad(ttxClean(r.name).toUpperCase(),12)+" ")+c("c",ttxPad((r.pos||"").split("/")[0].replace("Alternate","SUB"),4))+c("m"," "+ttxPad(ttxClean(r.city||"").toUpperCase().split(",")[0],14))));
+  }
+  while(L.length<23)L.push("");
+  L.push(`<span class="ttx-fast"><button data-ttx="303" class="tr">Results</button><button data-ttx="302" class="tg">Table</button><button data-ttx="304" class="ty">Squad</button><button data-ttx="x" class="tc">Exit</button></span>`);
+  document.getElementById("ttxScr").innerHTML=L.join("\n");
+}
+function ttxOpen(){const el=document.getElementById("ttx");el.hidden=false;document.body.classList.add("ttx-open");
+  // the old "searching for page" count-up before the page appears
+  let n=100;const scr=document.getElementById("ttxScr");clearInterval(TTX.timer);
+  const tick=setInterval(()=>{n+=17;if(n>=TTX.page){clearInterval(tick);ttxRender();TTX.timer=setInterval(ttxRender,1000);return}
+    scr.innerHTML=`<span class="tw">P${n}</span>`},35);
+  el.querySelector("button")?.focus?.();}
+function ttxClose(){clearInterval(TTX.timer);document.getElementById("ttx").hidden=true;document.body.classList.remove("ttx-open");document.getElementById("eggBird").focus()}
+document.getElementById("eggBird").onclick=()=>{TTX.page=302;ttxOpen()};
+document.getElementById("ttx").addEventListener("click",e=>{const b=e.target.closest("[data-ttx]");
+  if(b){if(b.dataset.ttx==="x")ttxClose();else{TTX.page=+b.dataset.ttx;ttxRender()}}else if(e.target.id==="ttx")ttxClose()});
+document.addEventListener("keydown",e=>{if(document.getElementById("ttx").hidden)return;
+  if(e.key==="Escape")ttxClose();const k={r:303,g:302,y:304}[e.key.toLowerCase()];if(k){TTX.page=k;ttxRender()}});
+
+/* ---------- Easter egg 2: the glass gets the site drunk ---------- */
+const HICS=["Hic.","Another round?","I love you guys.","We were robbed.","Who ordered this?","Last orders!","Is the room moving?","I'm fine. I'm fine."];
+let hicT=null;
+function setDrunk(on){document.body.classList.toggle("drunk",on);document.getElementById("eggGlass").setAttribute("aria-pressed",on);
+  document.getElementById("eggGlass").setAttribute("aria-label",on?"Sober up":"Have another");
+  const h=document.getElementById("hic");clearInterval(hicT);
+  const say=t=>{h.textContent=t;h.classList.remove("show");void h.offsetWidth;h.classList.add("show")};
+  if(on){say("Cheers!");hicT=setInterval(()=>say(HICS[Math.floor(Math.random()*HICS.length)]),6500)}else say("Sobering up…");}
+document.getElementById("eggGlass").onclick=()=>setDrunk(!document.body.classList.contains("drunk"));
+
 /* ---------- the back page: gossip, rumours and fines ---------- */
 function renderBackPage(){
   const T=DATA.tabloid||{}, out=new Set(T.optOut||[]), ok=x=>!x.who||!out.has(x.who);
