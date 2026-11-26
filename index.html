@@ -608,6 +608,10 @@ body.mood-win .hero{box-shadow:inset 0 0 160px rgba(229,185,78,.35)}
 .beer-clock.open{animation:pop .4s ease-out}
 @media (max-width:600px){.beer-clock{top:auto;bottom:10px;font-size:15px}.wgo{bottom:auto;top:70px;left:14px;font-size:14px}}
 @media (prefers-reduced-motion:reduce){body.mood-loss .wx .rain{animation:none}body.mood-storm .wx .flash{animation:none}}
+.hero{transition:filter 1.5s ease,box-shadow 1.5s ease}
+.wx .rain,.wx .flash,.wgo{transition:opacity 1.5s ease}
+body.mood-fade .wx .rain,body.mood-fade .wx .flash,body.mood-fade .wgo{opacity:0!important;animation-play-state:paused}
+body.mood-fade .hero{filter:none!important;box-shadow:none}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1857,7 +1861,11 @@ function applyMood(){
   document.body.classList.add(v.r==="W"?"mood-win":v.r==="L"?"mood-loss":"mood-draw");
   if(big) document.body.classList.add("mood-storm");
   if(v.r==="L"){const w=document.getElementById("wgo");w.hidden=false;w.title=`${v.f}–${v.a} vs ${oppOfGame(g.m)}`;}
-  if(v.r==="W"){const go=()=>setTimeout(confetti,350);document.getElementById("landing").hidden?go():document.addEventListener("landingclosed",go,{once:true});}
+  const onSite=fn=>document.getElementById("landing").hidden?fn():document.addEventListener("landingclosed",fn,{once:true});
+  if(v.r==="W") onSite(()=>setTimeout(confetti,350));
+  // the mood only lasts the first 30 seconds on the site, then fades back to normal
+  onSite(()=>setTimeout(()=>{document.body.classList.add("mood-fade");
+    setTimeout(()=>{document.body.classList.remove("mood-win","mood-loss","mood-draw","mood-storm","mood-fade");document.getElementById("wgo").hidden=true},1600)},30000));
 }
 
 /* ---------- the pigeon who lives here ---------- */
@@ -1987,9 +1995,10 @@ document.querySelectorAll("img.logo, img.fm-logo").forEach(im=>{
 document.getElementById("livePill").hidden=isComplete(current);
 const curRow=standings(current), curPos=curRow.findIndex(r=>r.team===US)+1;
 document.getElementById("heroMeta").innerHTML=`<small>${esc(DATA.league)}</small>${label(current)} · ${ord(curPos)} place`;
-renderCurrentStandings();renderCurrentStats();renderPastStandings();renderPastStats();renderRecords();renderAttWidget();applyMood();
+renderCurrentStandings();renderCurrentStats();renderPastStandings();renderPastStats();renderRecords();renderAttWidget();
 show(location.hash.slice(1));
 renderLanding();
+applyMood();   // after the landing decides whether it shows, so the 30 seconds start once you are on the site
 </script>
 </body>
 </html>
