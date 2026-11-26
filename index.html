@@ -1697,7 +1697,7 @@ function teamSummary(season){
 const spct=p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return f?Math.round((p.saves||0)/f*100):null;};
 function motmScore(p){
   const sp=spct(p);
-  return (p.goals||0)*3 + (p.assists||0)*2 + (p.plusMinus||0) + (p.steals||0)*1.0 + (p.saves||0)*1.0
+  return (p.goals||0)*3 + (p.assists||0)*2 + (p.plusMinus||0) + (p.steals||0)*1.0 - (p.giveaways||0)*0.5 + (p.saves||0)*1.0
        + (sp!=null&&(p.saves||0)>=5&&sp>=70?3:0) - (p.goalsAgainst||0)*0.2
        - (p.yellow||0)*2 - (p.red||0)*5;
 }
@@ -1799,16 +1799,16 @@ function seasonPlayers(s){
   if((s.players||[]).length) return s.players;
   const m={}, ros=Object.fromEntries((DATA.roster||[]).map(p=>[p.name,p]));
   Object.values(s.gameStats||{}).forEach(g=>(g||[]).forEach(p=>{
-    const r=m[p.name]||(m[p.name]={num:(ros[p.name]||{}).num,name:p.name,pos:(ros[p.name]||{}).pos||"",apps:0,goals:0,assists:0,plusMinus:0,steals:0,saves:0,goalsAgainst:0,yellow:0,red:0});
-    r.apps++; ["goals","assists","plusMinus","steals","saves","goalsAgainst","yellow","red"].forEach(k=>r[k]+=(p[k]||0));
+    const r=m[p.name]||(m[p.name]={num:(ros[p.name]||{}).num,name:p.name,pos:(ros[p.name]||{}).pos||"",apps:0,goals:0,assists:0,plusMinus:0,steals:0,giveaways:0,saves:0,goalsAgainst:0,yellow:0,red:0});
+    r.apps++; ["goals","assists","plusMinus","steals","giveaways","saves","goalsAgainst","yellow","red"].forEach(k=>r[k]+=(p[k]||0));
   }));
   return Object.values(m);
 }
 function aggregatePlayers(list){
   const m={};
   list.forEach(s=>seasonPlayers(s).forEach(p=>{
-    const r=m[p.name]||(m[p.name]={num:p.num,name:p.name,pos:p.pos,apps:0,goals:0,assists:0,plusMinus:0,steals:0,saves:0,goalsAgainst:0,yellow:0,red:0,seasons:0});
-    ["apps","goals","assists","plusMinus","steals","saves","goalsAgainst","yellow","red"].forEach(k=>r[k]+=(p[k]||0)); r.seasons++;
+    const r=m[p.name]||(m[p.name]={num:p.num,name:p.name,pos:p.pos,apps:0,goals:0,assists:0,plusMinus:0,steals:0,giveaways:0,saves:0,goalsAgainst:0,yellow:0,red:0,seasons:0});
+    ["apps","goals","assists","plusMinus","steals","giveaways","saves","goalsAgainst","yellow","red"].forEach(k=>r[k]+=(p[k]||0)); r.seasons++;
   }));
   return Object.values(m);
 }
@@ -1821,7 +1821,7 @@ function sortBar(id,opts){
     <select data-sortsel="${id}" aria-label="Sort players by">${opts.map(([k,l])=>`<option value="${k}" ${st.key===k?"selected":""}>${l}</option>`).join("")}</select></label>
     <button class="chip" data-sortdir="${id}" aria-label="Reverse sort order">${st.asc?"↑":"↓"} ${dir}</button></div>`;
 }
-const STAT_SORTS=[["goals","Goals"],["assists","Assists"],["ga","Goals + Assists"],["plusMinus","+/-"],["steals","Steals"],["apps","Appearances"],["saves","Saves"],["goalsAgainst","Goals Against"],["cards","Cards"],["num","Shirt number"],["name","Name"],["pos","Position"]];
+const STAT_SORTS=[["goals","Goals"],["assists","Assists"],["ga","Goals + Assists"],["plusMinus","+/-"],["steals","Steals"],["giveaways","Giveaways"],["apps","Appearances"],["saves","Saves"],["goalsAgainst","Goals Against"],["cards","Cards"],["num","Shirt number"],["name","Name"],["pos","Position"]];
 const SQUAD_SORTS=[["num","Shirt number"],["name","Name"],["pos","Position"]];
 function leaderTile(players,key,labelText,ghost,filter){
   const ranked=players.map(p=>({...p,ga:(p.goals||0)+(p.assists||0)})).filter(filter||(()=>true)).filter(p=>p[key]>0).sort((a,b)=>b[key]-a[key]||b.ga-a.ga);
@@ -1837,8 +1837,8 @@ function playerTable(players,tableId,showSeasons){
   const opts=(showSeasons?[["seasons","Seasons"]]:[]).concat(STAT_SORTS);
   const cols=[["num","#",false],["name","Player",false],["pos","Pos",false]]
     .concat(showSeasons?[["seasons","Szns",true]]:[])
-    .concat([["apps","Apps",true],["goals","Goals",true],["assists","Assists",true],["ga","G+A",true],["plusMinus","+/-",true],["steals","Steals",true],["saves","Saves",true],["goalsAgainst","GA",true],["savePct","Save %",true],["cards","Cards",true]]);
-  const rows=players.map(p=>({...p,apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,steals:p.steals||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0),
+    .concat([["apps","Apps",true],["goals","Goals",true],["assists","Assists",true],["ga","G+A",true],["plusMinus","+/-",true],["steals","Steals",true],["giveaways","Giveaways",true],["saves","Saves",true],["goalsAgainst","GA",true],["savePct","Save %",true],["cards","Cards",true]]);
+  const rows=players.map(p=>({...p,apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,steals:p.steals||0,giveaways:p.giveaways||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0),
     savePct:((p.saves||0)+(p.goalsAgainst||0))?(p.saves||0)/((p.saves||0)+(p.goalsAgainst||0)):null})).sort((a,b)=>{
     if(st.key==="savePct"&&(a.savePct==null)!==(b.savePct==null)) return a.savePct==null?1:-1;
     const x=st.key==="num"?(a.num??999):(a[st.key]??0), y=st.key==="num"?(b.num??999):(b[st.key]??0); const c=typeof x==="string"?x.localeCompare(y):x-y;
@@ -1849,7 +1849,7 @@ function playerTable(players,tableId,showSeasons){
     <td class="l team"><span class="num-badge">${p.num??"–"}</span>${esc(p.name)}</td>
     <td class="l" style="color:var(--muted)">${p.pos}</td>
     ${showSeasons?z(p.seasons):""}${z(p.apps)}${z(p.goals)}${z(p.assists)}<td class="pts">${p.ga}</td>
-    <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.steals)}${z(p.saves)}${z(p.goalsAgainst)}<td class="${p.savePct==null?"zero":""}">${p.savePct==null?"–":(p.savePct*100).toFixed(1)+"%"}</td>
+    <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.steals)}${z(p.giveaways)}${z(p.saves)}${z(p.goalsAgainst)}<td class="${p.savePct==null?"zero":""}">${p.savePct==null?"–":(p.savePct*100).toFixed(1)+"%"}</td>
     <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:var(--zero)">0</span>`}</td>
   </tr>`).join("")}</tbody></table></div></div>`;
 }
@@ -1862,9 +1862,9 @@ function noStats(id){
   const th=(k,l)=>`<th class="sortable l ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${id}" tabindex="0" aria-sort="${st.key===k?(st.asc?"ascending":"descending"):"none"}">${l}</th>`;
   return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
       <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
-      <div style="color:var(--muted);margin-top:6px">Appearances, Goals, Assists, Goals + Assists, +/-, Steals, Saves, Goals Against, Save % and Cards will be tracked from then on, playoff games included.</div></div>
-    ${r.length?`<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}<th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Steals</th><th>Saves</th><th>GA</th><th>Save %</th><th>Cards</th></tr></thead><tbody>
-      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${esc(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(10)}</tr>`).join("")}
+      <div style="color:var(--muted);margin-top:6px">Appearances, Goals, Assists, Goals + Assists, +/-, Steals, Giveaways, Saves, Goals Against, Save % and Cards will be tracked from then on, playoff games included.</div></div>
+    ${r.length?`<div class="card flush"><h3>The Squad</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}<th>Apps</th><th>Goals</th><th>Assists</th><th>G+A</th><th>+/-</th><th>Steals</th><th>Giveaways</th><th>Saves</th><th>GA</th><th>Save %</th><th>Cards</th></tr></thead><tbody>
+      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${esc(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(11)}</tr>`).join("")}
     </tbody></table></div></div>`:""}`;
 }
 function statsBody(players,tableId,showSeasons){
@@ -1876,7 +1876,7 @@ function statsBody(players,tableId,showSeasons){
       ${leaderTile(players,"plusMinus","Plus / Minus","±")}
     </div>
     ${playerTable(players,tableId,showSeasons)}
-    <p class="note">Season totals include playoff games. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Steals = possession won from an opponent · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Cards = yellow / red cards.</p>`;
+    <p class="note">Season totals include playoff games. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · +/- = team goals scored minus goals conceded while the player was on the field · Steals = possession won from an opponent · Giveaways = possession lost to an opponent · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Cards = yellow / red cards.</p>`;
 }
 function renderCurrentStats(){
   const s=current;
@@ -1981,7 +1981,7 @@ function playoffMvp(s,po){
   const manual=(DATA.playoffMvp||{})[s.id]; if(manual&&manual.name) return {name:manual.name,line:manual.blurb||""};
   const dates=[...new Set(po.filter(m=>m.hs!=null).map(m=>m.date))], agg={};
   dates.forEach(d=>((s.gameStats||{})[d]||[]).forEach(p=>{const a=agg[p.name]||(agg[p.name]={name:p.name});
-    ["goals","assists","plusMinus","steals","saves","goalsAgainst","yellow","red"].forEach(k=>a[k]=(a[k]||0)+(p[k]||0));}));
+    ["goals","assists","plusMinus","steals","giveaways","saves","goalsAgainst","yellow","red"].forEach(k=>a[k]=(a[k]||0)+(p[k]||0));}));
   const best=Object.values(agg).filter(p=>motmScore(p)>0).sort((a,b)=>motmScore(b)-motmScore(a)||a.name.localeCompare(b.name))[0];
   if(best){const l=statLine(best);return {name:best.name,line:l?l.replace(/\.$/,"")+` across ${dates.length>1||po.filter(m=>m.hs!=null).length>1?"the playoffs":"the playoff"}.`:""};}
   const picks=motmPicks(s), pk=po.map(m=>picks[m.date]).filter(Boolean).pop();   // fallback: a playoff match pick
