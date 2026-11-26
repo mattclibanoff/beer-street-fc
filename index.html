@@ -2114,9 +2114,9 @@ function playJingle(r){
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-jingle]");if(!b)return;const r=(DATA.roster||[]).find(x=>x.name===b.dataset.jingle);if(r)playJingle(r)});
 
-/* 8. Brad's ghost: between 2 and 4am his photo sometimes fades out */
+/* 8. Brad's ghost: between midnight and 4am his photo sometimes fades out */
 (function(){const m=document.querySelector(".memoriam");if(!m)return;
-  const tick=()=>{const h=new Date().getHours();if(h>=2&&h<4&&Math.random()<.5){m.classList.add("haunt");setTimeout(()=>m.classList.remove("haunt"),4200)}};
+  const tick=()=>{const h=new Date().getHours();if(h>=0&&h<4&&Math.random()<.5){m.classList.add("haunt");setTimeout(()=>m.classList.remove("haunt"),4200)}};
   setInterval(tick,20000);setTimeout(tick,4000);})();
 
 /* ---------- the back page: gossip, rumours and fines ---------- */
