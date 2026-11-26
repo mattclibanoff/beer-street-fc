@@ -173,9 +173,37 @@ function summary(){const pad=(t,n)=>String(t).padEnd(n),L=[];
   const k=S.players.filter(p=>p.g==="keeper"&&used(p));
   L.push("","KEEPERS: Player | Saves | GA");k.forEach(p=>L.push([p.name,v(p,"saves"),v(p,"ga")].join(" | ")));
   return L.join("\n")}
+/* ---------- send to site (owner code only) ---------- */
+const CODE_KEY="bsfc-submit-code";
+const getCode=()=>{try{return localStorage.getItem(CODE_KEY)||""}catch(e){return ""}};
+const setCode=c=>{try{c?localStorage.setItem(CODE_KEY,c):localStorage.removeItem(CODE_KEY)}catch(e){}};
+function payload(){const used=p=>p.played||Object.values(p.s).some(x=>x);
+  const field=S.players.filter(p=>p.g!=="keeper"&&used(p)).map(p=>({name:p.name,played:!!p.played,...Object.fromEntries(["goals","assists","shots","plus","minus","takeaways","giveaways","blocks","fouls","yellow","red"].map(k=>[k,v(p,k)]))}));
+  const keepers=S.players.filter(p=>p.g==="keeper"&&used(p)).map(p=>({name:p.name,played:!!p.played,saves:v(p,"saves"),ga:v(p,"ga")}));
+  return {date:S.date,opp:S.opp,us:ourScore(),them:S.them,other:S.other,field,keepers};}
+async function sendToSite(){
+  const msg=document.getElementById("sendMsg"),btn=document.getElementById("send"),inp=document.getElementById("codeIn");
+  const code=inp?inp.value.trim():getCode();
+  if(!S.date){msg.textContent="Add the game date at the top first.";return}
+  if(!code){msg.textContent="Enter your code first.";return}
+  btn.disabled=true;msg.textContent="Sending…";
+  try{const r=await fetch("/api/submit",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({code,game:payload()})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok&&j.ok){setCode(code);S.sentAt=new Date().toISOString();save();msg.textContent="Sent ✓ The site updates with the next daily refresh.";btn.textContent="Send again (replaces it)";}
+    else if(r.status===401){setCode("");msg.textContent="That code wasn't right.";renderSend();}
+    else msg.textContent=(j.error||"Couldn't send")+" Use Copy instead.";
+  }catch(e){msg.textContent="No connection. Try again, or use Copy.";}
+  btn.disabled=false;}
+function renderSend(){const box=document.getElementById("sendBox");if(!box)return;const has=!!getCode();
+  box.innerHTML=`${has?"":`<input id="codeIn" type="password" autocomplete="off" placeholder="Your code" aria-label="Submission code" style="flex:1 1 140px;min-height:44px;background:#15101a;color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:0 12px;font-size:16px">`}
+    <button class="btn gold" id="send">${S.sentAt?"Send again (replaces it)":"Send to site"}</button>`;
+  document.getElementById("send").onclick=sendToSite;}
 document.getElementById("done").onclick=()=>{const t=summary();
-  openDlg("Full time",`<p class="hint" style="margin-top:0">Copy this and paste it to Claude to update the site.</p><textarea readonly id="sumTxt">${esc(t)}</textarea>
-  <div class="row" style="margin-top:10px;justify-content:flex-end"><button class="btn ghost" id="x">Close</button><button class="btn gold" id="cp">Copy</button></div>`);
+  openDlg("Full time",`<div class="row" id="sendBox" style="justify-content:flex-start;flex-wrap:wrap"></div><p class="hint" id="sendMsg" style="min-height:1.4em">${S.sentAt?"Already sent. Sending again replaces the earlier one.":""}</p>
+  <details style="margin-top:6px"><summary class="hint" style="cursor:pointer">Or copy the summary</summary><textarea readonly id="sumTxt">${esc(t)}</textarea>
+  <div class="row" style="margin-top:10px;justify-content:flex-end"><button class="btn ghost" id="cp">Copy</button></div></details>
+  <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn ghost" id="x">Close</button></div>`);
+  renderSend();
   document.getElementById("x").onclick=()=>dlg.close();
   document.getElementById("cp").onclick=async()=>{const ta=document.getElementById("sumTxt");
     try{await navigator.clipboard.writeText(t);toast("Copied")}catch(e){ta.focus();ta.select();toast("Selected: tap Copy in the menu")}}};
