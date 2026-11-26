@@ -1848,8 +1848,10 @@ function fifaRating(p,gk){
   let score;
   if(gk){ const shots=(p.saves||0)+(p.goalsAgainst||0), sv=shots?(p.saves||0)/shots:.5;
     score=10*(sv-.5)+.4*per("saves")-.3*per("goalsAgainst")+2*per("cleanSheets");
-  } else score=3*per("goals")+2*per("assists")+.15*per("shots")+.5*per("plusMinus")+.6*per("takeaways")+.6*per("blocks")
-    -.5*per("giveaways")-.5*per("fouls")-(2*(p.yellow||0)+5*(p.red||0))/apps;
+  } else { /* position tweaks (+20%): FW goals & assists, MF assists, DF +/- & takeaways */
+    const pos=posOf(p), fw=/\bFW\b/.test(pos), mf=/\bMF\b/.test(pos), df=/\bDF\b/.test(pos), up=b=>b?1.2:1;
+    score=3*up(fw)*per("goals")+2*up(fw||mf)*per("assists")+.15*per("shots")+.5*up(df)*per("plusMinus")+.6*up(df)*per("takeaways")+.6*per("blocks")
+    -.5*per("giveaways")-.5*per("fouls")-(2*(p.yellow||0)+5*(p.red||0))/apps; }
   score*=apps/(apps+1);
   const r=score>=0?40+59*(1-Math.exp(-score/5)):40*Math.exp(score/3);
   return Math.max(1,Math.min(99,Math.round(r)));
@@ -1905,7 +1907,7 @@ function statsBody(players,tableId,showSeasons){
     </div>
     ${playerTable(players,tableId,showSeasons,"out")}
     ${playerTable(players,tableId+"-gk",showSeasons,"gk")}
-    <p class="note">Season totals include playoff games. Players who play two positions appear in both tables. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · Shots = shots taken · +/- = team goals scored minus goals conceded while the player was on the field · Takeaways = possession won from an opponent · Giveaways = possession lost to an opponent · Blocks = opponent shots blocked · Fouls = fouls committed · Cards = yellow / red cards · Apps in Goal = games spent in goal · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Clean Sheets = games in goal without conceding · Rating = FIFA-style 1–99 score built from every stat across the season, per game played: goals, assists, shots, +/-, takeaways and blocks push it up; giveaways, fouls and cards pull it down. Keepers are rated on save %, saves, goals against and clean sheets. Gold 75+, silver 65–74, bronze under 65.</p>`;
+    <p class="note">Season totals include playoff games. Players who play two positions appear in both tables. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · Shots = shots taken · +/- = team goals scored minus goals conceded while the player was on the field · Takeaways = possession won from an opponent · Giveaways = possession lost to an opponent · Blocks = opponent shots blocked · Fouls = fouls committed · Cards = yellow / red cards · Apps in Goal = games spent in goal · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Clean Sheets = games in goal without conceding · Rating = FIFA-style 1–99 score built from every stat across the season, per game played: goals, assists, shots, +/-, takeaways and blocks push it up; giveaways, fouls and cards pull it down. Forwards get extra credit for goals and assists, midfielders for assists, defenders for +/- and takeaways. Keepers are rated on save %, saves, goals against and clean sheets. Gold 75+, silver 65–74, bronze under 65.</p>`;
 }
 function renderCurrentStats(){
   const s=current;
