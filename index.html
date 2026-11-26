@@ -1033,7 +1033,14 @@ function renderRecords(){
   const wild=pick(()=>true,(a,b)=>(b.v.f+b.v.a)-(a.v.f+a.v.a));
   const streak=test=>{let best=0,cur=0,end=null,bestEnd=null;games.forEach(g=>{if(test(g.v.r)){cur++;if(cur>best){best=cur;bestEnd=g}}else cur=0});return {n:best,end:bestEnd}};
   const ws=streak(r=>r==="W"), us=streak(r=>r!=="L");
-  const fin=seasons.filter(isComplete).map(s=>({s,pos:standings(s).findIndex(r=>r.team===US)+1,n:standings(s).length})).filter(x=>x.pos>0);
+  /* final placing: final won = 1st, final lost = 2nd, semifinal lost = 3rd, otherwise league position */
+  const isFinalM=m=>m.stage&&/final|championship/i.test(m.stage+" "+(m.label||""))&&!/semi/i.test((m.label||"")+" "+m.stage);
+  const isSemiM=m=>m.stage&&/semi/i.test((m.label||"")+" "+m.stage);
+  const placing=s=>{const po=ourMatches(s).filter(m=>m.stage&&m.hs!=null),f=po.find(isFinalM),sf=po.find(isSemiM),lg=standings(s).findIndex(r=>r.team===US)+1;
+    if(f) return {pos:view(f).r==="W"?1:2,how:view(f).r==="W"?"Champions":"Runners-up",lg};
+    if(sf&&view(sf).r==="L") return {pos:3,how:"Semifinalists",lg};
+    return {pos:lg,how:"",lg};};
+  const fin=seasons.filter(isComplete).map(s=>({s,...placing(s),n:standings(s).length})).filter(x=>x.pos>0);
   const best=fin.slice().sort((a,b)=>a.pos-b.pos)[0];
   const finals=seasons.filter(s=>ourMatches(s).some(m=>m.stage&&/final|championship/i.test(m.stage+" "+(m.label||""))&&!/semi/i.test(m.stage)));
   const titles=seasons.filter(s=>isComplete(s)&&seasonChampion(s)===US);
@@ -1056,7 +1063,7 @@ function renderRecords(){
       ${bigW?rec("Biggest win",gameLine(bigW),(n=>n>1?`Done ${n} times`:"")(games.filter(g=>g.v.r==="W"&&g.v.f-g.v.a===bigW.v.f-bigW.v.a&&g.v.f===bigW.v.f).length)):""}${bigL?rec("Heaviest defeat",gameLine(bigL)):""}
       ${most?rec("Most goals in a game",`${most.v.f} goals`,gameLine(most)):""}${wild?rec("Highest-scoring game",`${wild.v.f+wild.v.a} goals`,gameLine(wild)):""}
       ${rec("Longest winning streak",`${ws.n} game${ws.n===1?"":"s"}`,streakSub(ws))}${rec("Longest unbeaten run",`${us.n} game${us.n===1?"":"s"}`,streakSub(us))}
-      ${best?rec("Best league finish",`${ord(best.pos)} of ${best.n}`,esc(label(best.s))):""}
+      ${best?rec("Best finish",`${ord(best.pos)} of ${best.n}`,`${esc(label(best.s))}${best.how?` · ${best.how}`:""}${best.lg&&best.lg!==best.pos?` · ${ord(best.lg)} in the regular season`:""}`):""}
       ${finals.length?rec("Finals reached",finals.length,finals.map(s=>esc(label(s))).join(", ")):""}
     </div></div>
     <p class="note">All competitive games, playoffs included. Player records join this page once a few seasons of stats are in.</p>`;
