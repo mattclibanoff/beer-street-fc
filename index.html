@@ -1898,9 +1898,6 @@ function applyMood(){
   if(v.r==="L"){const w=document.getElementById("wgo");w.hidden=false;w.title=`${v.f}–${v.a} vs ${oppOfGame(g.m)}`;}
   const onSite=fn=>document.getElementById("landing").hidden?fn():document.addEventListener("landingclosed",fn,{once:true});
   if(v.r==="W") onSite(()=>setTimeout(confetti,350));
-  // the mood only lasts the first 30 seconds on the site, then fades back to normal
-  onSite(()=>setTimeout(()=>{document.body.classList.add("mood-fade");
-    setTimeout(()=>{document.body.classList.remove("mood-win","mood-loss","mood-draw","mood-storm","mood-fade");document.getElementById("wgo").hidden=true},1600)},30000));
 }
 
 /* ---------- the pigeon who lives here ---------- */
