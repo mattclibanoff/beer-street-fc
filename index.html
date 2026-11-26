@@ -612,6 +612,13 @@ body.mood-win .hero{box-shadow:inset 0 0 160px rgba(229,185,78,.35)}
 .wx .rain,.wx .flash,.wgo{transition:opacity 1.5s ease}
 body.mood-fade .wx .rain,body.mood-fade .wx .flash,body.mood-fade .wgo{opacity:0!important;animation-play-state:paused}
 body.mood-fade .hero{filter:none!important;box-shadow:none}
+
+.form .fchip{width:18px;height:18px;display:grid;place-items:center;font:800 12px "Barlow Condensed",sans-serif;border-radius:2px;color:var(--ink);text-decoration:none;border:0;padding:0;cursor:pointer;transition:transform .12s}
+.strip .form .fchip{width:20px;height:22px;font-size:13px}
+.fchip.W{background:var(--win)}.fchip.L{background:var(--loss)}.fchip.D{background:var(--cream-2)}
+.fchip:hover,.fchip:focus-visible{transform:translateY(-2px) scale(1.12);outline:none;box-shadow:0 0 0 2px var(--cream)}
+.form-pop{position:fixed;z-index:180;background:var(--cream);color:var(--ink);font:600 13px "Barlow",system-ui,sans-serif;padding:7px 10px;box-shadow:3px 3px 0 rgba(0,0,0,.35);white-space:nowrap}
+.form-pop[hidden]{display:none}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -809,7 +816,24 @@ function formOf(season,team){
     .sort((a,b)=>a.date.localeCompare(b.date)||tmin(a.time)-tmin(b.time))
     .map(m=>{const f=m.home===team?m.hs:m.as,a=m.home===team?m.as:m.hs;return f>a?"W":f<a?"L":"D"});
 }
-const formChips=f=>f.length?`<span class="form" title="Last ${Math.min(5,f.length)} results, oldest to newest">${f.slice(-5).map(x=>`<i class="${x}">${x}</i>`).join("")}</span>`:`<span class="zero">–</span>`;
+/* the games behind a team's form, so each W/D/L can be clicked */
+function formGames(season,team){
+  const src=(season.leagueMatches||[]).length?season.leagueMatches:(season.matches||[]);
+  return src.filter(m=>!m.bye&&m.hs!=null&&m.as!=null&&(m.home===team||m.away===team))
+    .sort((a,b)=>a.date.localeCompare(b.date)||tmin(a.time)-tmin(b.time))
+    .map(m=>{const home=m.home===team,f=home?m.hs:m.as,a=home?m.as:m.hs;
+      return {r:f>a?"W":f<a?"L":"D",f,a,opp:home?m.away:m.home,m,ours:m.home===US||m.away===US,team}});
+}
+const formChips=f=>{
+  if(!f.length) return `<span class="zero">–</span>`;
+  const last=f.slice(-5);
+  return `<span class="form" title="Last ${last.length} results, oldest to newest">${last.map(x=>{
+    if(typeof x==="string") return `<i class="${x}">${x}</i>`;
+    const tip=`${x.r} ${x.f}–${x.a} vs ${x.opp} · ${fmtDate(x.m.date,{month:"short",day:"numeric"})}${x.m.stage?" · "+(x.m.label||x.m.stage):" · Wk "+x.m.round}`;
+    // Beer Street games open their match page; anyone else's shows the score
+    return x.ours?`<a class="fchip ${x.r}" href="#${matchId(x.m)}" title="${esc(tip)}" aria-label="${esc(tip)}">${x.r}</a>`
+                 :`<button type="button" class="fchip ${x.r}" data-tip="${esc(tip)}" aria-label="${esc(tip)}">${x.r}</button>`}).join("")}</span>`;
+};
 const teamSlug=n=>"team-"+String(n).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const tlink=n=>n===US||!n||n==="TBD"?esc(n):`<a class="plink" href="#${teamSlug(n)}">${esc(n)}</a>`;
 function standingsTable(season){
@@ -823,7 +847,7 @@ function standingsTable(season){
       <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
       <td class="hide-sm">${r.gf}</td><td class="hide-sm">${r.ga}</td>
       <td>${r.gd>0?"+":""}${r.gd}</td><td class="pts">${r.pts}</td>
-      <td class="l hide-sm">${formChips(season.standings?formOf(season,r.team):r.form)}</td>
+      <td class="l hide-sm">${formChips(season.standings?formGames(season,r.team):r.form)}</td>
     </tr>`}).join("")}</tbody></table></div>`;
 }
 
@@ -890,7 +914,7 @@ function teamSummary(season){
     <div><div class="k">Goals</div><div class="v">${rec.gf}<small>for</small> ${rec.ga}<small>ag</small></div></div>
     <div><div class="k">Goal Diff</div><div class="v">${rec.gd>0?"+":""}${rec.gd}${rec.po?"<small>incl. playoffs</small>":""}</div></div>
     <div><div class="k">Clean Sheets</div><div class="v">${cs}</div></div>
-    <div><div class="k">Form</div><div class="v">${formChips(formOf(season,US))}</div></div>
+    <div><div class="k">Form</div><div class="v">${formChips(formGames(season,US))}</div></div>
   </div>`;
 }
 
@@ -1389,7 +1413,7 @@ function renderMatch(id){
   // head to head going into / including this game
   const meets=games.filter(x=>oppOfGame(x.m)===opp&&view(x.m).played);
   const hw=meets.filter(x=>view(x.m).r==="W").length, hl=meets.filter(x=>view(x.m).r==="L").length, hd=meets.length-hw-hl;
-  const oppRow=standings(s).findIndex(r=>r.team===opp)+1, oppForm=formOf(s,opp);
+  const oppRow=standings(s).findIndex(r=>r.team===opp)+1, oppForm=formGames(s,opp);
   const hls=((DATA.highlights||{})[s.id]||[]).filter(h=>h.date===m.date&&(!h.time||h.time===m.time));
   const prev=games[i-1], next=games[i+1];
   const nav=g=>g?`<a href="#${matchId(g.m)}">${fmtDate(g.m.date,{month:"short",day:"numeric"})} · ${esc(view(g.m).played?`${view(g.m).r} ${view(g.m).f}–${view(g.m).a}`:"")} ${g.m.stage?esc(g.m.label||g.m.stage):`vs ${esc(oppOfGame(g.m))}`}</a>`:"<span></span>";
@@ -1455,7 +1479,7 @@ function renderTeam(slug){
         <div class="opp"><a class="mlink" href="#${matchId(x.m)}">${x.m.stage?esc(x.m.label||x.m.stage):`${v.home?"vs":"@"} ${esc(name)}`}</a><small>${esc(label(x.s))}${x.m.stage?"":` · Wk ${x.m.round}`}</small></div>
         ${v.played?`<div class="res">${v.f}–${v.a}<i class="${v.r}">${v.r}</i></div>`:`<span class="tag">${esc(x.m.time)}</span>`}</li>`}).join("")}</ul>`:`<div class="empty" style="padding:20px">We haven't played them yet.</div>`}</div>
     ${seasonsIn.length?`<div class="card flush"><h3>Their seasons</h3><div class="tbl-wrap"><table><thead><tr><th class="l">Season</th><th>Pos</th><th>W</th><th>D</th><th>L</th><th>Pts</th><th class="l">Form</th></tr></thead><tbody>
-      ${seasonsIn.map(s=>{const st=standings(s),i=st.findIndex(r=>r.team===name),r=st[i];return `<tr><td class="l">${esc(label(s))}${isComplete(s)&&seasonChampion(s)===name?` <svg class="trophy" style="color:var(--cream)"><use href="#cup"/></svg>`:""}</td><td>${ord(i+1)}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td class="pts">${r.pts}</td><td class="l">${formChips(formOf(s,name))}</td></tr>`}).join("")}
+      ${seasonsIn.map(s=>{const st=standings(s),i=st.findIndex(r=>r.team===name),r=st[i];return `<tr><td class="l">${esc(label(s))}${isComplete(s)&&seasonChampion(s)===name?` <svg class="trophy" style="color:var(--cream)"><use href="#cup"/></svg>`:""}</td><td>${ord(i+1)}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td class="pts">${r.pts}</td><td class="l">${formChips(formGames(s,name))}</td></tr>`}).join("")}
     </tbody></table></div></div>`:""}`;
   document.title=`${name} · Beer Street FC`;
 }
@@ -1844,6 +1868,17 @@ function setDrunk(on){document.body.classList.toggle("drunk",on);document.getEle
   const say=t=>{h.textContent=t;h.classList.remove("show");void h.offsetWidth;h.classList.add("show")};
   if(on){say("Cheers!");hicT=setInterval(()=>say(HICS[Math.floor(Math.random()*HICS.length)]),6500)}else say("Sobering up…");}
 document.getElementById("eggGlass").onclick=()=>setDrunk(!document.body.classList.contains("drunk"));
+
+/* ---------- form chips that aren't ours: show the score in a little popover ---------- */
+document.addEventListener("click",e=>{
+  let pop=document.getElementById("formPop");
+  const b=e.target.closest("button.fchip");
+  if(!b){if(pop)pop.hidden=true;return}
+  if(!pop){pop=document.createElement("div");pop.id="formPop";pop.className="form-pop";pop.setAttribute("role","status");document.body.appendChild(pop)}
+  pop.textContent=b.dataset.tip;pop.hidden=false;
+  const r=b.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-pop.offsetWidth-8,r.left+r.width/2-pop.offsetWidth/2))+"px";pop.style.top=(r.bottom+8)+"px";
+});
+addEventListener("scroll",()=>{const p=document.getElementById("formPop");if(p)p.hidden=true},{passive:true});
 
 /* ---------- the site's mood follows the last result ---------- */
 const lastPlayed=()=>allGames().filter(g=>view(g.m).played).pop()||null;
