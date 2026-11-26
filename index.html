@@ -844,8 +844,7 @@ function noStats(id){
       ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${plink(p.name)}${cityFlag(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(labels.length)}</tr>`).join("")}
     </tbody></table></div></div>`:"";};
   return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
-      <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
-      <div style="color:var(--muted);margin-top:6px">Outfield: Appearances, Goals, Assists, Goals + Assists, Shots, +/-, Takeaways, Giveaways, Blocked Shots, Fouls and Cards. Goalkeeping: Apps in Goal, Saves, Goals Against, Save % and Clean Sheets. Tracked from then on, playoff games included.</div></div>
+      <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div></div>
     ${table(id,p=>/\b(DF|MF|FW)\b/.test(p.pos)||!/\bGK\b/.test(p.pos),"Outfield",OUT_COLS.map(c=>c[1]))}
     ${table(id+"-gk",p=>/\bGK\b/.test(p.pos),"Goalkeeping",GK_COLS.map(c=>c[1]))}`;
 }
