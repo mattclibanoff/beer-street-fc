@@ -638,12 +638,6 @@ body.hungover *{transition-duration:.9s!important}
 .pint.go .pint-beer{animation:pour 5.2s ease-in-out forwards,bubbles 1.2s linear infinite}
 @keyframes pour{0%{height:0}35%{height:100%}62%{height:100%}100%{height:0}}
 @keyframes bubbles{to{background-position:0 -60px,0 0}}
-/* kickable ball */
-.kickball{position:fixed;left:0;top:0;z-index:130;width:40px;height:40px;padding:0;border:0;background:none;cursor:grab;touch-action:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45));will-change:transform}
-.kickball:active{cursor:grabbing}.kickball svg{width:100%;height:100%;display:block}
-.knocked{animation:knock .7s ease-out}
-@keyframes knock{20%{transform:rotate(-24deg) translate(-4px,-3px)}50%{transform:rotate(14deg) translate(3px,1px)}80%{transform:rotate(-6deg)}}
-@media print{.kickball{display:none}}
 /* odds */
 .odds h3 small{font-size:.7em;color:var(--muted)}
 .odds-t{width:100%;margin:0 0 10px}.odds-t td{padding:7px 20px}.odds-t td:last-child{text-align:right}
@@ -736,7 +730,6 @@ body.pigeons .pp-photo .pp-ph{display:none!important}
 <div class="crumb" id="crumb" hidden></div>
 <div class="hangover" id="hangover" hidden>Please keep it down.</div>
 <div class="pint" id="pint" aria-hidden="true" hidden><div class="pint-beer"><div class="pint-foam"></div></div></div>
-<button type="button" class="kickball" id="kickball" aria-label="Football. Drag or flick it around."><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18.5" fill="#f4f1ea" stroke="#111" stroke-width="1.5"/><path d="M20 12l6 4.5-2.3 7h-7.4l-2.3-7z" fill="#111"/><path d="M20 12V3.5M26 16.5l8-2.8M23.7 23.5l5 6.5M16.3 23.5l-5 6.5M14 16.5l-8-2.8" stroke="#111" stroke-width="1.4"/></svg></button>
 <div class="var" id="var" role="dialog" aria-modal="true" aria-label="VAR review" hidden><div class="var-box">
   <div class="var-head"><span class="var-dot"></span>VAR · REVIEW IN PROGRESS</div>
   <svg class="var-pitch" viewBox="0 0 320 180" aria-hidden="true"><rect width="320" height="180" fill="#2d6a3a"/>
@@ -2044,27 +2037,6 @@ function pourPint(){
   // Konami code turns everyone into pigeons
   const K=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];let ki=0;
   document.addEventListener("keydown",e=>{ki=(e.key===K[ki]||e.key.toLowerCase()===K[ki])?ki+1:(e.key===K[0]?1:0);if(ki===K.length){ki=0;pigeonTakeover();}});
-})();
-
-/* 3. a football you can kick around the page */
-(function(){
-  const b=document.getElementById("kickball"); if(!b) return;
-  const S=40; let x=16,y=innerHeight-S-16,vx=0,vy=0,drag=null,raf=null,hist=[];
-  const place=()=>{b.style.transform=`translate(${x}px,${y}px) rotate(${x*3}deg)`};place();
-  addEventListener("resize",()=>{x=Math.min(x,innerWidth-S);y=Math.min(y,innerHeight-S);place()});
-  const knock=()=>{const els=document.elementsFromPoint(x+S/2,y+S/2);for(const el of els){const t=el.closest&&el.closest(".fifa,.num-badge,.fchip,.tc-ovr,.mp-num");if(t&&!t.classList.contains("knocked")){t.classList.add("knocked");setTimeout(()=>t.classList.remove("knocked"),700);break}}};
-  const loop=()=>{x+=vx;y+=vy;vx*=.985;vy*=.985;
-    if(x<0){x=0;vx=-vx*.8}if(x>innerWidth-S){x=innerWidth-S;vx=-vx*.8}
-    if(y<0){y=0;vy=-vy*.8}if(y>innerHeight-S){y=innerHeight-S;vy=-vy*.8}
-    place();knock();
-    if(Math.hypot(vx,vy)>.15&&!drag)raf=requestAnimationFrame(loop);else raf=null};
-  b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);cancelAnimationFrame(raf);drag={dx:e.clientX-x,dy:e.clientY-y};hist=[[e.clientX,e.clientY,performance.now()]]});
-  b.addEventListener("pointermove",e=>{if(!drag)return;x=e.clientX-drag.dx;y=e.clientY-drag.dy;place();knock();hist.push([e.clientX,e.clientY,performance.now()]);if(hist.length>5)hist.shift()});
-  b.addEventListener("pointerup",e=>{if(!drag)return;drag=null;const a=hist[0],z=hist[hist.length-1],dt=Math.max(16,z[2]-a[2]);
-    vx=(z[0]-a[0])/dt*16;vy=(z[1]-a[1])/dt*16;
-    if(Math.hypot(vx,vy)<1){vx=(Math.random()*2-1)*14;vy=-10-Math.random()*6}   // a tap is a kick
-    raf=requestAnimationFrame(loop)});
-  b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();vx=(Math.random()*2-1)*14;vy=-12;raf=raf||requestAnimationFrame(loop)}});
 })();
 
 /* 4. fake betting odds on match previews (no money, obviously) */
