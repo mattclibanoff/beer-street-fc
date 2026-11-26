@@ -384,6 +384,15 @@ a.plink:hover{border-bottom-style:solid;color:var(--cream)}
 .aw-v{font:800 26px/1 "Barlow Condensed",sans-serif;margin-top:auto;padding-top:6px}
 .aw-v small{display:block;font:400 12px "Barlow",system-ui,sans-serif;color:var(--muted);margin-top:3px}
 .aw.bad .aw-t{color:var(--loss)}
+.cflag{position:relative;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:8px;width:24px;height:16px;border:1px solid rgba(var(--cream-rgb),.45);background:var(--plum);cursor:default;outline:none;font-style:normal}
+.cflag img{width:100%;height:100%;object-fit:cover;display:block}
+.cflag b{font:800 9px/1 "Barlow Condensed",sans-serif;color:var(--cream);letter-spacing:.02em}
+.cflag.big{width:54px;height:36px;margin-left:16px;border-width:2px;transform:translateY(-6px)}
+.cflag.big b{font-size:16px}
+.cflag::after{content:attr(data-city);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translate(-50%,4px);white-space:nowrap;background:var(--cream);color:var(--ink);font:600 13px/1 "Barlow",system-ui,sans-serif;font-style:normal;letter-spacing:0;text-transform:none;padding:6px 9px;box-shadow:3px 3px 0 rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:30}
+.cflag:hover::after,.cflag:focus::after,.cflag:focus-visible::after{opacity:1;transform:translate(-50%,0)}
+.cflag:focus-visible{box-shadow:0 0 0 2px var(--cream)}
+td .cflag::after{bottom:auto;top:calc(100% + 8px)}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -684,7 +693,7 @@ function motmCard(){
   const num=m.num??p.num;
   const meta=[m.opponent?`vs ${esc(m.opponent)}`:"",m.date?fmtDate(m.date,{month:"short",day:"numeric"}):"",m.score?esc(m.score):""].filter(Boolean).join(" · ");
   return `<div class="motm">${head}<div class="row"><div class="shirt">${num!=null?num:"★"}</div>
-    <div><div class="name">${plink(m.name)}</div>${meta?`<div class="meta">${meta}</div>`:""}</div></div>
+    <div><div class="name">${plink(m.name)}${cityFlag(m.name)}</div>${meta?`<div class="meta">${meta}</div>`:""}</div></div>
     ${m.blurb?`<p class="blurb">${esc(m.blurb)}</p>`:""}</div>`;
 }
 function leagueList(season){
@@ -777,6 +786,8 @@ function leaderTile(players,key,labelText,ghost,filter){
 }
 /* which table(s) a player belongs in: GK in their position → goalkeepers; any outfield position → outfield (both if both) */
 const playerSlug=n=>"player-"+String(n).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const cityFlag=(n,big)=>{const r=(DATA.roster||[]).find(x=>x.name===n);if(!r||!r.city)return "";
+  return `<span class="cflag${big?" big":""}" tabindex="0" role="img" aria-label="${esc(r.city)}" data-city="${esc(r.city)}">${r.flag?`<img src="${esc(r.flag)}" alt="" loading="lazy">`:`<b>${esc(r.city.slice(0,3).toUpperCase())}</b>`}</span>`;};
 const plink=n=>(DATA.roster||[]).some(r=>r.name===n)?`<a class="plink" href="#${playerSlug(n)}">${esc(n)}</a>`:esc(n);
 const posOf=p=>((DATA.roster||[]).find(r=>r.name===p.name)||{}).pos||p.pos||"";
 const isGK=p=>/\bGK\b/.test(posOf(p))||(p.saves||0)+(p.goalsAgainst||0)>0;
@@ -817,7 +828,7 @@ function playerTable(players,tableId,showSeasons,kind){
     <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.takeaways)}${z(p.giveaways)}${z(p.blocks)}${z(p.fouls)}
     <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:var(--zero)">0</span>`}</td>${ratingBadge(p.rating)}`;
   return `<div class="card flush" style="margin-bottom:18px"><h3>${gk?"Goalkeeping":"Outfield"}</h3><div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
-    <td class="l team"><span class="num-badge">${p.num??"–"}</span>${plink(p.name)}</td>
+    <td class="l team"><span class="num-badge">${p.num??"–"}</span>${plink(p.name)}${cityFlag(p.name)}</td>
     <td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${cells(p)}
   </tr>`).join("")}</tbody></table></div></div>`;
 }
@@ -830,7 +841,7 @@ function noStats(id){
       return (st.key==="num"?rank(a)-rank(b):0)||(st.asc?c:-c)||rank(a)-rank(b)||(a.num??999)-(b.num??999);});
     const th=(k,l)=>`<th class="sortable l ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${tid}" tabindex="0" aria-sort="${st.key===k?(st.asc?"ascending":"descending"):"none"}">${l}</th>`;
     return r.length?`<div class="card flush" style="margin-bottom:18px"><h3>${title}</h3><div class="tbl-wrap"><table><thead><tr>${th("name","Player")}${th("pos","Pos")}${labels.map(l=>`<th>${l}</th>`).join("")}</tr></thead><tbody>
-      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${plink(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(labels.length)}</tr>`).join("")}
+      ${r.map(p=>`<tr style="${p.pos==="Retired"?"opacity:.55":""}"><td class="l team"><span class="num-badge" style="${p.num==null?"background:var(--plum-soft)":""}">${p.num??"–"}</span>${plink(p.name)}${cityFlag(p.name)}</td><td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${'<td class="zero">–</td>'.repeat(labels.length)}</tr>`).join("")}
     </tbody></table></div></div>`:"";};
   return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
       <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
@@ -1025,7 +1036,7 @@ function renderPlayer(slug){
   root.innerHTML=`<a class="back" href="#current-stats">← Squad &amp; stats</a>
     <div class="pp-hero">
       <div class="pp-photo ${photo?"":"nophoto"}">${photo}<span class="pp-ph">${r.num??"★"}</span></div>
-      <div class="pp-id"><div class="pp-num">${r.num!=null?"#"+r.num:""}</div><h2 class="pp-name">${esc(r.name)}</h2>
+      <div class="pp-id"><div class="pp-num">${r.num!=null?"#"+r.num:""}</div><h2 class="pp-name">${esc(r.name)}${cityFlag(r.name,true)}</h2>
         <div class="pp-pos">${esc(posWords(r.pos))}${r.pos==="Retired"||r.pos==="Alternate"?"":" · Beer Street FC"}</div>
         ${r.bio?`<p class="pp-bio">${esc(r.bio)}</p>`:""}</div>
     </div>
