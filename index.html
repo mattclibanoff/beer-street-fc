@@ -316,6 +316,8 @@ footer{border-top:3px double rgba(var(--cream-rgb),.3)}
 body.on-about{font-family:"Barlow",system-ui,sans-serif;font-size:15px}
 .fifa{display:inline-grid;place-items:center;min-width:34px;height:26px;padding:0 4px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:16px;clip-path:polygon(0 0,100% 0,100% 78%,50% 100%,0 78%);color:#1b1410}
 .fifa.gold{background:linear-gradient(160deg,#f3dc8b,#c79a2e)}.fifa.silver{background:linear-gradient(160deg,#eef0f2,#9aa3ab)}.fifa.bronze{background:linear-gradient(160deg,#e7b48a,#9c5b31)}
+.tally-link{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;margin-top:6px;background:var(--plum);color:var(--cream);font:italic 800 16px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.03em;text-decoration:none;transform:rotate(-2deg);box-shadow:3px 3px 0 var(--cream);transition:transform .15s}
+.tally-link:hover{transform:rotate(0)}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1912,7 +1914,8 @@ function statsBody(players,tableId,showSeasons){
 function renderCurrentStats(){
   const s=current;
   document.getElementById("current-stats").innerHTML=`
-    <div class="section-head"><h2><span class="sub">Beer Street FC · Player stats</span>${label(s)}</h2></div>
+    <div class="section-head"><h2><span class="sub">Beer Street FC · Player stats</span>${label(s)}</h2>
+      <a class="tally-link" href="https://claude.ai/artifact/Um4jVYvHx7GG5LuwSoxwGS" target="_blank" rel="noopener">Open the tally app →</a></div>
     ${teamSummary(s)}${statsBody(seasonPlayers(s),"cur",false)}`;
 }
 
