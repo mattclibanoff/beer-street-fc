@@ -1697,14 +1697,14 @@ function teamSummary(season){
 const spct=p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return f?Math.round((p.saves||0)/f*100):null;};
 function motmScore(p){
   const sp=spct(p);
-  return (p.goals||0)*3 + (p.assists||0)*2 + (p.plusMinus||0) + (p.steals||0)*1.0 - (p.giveaways||0)*0.5 - (p.fouls||0)*0.5 + (p.saves||0)*1.0
+  return (p.goals||0)*3 + (p.assists||0)*2 + (p.plusMinus||0) + (p.takeaways||0)*1.0 - (p.giveaways||0)*0.5 - (p.fouls||0)*0.5 + (p.saves||0)*1.0
        + (sp!=null&&(p.saves||0)>=5&&sp>=70?3:0) - (p.goalsAgainst||0)*0.2
        - (p.yellow||0)*2 - (p.red||0)*5;
 }
 function statLine(p){
   const bits=[], pl=(n,w)=>`${n} ${w}${n===1?"":"s"}`;
   if(p.goals) bits.push(pl(p.goals,"goal")); if(p.assists) bits.push(pl(p.assists,"assist"));
-  if(p.steals) bits.push(pl(p.steals,"steal"));
+  if(p.takeaways) bits.push(pl(p.takeaways,"takeaway"));
   if(p.saves) bits.push(`${pl(p.saves,"save")}${spct(p)!=null?` (${spct(p)}%)`:""}`);
   if(!bits.length&&p.plusMinus>0) bits.push(`+${p.plusMinus} on the pitch`);
   return bits.length?bits.join(", ").replace(/, ([^,]*)$/," and $1")+".":"";
@@ -1799,17 +1799,17 @@ function seasonPlayers(s){
   if((s.players||[]).length) return s.players;
   const m={}, ros=Object.fromEntries((DATA.roster||[]).map(p=>[p.name,p]));
   Object.values(s.gameStats||{}).forEach(g=>(g||[]).forEach(p=>{
-    const r=m[p.name]||(m[p.name]={num:(ros[p.name]||{}).num,name:p.name,pos:(ros[p.name]||{}).pos||"",apps:0,goals:0,assists:0,shots:0,plusMinus:0,steals:0,giveaways:0,fouls:0,saves:0,goalsAgainst:0,yellow:0,red:0});
+    const r=m[p.name]||(m[p.name]={num:(ros[p.name]||{}).num,name:p.name,pos:(ros[p.name]||{}).pos||"",apps:0,goals:0,assists:0,shots:0,plusMinus:0,takeaways:0,giveaways:0,fouls:0,saves:0,goalsAgainst:0,yellow:0,red:0});
     r.apps++; if(p.saves!=null||p.goalsAgainst!=null||p.gk){r.gkApps=(r.gkApps||0)+1; if(!(p.goalsAgainst||0)) r.cleanSheets=(r.cleanSheets||0)+1;}
-    ["goals","assists","shots","plusMinus","steals","giveaways","fouls","saves","goalsAgainst","yellow","red"].forEach(k=>r[k]+=(p[k]||0));
+    ["goals","assists","shots","plusMinus","takeaways","giveaways","fouls","saves","goalsAgainst","yellow","red"].forEach(k=>r[k]+=(p[k]||0));
   }));
   return Object.values(m);
 }
 function aggregatePlayers(list){
   const m={};
   list.forEach(s=>seasonPlayers(s).forEach(p=>{
-    const r=m[p.name]||(m[p.name]={num:p.num,name:p.name,pos:p.pos,apps:0,gkApps:0,cleanSheets:0,goals:0,assists:0,shots:0,plusMinus:0,steals:0,giveaways:0,fouls:0,saves:0,goalsAgainst:0,yellow:0,red:0,seasons:0});
-    ["apps","gkApps","cleanSheets","goals","assists","shots","plusMinus","steals","giveaways","fouls","saves","goalsAgainst","yellow","red"].forEach(k=>r[k]+=(p[k]||0)); r.seasons++;
+    const r=m[p.name]||(m[p.name]={num:p.num,name:p.name,pos:p.pos,apps:0,gkApps:0,cleanSheets:0,goals:0,assists:0,shots:0,plusMinus:0,takeaways:0,giveaways:0,fouls:0,saves:0,goalsAgainst:0,yellow:0,red:0,seasons:0});
+    ["apps","gkApps","cleanSheets","goals","assists","shots","plusMinus","takeaways","giveaways","fouls","saves","goalsAgainst","yellow","red"].forEach(k=>r[k]+=(p[k]||0)); r.seasons++;
   }));
   return Object.values(m);
 }
@@ -1822,7 +1822,7 @@ function sortBar(id,opts){
     <select data-sortsel="${id}" aria-label="Sort players by">${opts.map(([k,l])=>`<option value="${k}" ${st.key===k?"selected":""}>${l}</option>`).join("")}</select></label>
     <button class="chip" data-sortdir="${id}" aria-label="Reverse sort order">${st.asc?"↑":"↓"} ${dir}</button></div>`;
 }
-const STAT_SORTS=[["goals","Goals"],["assists","Assists"],["ga","Goals + Assists"],["shots","Shots"],["plusMinus","+/-"],["steals","Steals"],["giveaways","Giveaways"],["fouls","Fouls"],["apps","Appearances"],["saves","Saves"],["goalsAgainst","Goals Against"],["cards","Cards"],["num","Shirt number"],["name","Name"],["pos","Position"]];
+const STAT_SORTS=[["goals","Goals"],["assists","Assists"],["ga","Goals + Assists"],["shots","Shots"],["plusMinus","+/-"],["takeaways","Takeaways"],["giveaways","Giveaways"],["fouls","Fouls"],["apps","Appearances"],["saves","Saves"],["goalsAgainst","Goals Against"],["cards","Cards"],["num","Shirt number"],["name","Name"],["pos","Position"]];
 const SQUAD_SORTS=[["num","Shirt number"],["name","Name"],["pos","Position"]];
 function leaderTile(players,key,labelText,ghost,filter){
   const ranked=players.map(p=>({...p,ga:(p.goals||0)+(p.assists||0)})).filter(filter||(()=>true)).filter(p=>p[key]>0).sort((a,b)=>b[key]-a[key]||b.ga-a.ga);
@@ -1836,13 +1836,13 @@ function leaderTile(players,key,labelText,ghost,filter){
 /* which table(s) a player belongs in: GK in their position → goalkeepers; any outfield position → outfield (both if both) */
 const posOf=p=>((DATA.roster||[]).find(r=>r.name===p.name)||{}).pos||p.pos||"";
 const isGK=p=>/\bGK\b/.test(posOf(p))||(p.saves||0)+(p.goalsAgainst||0)>0;
-const isOut=p=>/\b(DF|MF|FW)\b/.test(posOf(p))||!/\bGK\b/.test(posOf(p))||(p.goals||0)+(p.assists||0)+(p.shots||0)+(p.steals||0)>0;
-const OUT_COLS=[["apps","Apps"],["goals","Goals"],["assists","Assists"],["ga","G+A"],["shots","Shots"],["plusMinus","+/-"],["steals","Steals"],["giveaways","Giveaways"],["fouls","Fouls"],["cards","Cards"]];
+const isOut=p=>/\b(DF|MF|FW)\b/.test(posOf(p))||!/\bGK\b/.test(posOf(p))||(p.goals||0)+(p.assists||0)+(p.shots||0)+(p.takeaways||0)>0;
+const OUT_COLS=[["apps","Apps"],["goals","Goals"],["assists","Assists"],["ga","G+A"],["shots","Shots"],["plusMinus","+/-"],["takeaways","Takeaways"],["giveaways","Giveaways"],["fouls","Fouls"],["cards","Cards"]];
 const GK_COLS=[["gkApps","Apps in Goal"],["saves","Saves"],["goalsAgainst","GA"],["savePct","Save %"],["cleanSheets","Clean Sheets"]];
 function playerTable(players,tableId,showSeasons,kind){
   const gk=kind==="gk", st=sortState[tableId]||(sortState[tableId]={key:gk?"saves":"goals",asc:false});
   const cols=[["name","Player"],["pos","Pos"]].concat(showSeasons&&!gk?[["seasons","Szns"]]:[]).concat(gk?GK_COLS:OUT_COLS);
-  const rows=players.filter(gk?isGK:isOut).map(p=>({...p,pos:posOf(p),apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,shots:p.shots||0,steals:p.steals||0,giveaways:p.giveaways||0,fouls:p.fouls||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,gkApps:p.gkApps||0,cleanSheets:p.cleanSheets||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0),
+  const rows=players.filter(gk?isGK:isOut).map(p=>({...p,pos:posOf(p),apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,shots:p.shots||0,takeaways:p.takeaways||0,giveaways:p.giveaways||0,fouls:p.fouls||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,gkApps:p.gkApps||0,cleanSheets:p.cleanSheets||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0),
     savePct:((p.saves||0)+(p.goalsAgainst||0))?(p.saves||0)/((p.saves||0)+(p.goalsAgainst||0)):null})).sort((a,b)=>{
     if(st.key==="savePct"&&(a[st.key]==null)!==(b[st.key]==null)) return a[st.key]==null?1:-1;
     const x=st.key==="num"?(a.num??999):(a[st.key]??0), y=st.key==="num"?(b.num??999):(b[st.key]??0); const c=typeof x==="string"?x.localeCompare(y):x-y;
@@ -1853,7 +1853,7 @@ function playerTable(players,tableId,showSeasons,kind){
   const cells=p=>gk
     ? `${z(p.gkApps)}${z(p.saves)}${z(p.goalsAgainst)}<td class="${p.savePct==null?"zero":""}">${p.savePct==null?"–":(p.savePct*100).toFixed(1)+"%"}</td>${z(p.cleanSheets)}`
     : `${showSeasons?z(p.seasons):""}${z(p.apps)}${z(p.goals)}${z(p.assists)}<td class="pts">${p.ga}</td>${z(p.shots)}
-    <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.steals)}${z(p.giveaways)}${z(p.fouls)}
+    <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.takeaways)}${z(p.giveaways)}${z(p.fouls)}
     <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:var(--zero)">0</span>`}</td>`;
   return `<div class="card flush" style="margin-bottom:18px"><h3>${gk?"Goalkeeping":"Outfield"}</h3><div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
     <td class="l team"><span class="num-badge">${p.num??"–"}</span>${esc(p.name)}</td>
@@ -1873,7 +1873,7 @@ function noStats(id){
     </tbody></table></div></div>`:"";};
   return `<div class="card" style="text-align:center;padding:32px 20px;margin-bottom:24px">
       <div class="cond" style="font-weight:800;font-style:italic;font-size:26px;text-transform:uppercase">Player stats start ${esc(DATA.statsStart||"soon")}</div>
-      <div style="color:var(--muted);margin-top:6px">Outfield: Appearances, Goals, Assists, Goals + Assists, Shots, +/-, Steals, Giveaways, Fouls and Cards. Goalkeeping: Apps in Goal, Saves, Goals Against, Save % and Clean Sheets. Tracked from then on, playoff games included.</div></div>
+      <div style="color:var(--muted);margin-top:6px">Outfield: Appearances, Goals, Assists, Goals + Assists, Shots, +/-, Takeaways, Giveaways, Fouls and Cards. Goalkeeping: Apps in Goal, Saves, Goals Against, Save % and Clean Sheets. Tracked from then on, playoff games included.</div></div>
     ${table(id,p=>/\b(DF|MF|FW)\b/.test(p.pos)||!/\bGK\b/.test(p.pos),"Outfield",OUT_COLS.map(c=>c[1]))}
     ${table(id+"-gk",p=>/\bGK\b/.test(p.pos),"Goalkeeping",GK_COLS.map(c=>c[1]))}`;
 }
@@ -1887,7 +1887,7 @@ function statsBody(players,tableId,showSeasons){
     </div>
     ${playerTable(players,tableId,showSeasons,"out")}
     ${playerTable(players,tableId+"-gk",showSeasons,"gk")}
-    <p class="note">Season totals include playoff games. Players who play two positions appear in both tables. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · Shots = shots taken · +/- = team goals scored minus goals conceded while the player was on the field · Steals = possession won from an opponent · Giveaways = possession lost to an opponent · Fouls = fouls committed · Cards = yellow / red cards · Apps in Goal = games spent in goal · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Clean Sheets = games in goal without conceding.</p>`;
+    <p class="note">Season totals include playoff games. Players who play two positions appear in both tables. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · Shots = shots taken · +/- = team goals scored minus goals conceded while the player was on the field · Takeaways = possession won from an opponent · Giveaways = possession lost to an opponent · Fouls = fouls committed · Cards = yellow / red cards · Apps in Goal = games spent in goal · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Clean Sheets = games in goal without conceding.</p>`;
 }
 function renderCurrentStats(){
   const s=current;
@@ -1992,7 +1992,7 @@ function playoffMvp(s,po){
   const manual=(DATA.playoffMvp||{})[s.id]; if(manual&&manual.name) return {name:manual.name,line:manual.blurb||""};
   const dates=[...new Set(po.filter(m=>m.hs!=null).map(m=>m.date))], agg={};
   dates.forEach(d=>((s.gameStats||{})[d]||[]).forEach(p=>{const a=agg[p.name]||(agg[p.name]={name:p.name});
-    ["goals","assists","shots","plusMinus","steals","giveaways","fouls","saves","goalsAgainst","yellow","red"].forEach(k=>a[k]=(a[k]||0)+(p[k]||0));}));
+    ["goals","assists","shots","plusMinus","takeaways","giveaways","fouls","saves","goalsAgainst","yellow","red"].forEach(k=>a[k]=(a[k]||0)+(p[k]||0));}));
   const best=Object.values(agg).filter(p=>motmScore(p)>0).sort((a,b)=>motmScore(b)-motmScore(a)||a.name.localeCompare(b.name))[0];
   if(best){const l=statLine(best);return {name:best.name,line:l?l.replace(/\.$/,"")+` across ${dates.length>1||po.filter(m=>m.hs!=null).length>1?"the playoffs":"the playoff"}.`:""};}
   const picks=motmPicks(s), pk=po.map(m=>picks[m.date]).filter(Boolean).pop();   // fallback: a playoff match pick
