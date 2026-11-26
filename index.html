@@ -1226,7 +1226,7 @@ function cardData(r){
   const shots=src?(src.saves||0)+(src.goalsAgainst||0):0;
   const stats=gk?[["SAV",v("saves")],["SV%",src&&shots?Math.round(src.saves/shots*100):"–"],["CS",v("cleanSheets")],["GA",v("goalsAgainst")],["APP",v("gkApps")],["GOL",v("goals")]]
                 :[["GOL",v("goals")],["AST",v("assists")],["SHT",v("shots")],["+/-",src?((src.plusMinus||0)>0?"+":"")+(src.plusMinus||0):"–"],["TKW",v("takeaways")],["BLK",v("blocks")]];
-  const edition=retired?"Legend":tier==="founders"?"Founders ’26":src===cur?label(current):"Career";
+  const edition=retired?"Legend":tier==="founders"?"":src===cur?label(current):"Career";
   return {rating,tier,stats,edition,pos:CARD_POS[pos]||CARD_POS[r.pos]||pos||"SUB"};
 }
 function tradingCard(r){
@@ -1246,7 +1246,7 @@ function renderCards(){
   const ros=(DATA.roster||[]).slice().sort((a,b)=>(a.pos==="Retired")-(b.pos==="Retired")||(a.pos==="Alternate")-(b.pos==="Alternate")||(a.num??999)-(b.num??999));
   document.getElementById("cards").innerHTML=`<a class="back" href="#current-stats">← Squad &amp; stats</a>
     <div class="section-head"><h2><span class="sub">Collect them all</span>Squad Cards</h2></div>
-    <p class="note" style="margin:-6px 0 20px">Ratings unlock with ${esc(DATA.statsStart||"stats")}: until then everyone carries a Founders ’26 card. Gold 75+, silver 65–74, bronze under 65.</p>
+    <p class="note" style="margin:-6px 0 20px">Ratings unlock with ${esc(DATA.statsStart||"stats")}: until then everyone carries a kit-stripe card. Gold 75+, silver 65–74, bronze under 65.</p>
     <div class="tc-grid">${ros.map(cardBlock).join("")}</div>`;
 }
 let h2iLoading=null;
