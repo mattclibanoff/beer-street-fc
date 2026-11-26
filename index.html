@@ -376,6 +376,14 @@ a.plink:hover{border-bottom-style:solid;color:var(--cream)}
 .pp-aw svg{width:20px;height:20px;color:var(--cream);margin-top:2px}
 .pp-aw b{display:block}.pp-aw small{color:var(--muted)}.pp-aw p{margin:4px 0 0}
 @media (max-width:600px){.pp-hero{grid-template-columns:1fr;gap:16px}.pp-photo{max-width:260px}}
+.aw-card{margin-top:24px}.aw-card h3 small{font-size:.75em;color:var(--muted)}
+.aw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px;margin:4px 20px 20px}
+.aw{background:var(--ink-2);border:1px solid rgba(var(--cream-rgb),.15);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.aw-t{font:italic 800 19px/1.05 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em}
+.aw-n{font-size:17px}
+.aw-v{font:800 26px/1 "Barlow Condensed",sans-serif;margin-top:auto;padding-top:6px}
+.aw-v small{display:block;font:400 12px "Barlow",system-ui,sans-serif;color:var(--muted);margin-top:3px}
+.aw.bad .aw-t{color:var(--loss)}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -862,12 +870,36 @@ function highlightsSection(s){
   return `<div class="card hl-card"><h3>Highlights · ${esc(label(s))}</h3>${hs.length?`<div class="hl-grid">${hs.map(highlightCard).join("")}</div>`
     :`<div class="empty" style="padding:22px 20px">No highlights yet this season.</div>`}</div>`;
 }
+/* ---------- season awards: team leaders (ties share it) ---------- */
+const AWARDS=[
+  {k:"goals",name:"The Golden Pint",what:"Most goals",v:p=>p.goals||0},
+  {k:"points",name:"Top Shelf",what:"Most points (goals + assists)",v:p=>(p.goals||0)+(p.assists||0)},
+  {k:"assists",name:"The Bartender",what:"Most assists",v:p=>p.assists||0},
+  {k:"takeaways",name:"The Pickpocket",what:"Most takeaways",v:p=>p.takeaways||0},
+  {k:"savePct",name:"The Bouncer",what:"Best save %",v:p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return f?(p.saves||0)/f:0},
+    fmt:x=>(x*100).toFixed(1)+"%",ok:(p,ps)=>{const f=q=>(q.saves||0)+(q.goalsAgainst||0),mx=Math.max(0,...ps.map(f));return f(p)>0&&f(p)>=Math.max(10,.4*mx)}},
+  {k:"fouls",name:"Bad Boy",what:"Most fouls committed",v:p=>p.fouls||0},
+];
+const awardName=(a,n)=>a.k==="fouls"&&(DATA.womanOfMatch||[]).includes(n)?"Bad Girl":a.name;
+function seasonAwards(s){
+  const ps=seasonPlayers(s);
+  return AWARDS.map(a=>{const el=ps.filter(p=>!a.ok||a.ok(p,ps)), best=Math.max(0,...el.map(a.v));
+    return {...a,best,winners:best>0?el.filter(p=>a.v(p)===best).map(p=>p.name):[]};});
+}
+function awardsSection(s){
+  const aw=seasonAwards(s); if(!aw.some(a=>a.winners.length)) return "";
+  const fin=isComplete(s);
+  return `<div class="card aw-card"><h3>Season Awards · ${esc(label(s))}${fin?"":` <small>· leaders so far</small>`}</h3><div class="aw-grid">${aw.map(a=>{
+    const names=a.winners.length?a.winners.map(plink).join(" &amp; "):"–";
+    const title=a.k==="fouls"&&a.winners.length?[...new Set(a.winners.map(n=>awardName(a,n)))].join(" / "):a.name;
+    return `<div class="aw ${a.k==="fouls"?"bad":""}"><div class="aw-t">${esc(title)}</div><div class="aw-n">${names}</div><div class="aw-v">${a.winners.length?(a.fmt?a.fmt(a.best):a.best):""}<small>${esc(a.what)}</small></div></div>`}).join("")}</div></div>`;
+}
 function renderCurrentStats(){
   const s=current;
   document.getElementById("current-stats").innerHTML=`
     <div class="section-head"><h2><span class="sub">Beer Street FC · Player stats</span>${label(s)}</h2>
       <a class="tally-link" href="https://beerstreetfc.com/tally/" target="_blank" rel="noopener">Open the tally app →</a></div>
-    ${teamSummary(s)}${statsBody(seasonPlayers(s),"cur",false)}${highlightsSection(s)}`;
+    ${teamSummary(s)}${statsBody(seasonPlayers(s),"cur",false)}${awardsSection(s)}${highlightsSection(s)}`;
 }
 
 /* --- past-season picker --- */
@@ -922,7 +954,7 @@ function renderPastStats(){
       <div><div class="k">Goals scored</div><div class="v">${past.reduce((a,s)=>a+(standings(s).find(r=>r.team===US)?.gf||0),0)}</div></div>
       <div><div class="k">Squad</div><div class="v">${(DATA.roster||[]).length}</div></div>
     </div>`:teamSummary(s)}
-    ${statsBody(players,all?"all":"past",all)}${all?"":highlightsSection(s)}
+    ${statsBody(players,all?"all":"past",all)}${all?"":awardsSection(s)+highlightsSection(s)}
     ${all&&titles.length?`<p class="note">Titles: ${titles.join(" · ")}</p>`:""}`;
   bindPicker(root,pstState,renderPastStats);
 }
@@ -983,6 +1015,7 @@ function renderPlayer(slug){
       awards.push({d,t:`${wo?"(Wo)man":"Man"} of the Match`,sub:`${g?(g.stage?esc(g.label||g.stage):`vs ${esc(oppOfGame(g))}`):""}${v&&v.played?` · ${v.r} ${v.f}–${v.a}`:""}`,line:x.line})});
     const po=ourMatches(s).filter(m=>m.stage), mv=po.length?playoffMvp(s,po):null;
     if(mv&&mv.name===r.name) awards.push({d:po[po.length-1].date,t:`${wo?"(Wo)man":"Man"} of the Playoffs`,sub:esc(label(s)),line:mv.line});
+    if(isComplete(s)) seasonAwards(s).forEach(a=>{if(a.winners.includes(r.name)) awards.push({d:(ourMatches(s).filter(m=>m.hs!=null).pop()||{}).date||"",t:awardName(a,r.name),sub:`${esc(label(s))} · ${esc(a.what)}: ${a.fmt?a.fmt(a.best):a.best}${a.winners.length>1?" (shared)":""}`,line:""});});
     if(isComplete(s)&&seasonChampion(s)===US&&rows.some(x=>x.s.id===s.id)) awards.push({d:s.updated||"",t:"Champion",sub:esc(label(s)),line:""});
   });
   awards.sort((a,b)=>b.d.localeCompare(a.d));
