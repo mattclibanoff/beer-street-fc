@@ -314,6 +314,8 @@ footer{border-top:3px double rgba(var(--cream-rgb),.3)}
 .hero-meta small{font-family:"IM Fell English SC",serif;font-weight:400}
 /* About tab keeps its original fonts (grain stays) */
 body.on-about{font-family:"Barlow",system-ui,sans-serif;font-size:15px}
+.fifa{display:inline-grid;place-items:center;min-width:34px;height:26px;padding:0 4px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:16px;clip-path:polygon(0 0,100% 0,100% 78%,50% 100%,0 78%);color:#1b1410}
+.fifa.gold{background:linear-gradient(160deg,#f3dc8b,#c79a2e)}.fifa.silver{background:linear-gradient(160deg,#eef0f2,#9aa3ab)}.fifa.bronze{background:linear-gradient(160deg,#e7b48a,#9c5b31)}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1838,24 +1840,39 @@ function leaderTile(players,key,labelText,ghost,filter){
 const posOf=p=>((DATA.roster||[]).find(r=>r.name===p.name)||{}).pos||p.pos||"";
 const isGK=p=>/\bGK\b/.test(posOf(p))||(p.saves||0)+(p.goalsAgainst||0)>0;
 const isOut=p=>/\b(DF|MF|FW)\b/.test(posOf(p))||!/\bGK\b/.test(posOf(p))||(p.goals||0)+(p.assists||0)+(p.shots||0)+(p.takeaways||0)>0;
-const OUT_COLS=[["apps","Apps"],["goals","Goals"],["assists","Assists"],["ga","G+A"],["shots","Shots"],["plusMinus","+/-"],["takeaways","Takeaways"],["giveaways","Giveaways"],["blocks","Blocks"],["fouls","Fouls"],["cards","Cards"]];
-const GK_COLS=[["gkApps","Apps in Goal"],["saves","Saves"],["goalsAgainst","GA"],["savePct","Save %"],["cleanSheets","Clean Sheets"]];
+/* FIFA-style rating, 1-99, from per-game rates over the whole season (playoffs included).
+   A score of ~2.5 a game is an average rec player (~63); the curve flattens toward 99; few games pull it back a little. */
+function fifaRating(p,gk){
+  const apps=gk?(p.gkApps||0):(p.apps||0); if(!apps) return null;
+  const per=k=>(p[k]||0)/apps;
+  let score;
+  if(gk){ const shots=(p.saves||0)+(p.goalsAgainst||0), sv=shots?(p.saves||0)/shots:.5;
+    score=10*(sv-.5)+.4*per("saves")-.3*per("goalsAgainst")+2*per("cleanSheets");
+  } else score=3*per("goals")+2*per("assists")+.15*per("shots")+.5*per("plusMinus")+.6*per("takeaways")+.6*per("blocks")
+    -.5*per("giveaways")-.5*per("fouls")-(2*(p.yellow||0)+5*(p.red||0))/apps;
+  score*=apps/(apps+1);
+  const r=score>=0?40+59*(1-Math.exp(-score/5)):40*Math.exp(score/3);
+  return Math.max(1,Math.min(99,Math.round(r)));
+}
+const ratingBadge=r=>r==null?`<td class="zero">–</td>`:`<td><span class="fifa ${r>=75?"gold":r>=65?"silver":"bronze"}">${r}</span></td>`;
+const OUT_COLS=[["apps","Apps"],["goals","Goals"],["assists","Assists"],["ga","G+A"],["shots","Shots"],["plusMinus","+/-"],["takeaways","Takeaways"],["giveaways","Giveaways"],["blocks","Blocks"],["fouls","Fouls"],["cards","Cards"],["rating","Rating"]];
+const GK_COLS=[["gkApps","Apps in Goal"],["saves","Saves"],["goalsAgainst","GA"],["savePct","Save %"],["cleanSheets","Clean Sheets"],["rating","Rating"]];
 function playerTable(players,tableId,showSeasons,kind){
   const gk=kind==="gk", st=sortState[tableId]||(sortState[tableId]={key:gk?"saves":"goals",asc:false});
   const cols=[["name","Player"],["pos","Pos"]].concat(showSeasons&&!gk?[["seasons","Szns"]]:[]).concat(gk?GK_COLS:OUT_COLS);
   const rows=players.filter(gk?isGK:isOut).map(p=>({...p,pos:posOf(p),apps:p.apps||0,goals:p.goals||0,assists:p.assists||0,plusMinus:p.plusMinus||0,shots:p.shots||0,takeaways:p.takeaways||0,giveaways:p.giveaways||0,blocks:p.blocks||0,fouls:p.fouls||0,saves:p.saves||0,goalsAgainst:p.goalsAgainst||0,gkApps:p.gkApps||0,cleanSheets:p.cleanSheets||0,yellow:p.yellow||0,red:p.red||0,cards:(p.yellow||0)+(p.red||0)*2,ga:(p.goals||0)+(p.assists||0),
-    savePct:((p.saves||0)+(p.goalsAgainst||0))?(p.saves||0)/((p.saves||0)+(p.goalsAgainst||0)):null})).sort((a,b)=>{
-    if(st.key==="savePct"&&(a[st.key]==null)!==(b[st.key]==null)) return a[st.key]==null?1:-1;
+    savePct:((p.saves||0)+(p.goalsAgainst||0))?(p.saves||0)/((p.saves||0)+(p.goalsAgainst||0)):null,rating:fifaRating(p,gk)})).sort((a,b)=>{
+    if((st.key==="savePct"||st.key==="rating")&&(a[st.key]==null)!==(b[st.key]==null)) return a[st.key]==null?1:-1;
     const x=st.key==="num"?(a.num??999):(a[st.key]??0), y=st.key==="num"?(b.num??999):(b[st.key]??0); const c=typeof x==="string"?x.localeCompare(y):x-y;
     return (st.asc?c:-c)||(gk?b.saves-a.saves:b.goals-a.goals)||(a.num??999)-(b.num??999);});
   if(!rows.length) return "";
   const head=cols.map(([k,l])=>`<th class="sortable ${k==="name"||k==="pos"?"l":""} ${st.key===k?"sorted"+(st.asc?" asc":""):""}" data-sort="${k}" data-table="${tableId}" tabindex="0" aria-sort="${st.key===k?(st.asc?"ascending":"descending"):"none"}">${l}</th>`).join("");
   const z=v=>`<td class="${v===0?"zero":""}">${v}</td>`;
   const cells=p=>gk
-    ? `${z(p.gkApps)}${z(p.saves)}${z(p.goalsAgainst)}<td class="${p.savePct==null?"zero":""}">${p.savePct==null?"–":(p.savePct*100).toFixed(1)+"%"}</td>${z(p.cleanSheets)}`
+    ? `${z(p.gkApps)}${z(p.saves)}${z(p.goalsAgainst)}<td class="${p.savePct==null?"zero":""}">${p.savePct==null?"–":(p.savePct*100).toFixed(1)+"%"}</td>${z(p.cleanSheets)}${ratingBadge(p.rating)}`
     : `${showSeasons?z(p.seasons):""}${z(p.apps)}${z(p.goals)}${z(p.assists)}<td class="pts">${p.ga}</td>${z(p.shots)}
     <td class="${p.plusMinus===0?"zero":""}" style="${p.plusMinus>0?"color:var(--win)":p.plusMinus<0?"color:var(--loss)":""}">${p.plusMinus>0?"+":""}${p.plusMinus}</td>${z(p.takeaways)}${z(p.giveaways)}${z(p.blocks)}${z(p.fouls)}
-    <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:var(--zero)">0</span>`}</td>`;
+    <td>${p.yellow||p.red?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:var(--zero)">0</span>`}</td>${ratingBadge(p.rating)}`;
   return `<div class="card flush" style="margin-bottom:18px"><h3>${gk?"Goalkeeping":"Outfield"}</h3><div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows.map(p=>`<tr>
     <td class="l team"><span class="num-badge">${p.num??"–"}</span>${esc(p.name)}</td>
     <td class="l" style="color:var(--muted)">${esc(p.pos)}</td>${cells(p)}
@@ -1888,7 +1905,7 @@ function statsBody(players,tableId,showSeasons){
     </div>
     ${playerTable(players,tableId,showSeasons,"out")}
     ${playerTable(players,tableId+"-gk",showSeasons,"gk")}
-    <p class="note">Season totals include playoff games. Players who play two positions appear in both tables. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · Shots = shots taken · +/- = team goals scored minus goals conceded while the player was on the field · Takeaways = possession won from an opponent · Giveaways = possession lost to an opponent · Blocks = opponent shots blocked · Fouls = fouls committed · Cards = yellow / red cards · Apps in Goal = games spent in goal · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Clean Sheets = games in goal without conceding.</p>`;
+    <p class="note">Season totals include playoff games. Players who play two positions appear in both tables. Click any column header to sort by that stat; click it again to flip the order. Apps = Appearances · G+A = Goals + Assists · Shots = shots taken · +/- = team goals scored minus goals conceded while the player was on the field · Takeaways = possession won from an opponent · Giveaways = possession lost to an opponent · Blocks = opponent shots blocked · Fouls = fouls committed · Cards = yellow / red cards · Apps in Goal = games spent in goal · Saves / GA = saves and goals against while in goal · Save % = saves ÷ (saves + goals against) · Clean Sheets = games in goal without conceding · Rating = FIFA-style 1–99 score built from every stat across the season, per game played: goals, assists, shots, +/-, takeaways and blocks push it up; giveaways, fouls and cards pull it down. Keepers are rated on save %, saves, goals against and clean sheets. Gold 75+, silver 65–74, bronze under 65.</p>`;
 }
 function renderCurrentStats(){
   const s=current;
