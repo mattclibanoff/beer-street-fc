@@ -686,7 +686,6 @@ body.mood-fade .hero{filter:none!important;box-shadow:none}
   <div class="hero-meta" id="heroMeta"></div>
   <div class="beer-clock" id="beerClock" hidden></div>
   <div class="wx" aria-hidden="true"><div class="rain"></div><div class="flash"></div></div>
-  <div class="wgo" id="wgo" hidden>We go again.</div>
 </header>
 <div class="ttx" id="ttx" role="dialog" aria-modal="true" aria-label="Teletext" hidden><div class="ttx-tv"><div class="ttx-scr" id="ttxScr"></div></div></div>
 <div class="hic" id="hic" aria-live="polite"></div>
@@ -1895,7 +1894,6 @@ function applyMood(){
   const big=v.r==="L"&&v.a-v.f>=6;
   document.body.classList.add(v.r==="W"?"mood-win":v.r==="L"?"mood-loss":"mood-draw");
   if(big) document.body.classList.add("mood-storm");
-  if(v.r==="L"){const w=document.getElementById("wgo");w.hidden=false;w.title=`${v.f}–${v.a} vs ${oppOfGame(g.m)}`;}
   const onSite=fn=>document.getElementById("landing").hidden?fn():document.addEventListener("landingclosed",fn,{once:true});
   if(v.r==="W") onSite(()=>setTimeout(confetti,350));
 }
