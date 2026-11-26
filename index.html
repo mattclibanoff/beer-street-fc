@@ -480,9 +480,9 @@ td .cap::after{bottom:auto;top:calc(100% + 8px)}
   <div class="tabs-inner" role="tablist">
     <button class="tab" role="tab" data-tab="current-standings">Current Standings<span class="pill" id="livePill">Live</span></button>
     <button class="tab" role="tab" data-tab="current-stats">Current Season Stats</button>
+    <button class="tab" role="tab" data-tab="records">Club Records</button>
     <button class="tab" role="tab" data-tab="past-standings">Past Seasons Standings</button>
     <button class="tab" role="tab" data-tab="past-stats">Past Season Stats</button>
-    <button class="tab" role="tab" data-tab="records">Club Records</button>
     <button class="tab" role="tab" data-tab="about">About</button>
   </div>
 </nav>
@@ -1127,7 +1127,7 @@ function renderPlayer(slug){
 }
 
 /* ---------- tabs + hash routing ---------- */
-const TABS=["current-standings","current-stats","past-standings","past-stats","records","about"];
+const TABS=["current-standings","current-stats","records","past-standings","past-stats","about"];
 function show(id){
   const isPlayer=/^player-/.test(id);
   if(isPlayer){renderPlayer(id);document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",false));
