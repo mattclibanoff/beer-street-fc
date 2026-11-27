@@ -843,6 +843,15 @@ body.season-summer #eggBird{position:relative}body.season-summer #eggBird .shade
 .thm-terminal .thm-in{font-size:3cqw}.thm-terminal .thm-h,.thm-terminal .thm-s{text-align:left;font-style:normal}.thm-terminal .thm-h{font-size:5.4cqw}.thm-terminal th{border-bottom:1px dashed #33ff66}.thm-terminal tr.us td{background:#33ff66;color:#000;text-shadow:none}
 .thm-terminal .thm-f{text-align:left;font-style:normal}.thm-terminal .thm-f::after{content:"█";animation:arcBlink 1s steps(1) infinite}.thm-terminal .thm-x{border-radius:0}
 
+.thm-tabs{display:flex;justify-content:center;gap:1.4cqw;margin:0 0 2.2cqw;flex-wrap:wrap}
+.thm-tabs button{font:inherit;font-size:2.2cqw;color:inherit;background:none;border:1.5px solid currentColor;border-radius:999px;padding:.6cqw 2.2cqw;cursor:pointer;opacity:.6}
+.thm-tabs button[aria-selected="true"]{opacity:1;background:color-mix(in srgb,currentColor 18%,transparent);font-weight:700;border-width:2px}
+.thm-res td small,.thm-sq td small{opacity:.7;font-size:.8em}.thm-sq td,.thm-sq th{padding-top:.55cqw!important;padding-bottom:.55cqw!important}.thm-comic .thm-sq tbody,.thm-pirate .thm-sq tbody{font-size:1em}
+.thm-res tr.r-W td.g{color:#2a8a3e}.thm-res tr.r-L td.g{color:#b3261e}.thm-res tr.r-D td.g{color:#a07a1c}
+.thm-space .thm-res tr.r-W td.g,.thm-stocks .thm-res tr.r-W td.g,.thm-terminal .thm-res tr.r-W td.g,.thm-arcade .thm-res tr.r-W td.g,.thm-haunted .thm-res tr.r-W td.g,.thm-racing .thm-res tr.r-W td.g,.thm-speakeasy .thm-res tr.r-W td.g,.thm-noir .thm-res tr.r-W td.g{color:#5fe07a}
+.thm-space .thm-res tr.r-L td.g,.thm-stocks .thm-res tr.r-L td.g,.thm-terminal .thm-res tr.r-L td.g,.thm-arcade .thm-res tr.r-L td.g,.thm-haunted .thm-res tr.r-L td.g,.thm-racing .thm-res tr.r-L td.g,.thm-speakeasy .thm-res tr.r-L td.g,.thm-noir .thm-res tr.r-L td.g{color:#ff6b6b}
+.thm-arcade .thm-t{font-size:1.9cqw}.thm-arcade .thm-tabs button{font-size:1.6cqw}
+@media(max-width:560px){.thm-tabs button{font-size:11px;padding:3px 9px}.thm-arcade .thm-t{font-size:9px}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -2058,17 +2067,54 @@ function thmBody(T){
     ${rows.map((r,i)=>`<tr class="${r.team===US?"us":""}"><td>${N(i+1)}</td><td class="l">${T.icon?`<span class="thm-ic">${T.icon(r)}</span>`:""}${esc(nm(r))}</td><td class="c2">${N(r.p)}</td><td>${N(r.w)}</td><td class="c4">${N(r.d)}</td><td class="c5">${T.redact&&r.team!==US?`<span class="redact">${"█".repeat(2)}</span>`:N(r.l)}</td><td class="g">${P(r.pts,i)}</td></tr>`).join("")}</tbody></table>`;
 }
 const ordWord=n=>["","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth","eleventh","twelfth"][n]||n+"th";
-function thmOpen(id){
+const THV={
+  medieval:{t:["Ye Table","Ye Battles","Ye Knights"],r:{W:"Victory",L:"Defeat",D:"Truce"},rc:["Day","Outcome","Tally","Foe"],sc:["No.","Knight","Station","Hails from"],p:{GK:"Gatekeeper",DF:"Shieldbearer",MF:"Squire",FW:"Lancer",Alternate:"Reserve"}},
+  western:{t:["Wanted","Showdowns","The Gang"],r:{W:"Won",L:"Lost",D:"Standoff"},rc:["Date","Outcome","Score","Varmints"],sc:["No.","Outlaw","Job","Rode in from"],p:{GK:"Sheriff",DF:"Deputy",MF:"Rustler",FW:"Gunslinger",Alternate:"Drifter"}},
+  pirate:{t:["The Map","Battles at Sea","The Crew"],r:{W:"Plundered",L:"Sunk",D:"Parley"},rc:["Date","Fate","Score","Enemy ship"],sc:["No.","Pirate","Post","Home port"],p:{GK:"Lookout",DF:"Boatswain",MF:"First Mate",FW:"Cannoneer",Alternate:"Stowaway"}},
+  space:{t:["Status","Mission Log","Crew Manifest"],r:{W:"Success",L:"Failure",D:"Holding"},rc:["Stardate","Outcome","Score","Contact"],sc:["ID","Astronaut","Role","Origin"],p:{GK:"Shields",DF:"Hull",MF:"Navigator",FW:"Pilot",Alternate:"Reserve"}},
+  noir:{t:["The Files","The Cases","The Usual Suspects"],r:{W:"Cracked",L:"Gone cold",D:"Open"},rc:["Night","Verdict","Score","Suspect"],sc:["No.","Name","Racket","Came from"],p:{GK:"Lookout",DF:"Muscle",MF:"Fixer",FW:"Trigger",Alternate:"Informant"}},
+  rome:{t:["Standings","The Games","The Legion"],r:{W:"Triumph",L:"Defeat",D:"Truce"},rc:["Date","Verdict","Score","Barbarians"],sc:["No.","Legionary","Rank","Province"],p:{GK:"Praetorian",DF:"Legionary",MF:"Centurion",FW:"Gladiator",Alternate:"Auxiliary"}},
+  arcade:{t:["SCORES","LEVELS","PLAYERS"],r:{W:"WIN",L:"LOSE",D:"DRAW"},rc:["LVL","RESULT","SCORE","BOSS"],sc:["P","PLAYER","CLASS","WORLD"],p:{GK:"TANK",DF:"BLOCK",MF:"COMBO",FW:"BLASTER",Alternate:"CONTINUE"}},
+  victorian:{t:["The Ledger","Engagements","The Members"],r:{W:"Triumph",L:"Setback",D:"Stalemate"},rc:["Date","Outcome","Score","Opposing society"],sc:["No.","Member","Office","Of"],p:{GK:"Custodian",DF:"Steward",MF:"Secretary",FW:"Chairman",Alternate:"Associate"}},
+  spy:{t:["Briefing","Operations","Agents"],r:{W:"Success",L:"Blown",D:"Stalemate"},rc:["Date","Status","Score","Target"],sc:["No.","Agent","Speciality","Station"],p:{GK:"Safehouse",DF:"Counter-intel",MF:"Handler",FW:"Field agent",Alternate:"Sleeper"}},
+  racing:{t:["Form Guide","Past Runs","The Stable"],r:{W:"Won",L:"Unplaced",D:"Dead heat"},rc:["Date","Finish","Score","Race vs"],sc:["Saddle","Runner","Trip","Bred in"],p:{GK:"Stayer",DF:"Stayer",MF:"Middle-distance",FW:"Sprinter",Alternate:"Reserve"}},
+  wildlife:{t:["The Herds","Encounters","The Pride"],r:{W:"Feast",L:"Fled",D:"Shared"},rc:["Date","Outcome","Score","Rival herd"],sc:["No.","Individual","Role","Habitat"],p:{GK:"Guardian",DF:"Elder",MF:"Scout",FW:"Hunter",Alternate:"Cub"}},
+  speakeasy:{t:["The Tally","The Nights","The Regulars"],r:{W:"Won",L:"Busted",D:"Even"},rc:["Night","Outcome","Score","Rival joint"],sc:["No.","Regular","Racket","Neighbourhood"],p:{GK:"Doorman",DF:"Bouncer",MF:"Bartender",FW:"Bootlegger",Alternate:"Lookout"}},
+  cooking:{t:["Leaderboard","Services","The Brigade"],r:{W:"Served",L:"Burnt",D:"Lukewarm"},rc:["Service","Verdict","Score","Rival kitchen"],sc:["No.","Chef","Station","Trained in"],p:{GK:"Plongeur",DF:"Sous chef",MF:"Saucier",FW:"Head chef",Alternate:"Commis"}},
+  shipping:{t:["Forecast","Past Reports","Crew List"],r:{W:"Good",L:"Poor",D:"Moderate"},rc:["Date","Conditions","Score","Sea area"],sc:["No.","Name","Duties","Home waters"],p:{GK:"Lighthouse",DF:"Harbour",MF:"Deckhand",FW:"Helmsman",Alternate:"Coastguard"}},
+  egypt:{t:["The Scroll","Campaigns","The Court"],r:{W:"Glory",L:"Flood",D:"Truce"},rc:["Date","Omen","Score","Foreign land"],sc:["No.","Name","Title","Nome"],p:{GK:"Sphinx",DF:"Guard",MF:"Scribe",FW:"Pharaoh",Alternate:"Priest"}},
+  comic:{t:["RANKINGS!","BATTLES!","HEROES!"],r:{W:"KAPOW!",L:"OOF!",D:"STANDOFF!"},rc:["Issue","Outcome","Score","Villains"],sc:["#","Hero","Power","Origin"],p:{GK:"Force field",DF:"Super strength",MF:"Telepathy",FW:"Laser eyes",Alternate:"Sidekick"}},
+  stocks:{t:["Market","Trading History","Portfolio"],r:{W:"▲ Up",L:"▼ Down",D:"■ Flat"},rc:["Date","Move","Score","Counterparty"],sc:["No.","Asset","Sector","Listed in"],p:{GK:"Bonds",DF:"Utilities",MF:"Index fund",FW:"Growth stock",Alternate:"Penny stock"}},
+  fairy:{t:["The Kingdoms","The Quests","The Court"],r:{W:"Victory",L:"Cursed",D:"Truce"},rc:["Day","Ending","Score","Kingdom"],sc:["No.","Name","Role","Realm"],p:{GK:"Dragon",DF:"Knight",MF:"Wizard",FW:"Hero",Alternate:"Fairy godparent"}},
+  haunted:{t:["Standings","Hauntings","The Spirits"],r:{W:"Haunted",L:"Exorcised",D:"Unsettled"},rc:["Night","Outcome","Score","Victims"],sc:["No.","Spirit","Manifests as","Haunts"],p:{GK:"Poltergeist",DF:"Banshee",MF:"Phantom",FW:"Ghoul",Alternate:"Wisp"}},
+  terminal:{t:["TABLE.EXE","RESULTS.LOG","SQUAD.DAT"],r:{W:"OK",L:"ERR",D:"WARN"},rc:["DATE","STATUS","SCORE","REMOTE_HOST"],sc:["PID","USER","PROC","DIR"],p:{GK:"gk.sys",DF:"def.dll",MF:"mid.exe",FW:"fwd.bat",Alternate:"sub.tmp"}}
+};
+const THM_P={};   // current page per open theme
+function thmResults(T,V){
+  const gs=allGames().filter(g=>view(g.m).played).reverse().slice(0,12), N=T.n||(x=>x);
+  return `<table class="thm-t thm-res"><thead><tr><th>${V.rc[0]}</th><th>${V.rc[1]}</th><th>${V.rc[2]}</th><th class="l">${V.rc[3]}</th></tr></thead><tbody>
+    ${gs.map(g=>{const v=view(g.m);return `<tr class="r-${v.r}"><td>${fmtDate(g.m.date,{month:"short",day:"numeric"})}</td><td class="g">${V.r[v.r]}</td><td>${N(v.f)}–${N(v.a)}</td><td class="l">${esc(oppOfGame(g.m))}${g.m.stage?` <small>(${esc((g.m.label||g.m.stage).split(" vs ")[0])})</small>`:""}</td></tr>`}).join("")}</tbody></table>`;
+}
+function thmSquad(T,V){
+  const N=T.n||(x=>x), sq=(DATA.roster||[]).filter(r=>r.pos!=="Retired").slice().sort((a,b)=>(a.num??999)-(b.num??999));
+  return `<table class="thm-t thm-sq"><thead><tr><th>${V.sc[0]}</th><th class="l">${V.sc[1]}</th><th class="l">${V.sc[2]}</th><th class="l c4">${V.sc[3]}</th></tr></thead><tbody>
+    ${sq.map(r=>{const k=(r.pos||"").split("/")[0];return `<tr class="${r.captain?"us":""}"><td>${r.num!=null?N(r.num):"–"}</td><td class="l">${esc(r.name)}${r.captain?` <small>(${r.captain})</small>`:""}</td><td class="l">${esc(V.p[k]||k)}</td><td class="l c4">${esc((r.city||"").split(",")[0])}</td></tr>`}).join("")}</tbody></table>`;
+}
+function thmOpen(id,page){
   const T=THEMES.find(t=>t.id===id);if(!T)return;thmFont(id);
   let ov=document.getElementById("thm");if(!ov){ov=document.createElement("div");ov.id="thm";ov.className="thm-ov";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");document.body.appendChild(ov)}
   const sea={Fall:"Autumn"}[current.name]||current.name;
   ov.setAttribute("aria-label",T.title);
-  ov.innerHTML=`<div class="thm-box thm-${id}"><div class="thm-in"><div class="thm-h">${esc(T.title)}</div><div class="thm-s">${esc(T.sub(sea))}</div>${thmBody(T)}<div class="thm-f">${esc(T.foot)}</div>
+  const Vt=THV[id],pg=page||"table";
+  const body=pg==="results"?thmResults(T,Vt):pg==="squad"?thmSquad(T,Vt):thmBody(T);
+  ov.innerHTML=`<div class="thm-box thm-${id}"><div class="thm-in"><div class="thm-h">${esc(T.title)}</div><div class="thm-s">${esc(T.sub(sea))}</div>
+    <div class="thm-tabs" role="tablist">${["table","results","squad"].map((k,i)=>`<button type="button" role="tab" aria-selected="${k===pg}" data-thp="${k}" data-thid="${id}">${esc(Vt.t[i])}</button>`).join("")}</div>
+    ${body}<div class="thm-f">${esc(T.foot)}</div>
     <button type="button" class="thm-x">${esc(T.close)}</button></div></div>`;
-  ov.hidden=false;document.body.classList.add("ttx-open");ov.querySelector(".thm-x").focus();
+  ov.hidden=false;document.body.classList.add("ttx-open");(ov.querySelector(`[data-thp="${pg}"]`)||ov.querySelector(".thm-x")).focus();
 }
 function thmClose(){const ov=document.getElementById("thm");if(ov)ov.hidden=true;document.body.classList.remove("ttx-open");document.getElementById("eggBird").focus()}
-document.addEventListener("click",e=>{const ov=document.getElementById("thm");if(!ov||ov.hidden)return;if(e.target.closest(".thm-x")||e.target===ov)thmClose()});
+document.addEventListener("click",e=>{const ov=document.getElementById("thm");if(!ov||ov.hidden)return;const tb=e.target.closest("[data-thp]");if(tb)return thmOpen(tb.dataset.thid,tb.dataset.thp);if(e.target.closest(".thm-x")||e.target===ov)thmClose()});
 document.addEventListener("keydown",e=>{const ov=document.getElementById("thm");if(ov&&!ov.hidden&&e.key==="Escape")thmClose()});
 
 /* shirt-sniff test: how ripe is the shirt? based on games played in a row (stats), or the laundry gods when there are none */
