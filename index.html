@@ -702,17 +702,21 @@ body.hungover *{transition-duration:.9s!important}
 @media(max-width:760px){.pundits{grid-template-columns:1fr}}
 .sniff{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.sniff-out{font-size:14px}.sniff-out small{display:block;color:var(--muted);font-size:12px}
 .fun-btn.sniffing{animation:sniffW .5s ease-in-out 2}@keyframes sniffW{25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
-.cd-card{margin-bottom:24px}.cd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
-.cd-door{position:relative;aspect-ratio:1;border:1.5px dashed rgba(var(--cream-rgb),.35);border-radius:6px;background:rgba(var(--cream-rgb),.04);color:var(--cream);cursor:pointer;padding:0;overflow:hidden;font:inherit}
-.cd-n{position:absolute;left:6px;top:4px;font:800 20px "Barlow Condensed",sans-serif;opacity:.8}
-.cd-door:not(.open){background:repeating-linear-gradient(135deg,rgba(var(--cream-rgb),.05) 0 8px,transparent 8px 16px)}
-.cd-door.open{border-style:solid;background:rgba(var(--cream-rgb),.08)}.cd-door.today{border-color:var(--win);box-shadow:0 0 0 2px var(--win)}
-.cd-in{position:absolute;inset:0;padding:26px 6px 6px;font-size:10.5px;line-height:1.2;text-align:left;display:flex;flex-direction:column;gap:2px;overflow:hidden}
-.cd-in img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}.cd-in b{font:800 11px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--cream-2)}
-.cd-in span{position:relative}.cd-in a{color:inherit}
-.cd-door.big{grid-column:span 3;grid-row:span 2;aspect-ratio:auto;min-height:170px}@media(max-width:560px){.cd-grid{grid-template-columns:repeat(5,1fr);gap:6px}.cd-n{font-size:16px}.cd-door.big{grid-column:1/-1}.cd-in b{font-size:9px}}.cd-door.big .cd-in{font-size:14px;padding:30px 12px 12px}.cd-door.big .cd-in img{opacity:.8}
-.cd-door.big .cd-in span{background:rgba(0,0,0,.55);padding:4px 6px;border-radius:4px;align-self:flex-start;margin-top:auto}.cd-door.big .cd-in b{font-size:13px}
-.cd-door.open:not(.big) .cd-in span{display:none}.cd-door.open:not(.big) .cd-in{justify-content:flex-end}.cd-door.shake{animation:sniffW .35s ease-in-out 2}.cd-peek{min-height:20px;margin-top:10px;font-size:13px;color:var(--cream-2)}
+.cd-card{margin-bottom:24px}.cd-months{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.cd-mh{font:800 16px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;color:var(--cream-2)}
+.cd-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cd-wd{text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding-bottom:2px}
+.cd-day,.cd-door{aspect-ratio:1;border-radius:5px;position:relative}.cd-day.out{display:grid;place-items:center;font-size:12px;color:var(--muted);opacity:.45}
+.cd-day.end{opacity:1;color:var(--cream);border:1px solid rgba(var(--cream-rgb),.3)}
+.cd-door{border:1.5px dashed rgba(var(--cream-rgb),.35);background:repeating-linear-gradient(135deg,rgba(var(--cream-rgb),.05) 0 6px,transparent 6px 12px);color:var(--cream);cursor:pointer;padding:0;overflow:hidden;font:inherit}
+.cd-n{position:absolute;left:4px;top:2px;font:800 14px "Barlow Condensed",sans-serif;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.cd-door.open{border-style:solid;background:rgba(var(--cream-rgb),.1)}.cd-door.today{border-color:var(--win);box-shadow:0 0 0 2px var(--win)}.cd-door.sel{outline:2px solid var(--cream);outline-offset:1px}
+.cd-in{position:absolute;inset:0}.cd-in img{width:100%;height:100%;object-fit:cover;opacity:.6}.cd-in span,.cd-in b{display:none}
+.cd-door.open:not(:has(img))::after{content:"✦";position:absolute;right:4px;bottom:2px;font-size:11px;color:var(--cream-2)}
+.cd-peek{min-height:20px;margin:0 0 14px;font-size:13px;color:var(--cream-2)}
+.cd-show{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:rgba(var(--cream-rgb),.06);border:1px solid rgba(var(--cream-rgb),.15);border-radius:6px;padding:10px 12px;color:var(--cream);font-size:15px}
+.cd-show-d{flex:0 0 100%;font:800 12px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-2)}
+.cd-show img{width:84px;height:84px;object-fit:cover;border-radius:4px}.cd-show b{font:800 12px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-2);margin-right:4px}.cd-show a{color:inherit}
+.cd-door.shake{animation:sniffW .35s ease-in-out 2}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1501,15 +1505,25 @@ function countdownCal(){
   const pics=(DATA.roster||[]).filter(r=>r.photo&&!/Retired/.test(r.pos||"")&&!new Set((DATA.tabloid||{}).optOut||[]).has(r.name));
   const door=i=>{const k=i%3;if(k===1&&pics.length){const r=pics[(i*7)%pics.length];return `<img src="${esc(r.photo)}" alt=""><span>Squad photo of the day: <a href="#${playerSlug(r.name)}">${esc(r.name)}</a></span>`}
     return k===2&&stats.length?`<b>Stat</b><span>${stats[(i*5)%stats.length]}</span>`:`<b>Joke</b><span>${esc(jokes[(i*7)%jokes.length])}</span>`};
-  const cells=Array.from({length:total},(_,j)=>{const i=j+1,date=iso(D(end)+i*864e5),open=i<=today,cur=i===today;
-    return `<button type="button" class="cd-door${open?" open":""}${cur?" today":""}" data-cd="${i}" data-date="${date}" ${open?"":`aria-label="Door ${i}, opens ${fmtDate(date,{month:"short",day:"numeric"})}"`}><span class="cd-n">${i}</span>${open?`<div class="cd-in">${door(i)}</div>`:""}</button>`}).join("");
+  // laid out on a real calendar: one block per month, Sunday to Saturday
+  const first=D(end)+864e5,last=D(end)+total*864e5,months=[];
+  for(let t=first;t<=last;){const d=new Date(t),y=d.getUTCFullYear(),mo=d.getUTCMonth();months.push([y,mo]);t=Date.UTC(y,mo+1,1)}
+  const cells=months.map(([y,mo])=>{const dim=new Date(Date.UTC(y,mo+1,0)).getUTCDate(),off=new Date(Date.UTC(y,mo,1)).getUTCDay();
+    const days=Array.from({length:dim},(_,k)=>{const t=Date.UTC(y,mo,k+1),i=Math.round((t-D(end))/864e5),date=iso(t);
+      if(i<1||i>total)return `<div class="cd-day out${date===end?" end":""}"${date===end?` title="Last game of ${esc(label(current))}"`:""}>${k+1}</div>`;
+      const open=i<=today,cur=i===today;
+      return `<button type="button" class="cd-door${open?" open":""}${cur?" today":""}" data-cd="${i}" data-date="${date}" aria-label="${fmtDate(date,{month:"short",day:"numeric"})}${open?"":", locked"}"><span class="cd-n">${k+1}</span>${open?`<div class="cd-in">${door(i)}</div>`:""}</button>`}).join("");
+    return `<div class="cd-month"><div class="cd-mh">${new Date(Date.UTC(y,mo,1)).toLocaleDateString("en-US",{month:"long",year:"numeric",timeZone:"UTC"})}</div>
+      <div class="cd-grid">${["S","M","T","W","T","F","S"].map(x=>`<div class="cd-wd">${x}</div>`).join("")}${'<div></div>'.repeat(off)}${days}</div></div>`}).join("");
   return `<div class="card cd-card"><h3>Countdown to ${esc(nx.name||"Winter 2027")}</h3>
-    <p class="note" style="margin:0 0 10px">${start?`${total-today+1} doors to go. `:"Start date TBC, so the calendar grows when the schedule lands. "}One new door every day: a joke, a stat or a face from the squad. Tap an open door to read it.</p>
-    <div class="cd-grid">${cells}</div><div class="cd-peek" aria-live="polite"></div></div>`;
+    <p class="note" style="margin:0 0 10px">${start?`${total-today+1} doors to go. `:"Start date TBC, so the calendar grows when the schedule lands. "}One new door every day: a joke, a stat or a face from the squad. Tap an open day to read it.</p>
+    <div class="cd-peek" aria-live="polite">${today>=1&&today<=total?`<div class="cd-show"><div class="cd-show-d">Today · ${fmtDate(TODAY,{weekday:"long",month:"long",day:"numeric"})}</div>${door(today)}</div>`:""}</div><div class="cd-months">${cells}</div></div>`;
 }
 document.addEventListener("click",e=>{const d=e.target.closest(".cd-door");if(!d)return;const pk=d.closest(".cd-card").querySelector(".cd-peek");
-  if(!d.classList.contains("open")){pk.textContent=`No peeking! Door ${d.dataset.cd} opens ${fmtDate(d.dataset.date,{weekday:"long",month:"short",day:"numeric"})}.`;d.classList.remove("shake");void d.offsetWidth;d.classList.add("shake");return}
-  d.closest(".cd-grid").querySelectorAll(".cd-door.big").forEach(x=>x!==d&&x.classList.remove("big"));d.classList.toggle("big");pk.textContent="";});
+  if(!d.classList.contains("open")){pk.textContent=`No peeking! This one opens ${fmtDate(d.dataset.date,{weekday:"long",month:"short",day:"numeric"})}.`;d.classList.remove("shake");void d.offsetWidth;d.classList.add("shake");return}
+  const was=d.classList.contains("sel");d.closest(".cd-card").querySelectorAll(".cd-door.sel").forEach(x=>x.classList.remove("sel"));
+  if(was){pk.innerHTML="";return}d.classList.add("sel");
+  pk.innerHTML=`<div class="cd-show"><div class="cd-show-d">${fmtDate(d.dataset.date,{weekday:"long",month:"long",day:"numeric"})}</div>${d.querySelector(".cd-in").innerHTML}</div>`;});
 function offSeasonCard(){
   if(ourMatches(current).some(m=>!m.bye&&m.hs==null&&m.date>=TODAY)) return "";
   const nx=DATA.nextSeason||{}, name=nx.name||"Winter 2027", start=nx.start&&nx.start>TODAY?nx.start:null;
