@@ -715,13 +715,16 @@ body.hungover *{transition-duration:.9s!important}
 #npAlm .alm-d{font-family:"IM Fell English",serif;color:var(--paper-ink);opacity:.8}#npAlm .alm-k{font-family:"IM Fell English SC",serif;color:var(--paper-ink);opacity:.7;font-weight:400;font-size:13px}
 #npAlm .alm-t{font-family:"IM Fell English",serif;font-size:16.5px}#npAlm .alm-t a{color:inherit}#npAlm .alm-none{color:var(--paper-ink);font-family:"IM Fell English",serif}
 @media(max-width:600px){#npAlm .alm-l li{grid-template-columns:1fr}}
-.tipjar{display:flex;gap:18px;align-items:center;margin-bottom:24px}.tj-art{position:relative;flex:0 0 130px}.tj-art svg{width:130px;display:block}
+.upnext-row{display:flex;gap:12px;align-items:stretch;margin-bottom:24px}.upnext-row>.next-match{flex:1;margin-bottom:0}
+.tipjar-slot:empty{display:none}.tipjar-slot{flex:0 0 auto}
+.tipjar{display:flex;gap:10px;align-items:center;margin:0;height:100%;padding:10px 14px 10px 8px;box-sizing:border-box}.tj-art{position:relative;flex:0 0 52px}.tj-art svg{width:52px;display:block}
 .tj-label{font:800 10px "Barlow Condensed",Arial Narrow,sans-serif;letter-spacing:.02em;fill:#3b2a20}
-.tj-body h3{margin:0 0 2px}.tj-for{color:var(--muted);font-size:13px;margin-bottom:8px}.tj-count b{font:800 30px "Barlow Condensed",sans-serif;margin-right:4px}.tj-level{margin:2px 0 10px;color:var(--cream-2)}
+.tj-h{font:800 15px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.06em;line-height:1.1}.tj-count{font-size:12.5px;color:var(--cream-2);margin:2px 0 6px}.tj-count b{font:800 18px "Barlow Condensed",sans-serif;color:var(--cream)}
+.tj-btn{font-size:12px!important;padding:4px 8px!important}
 .tj-drop{position:absolute;left:0;right:0;top:0;height:100%;pointer-events:none}
-.tj-coin{position:absolute;left:50%;top:-6px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe58a,#e3b341 60%,#8a6512);animation:tjDrop .7s ease-in forwards}
-@keyframes tjDrop{0%{transform:translateY(0) rotateY(0)}100%{transform:translateY(110px) rotateY(720deg);opacity:.2}}
-@media(max-width:560px){.tipjar{gap:10px}.tj-art{flex-basis:96px}.tj-art svg{width:96px}}
+.tj-coin{position:absolute;left:50%;top:-6px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe58a,#e3b341 60%,#8a6512);animation:tjDrop .7s ease-in forwards}
+@keyframes tjDrop{0%{transform:translateY(0) rotateY(0)}100%{transform:translateY(44px) rotateY(720deg);opacity:.2}}
+@media(max-width:640px){.upnext-row{flex-direction:column}.tipjar{padding:8px 12px 8px 6px}}
 .np-fxs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 18px;margin-top:10px;text-align:left}.np-fx{font-size:.95em}.np-fx small{opacity:.7}.np-fx i{font-style:italic}
 @media(max-width:700px){.np-fxs{grid-template-columns:1fr}}
 .hat{position:absolute;left:50%;top:2%;width:34%;transform:translateX(-50%) rotate(-8deg);filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));z-index:2;animation:hatBob 3s ease-in-out infinite}
@@ -1138,12 +1141,12 @@ function renderCurrentStandings(){
   document.getElementById("current-standings").innerHTML=`
     <div class="section-head"><h2><span class="sub">${isComplete(s)?"Final table":s.standings?(s.updated?`Updated ${fmtDate(s.updated,{month:"short",day:"numeric",year:"numeric"})}`:"In progress"):`Matchweek ${playedRounds} of ${totalRounds}`}</span>${label(s)} Table</h2></div>
     ${s.league?`<p class="note" style="margin:-8px 0 18px">${esc(s.league)}${s.source?` · <a href="${esc(s.source)}" style="color:var(--cream-2)">Official standings ↗</a>`:""}</p>`:""}
-    ${next?`<div class="next-match"><div class="inner">
+    ${next?`<div class="upnext-row"><div class="next-match"><div class="inner">
       <div><div class="tag" style="display:inline-block;margin-bottom:8px">${next.stage?"Up next":"Next match · Wk "+next.round}${matchupNames(next,s).map(x=>" · "+esc(x)).join("")}</div>
         <div class="vs">${next.stage?esc(next.stage)+`<span>·</span>`+esc(next.label):`Beer Street FC<span>${view(next).home?"vs":"@"}</span>${esc(view(next).opp)}`}</div>
         <a class="np-more" href="#${matchId(next)}">Match preview →</a></div>
       <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}${next.date>=TODAY?calMenu(next,s):""}</div>
-    </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()+`<div class="tipjar-slot" data-tipjar="opener-${esc(((DATA.nextSeason||{}).name||"Winter 2027").toLowerCase().replace(/[^a-z0-9]+/g,"-"))}" data-for="${esc(((DATA.nextSeason||{}).name||"Winter 2027"))} opener"></div>`}
+    </div></div>${next.date>=TODAY?`<div class="tipjar-slot" data-tipjar="${matchId(next).slice(6)}" data-for="${esc(next.stage?(next.label||next.stage):"vs "+view(next).opp)}"></div>`:""}</div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:`<div class="upnext-row">${offSeasonCard()}<div class="tipjar-slot" data-tipjar="opener-${esc(((DATA.nextSeason||{}).name||"Winter 2027").toLowerCase().replace(/[^a-z0-9]+/g,"-"))}" data-for="${esc(((DATA.nextSeason||{}).name||"Winter 2027"))} opener"></div></div>`}
     ${teamSummary(s)}
     <div class="grid">
       <div class="card flush">${standingsTable(s)}</div>
@@ -1514,7 +1517,7 @@ function tipLevel(c){return c<1?"Clean as a whistle":c<10?"A little sweetener":c
 function tipJarHtml(k,forWhat,c){
   const fill=Math.min(1,c/200),top=150-118*fill,coins=Math.min(60,Math.ceil(c/3.4));let seed=7;const R=()=>(seed=(seed*1103515245+12345)>>>0)/4294967296;
   const cs=Array.from({length:coins},(_,i)=>{const row=Math.floor(i/6),x=38+((i%6)*14)+(row%2?7:0)+(R()-.5)*3,y=146-row*7.2;return y>top-4?`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="7" ry="3.2" fill="#e3b341" stroke="#8a6512" stroke-width="1"/>`:""}).join("");
-  return `<div class="card tipjar"><div class="tj-art"><svg viewBox="0 0 150 170" aria-hidden="true">
+  return `<div class="card tipjar" title="Everyone who visits shares this jar. Purely ceremonial. Marcus has not been informed."><div class="tj-art"><svg viewBox="0 0 150 170" aria-hidden="true">
       <defs><clipPath id="tjc-${k}"><path d="M32 34h86v108a14 14 0 0 1-14 14H46a14 14 0 0 1-14-14z"/></clipPath></defs>
       <g clip-path="url(#tjc-${k})">${cs}</g>
       <path d="M32 34h86v108a14 14 0 0 1-14 14H46a14 14 0 0 1-14-14z" fill="rgba(200,230,255,.08)" stroke="rgba(var(--cream-rgb),.7)" stroke-width="3"/>
@@ -1522,10 +1525,9 @@ function tipJarHtml(k,forWhat,c){
       <path d="M44 46v90" stroke="rgba(255,255,255,.18)" stroke-width="5" stroke-linecap="round"/>
       <rect x="40" y="84" width="70" height="26" rx="3" fill="#efe6cf" transform="rotate(-4 75 97)"/><text x="75" y="101" text-anchor="middle" transform="rotate(-4 75 97)" class="tj-label" textLength="60" lengthAdjust="spacingAndGlyphs">MARCUS FUND</text>
     </svg><div class="tj-drop" aria-hidden="true"></div></div>
-    <div class="tj-body"><h3>Bribe Marcus the Ref</h3><div class="tj-for">${esc(forWhat)}</div>
-      <div class="tj-count"><b>${c}</b> coin${c===1?"":"s"} in the jar</div><div class="tj-level">Corruption level: <i>${tipLevel(c)}</i></div>
-      <button type="button" class="fun-btn tj-btn" data-tip="${k}">🪙 Slip Marcus a coin</button>
-      <p class="note" style="margin:8px 0 0">Everyone who visits shares this jar. Purely ceremonial. Marcus has not been informed.</p></div></div>`;
+    <div class="tj-body"><div class="tj-h">Bribe Marcus the Ref</div>
+      <div class="tj-count"><b>${c}</b> coin${c===1?"":"s"} · <i>${tipLevel(c)}</i></div>
+      <button type="button" class="fun-btn tj-btn" data-tip="${k}">🪙 Slip him a coin</button></div></div>`;
 }
 async function tipJarMount(root){
   for(const el of (root||document).querySelectorAll("[data-tipjar]")){const k=el.dataset.tipjar;
@@ -1536,7 +1538,7 @@ async function tipJarMount(root){
 document.addEventListener("click",e=>{const b=e.target.closest("[data-tip]");if(!b)return;const k=b.dataset.tip,J=TIPJAR[k];if(!J)return;
   J.c++;J.pend++;const slot=b.closest("[data-tipjar]");
   const coin=document.createElement("span");coin.className="tj-coin";slot.querySelector(".tj-drop").appendChild(coin);setTimeout(()=>coin.remove(),700);
-  setTimeout(()=>{if(slot.isConnected){const cnt=slot.querySelector(".tj-count b"),lv=slot.querySelector(".tj-level i");cnt.textContent=J.c;lv.textContent=tipLevel(J.c);
+  setTimeout(()=>{if(slot.isConnected){const cnt=slot.querySelector(".tj-count b"),lv=slot.querySelector(".tj-count i");cnt.textContent=J.c;lv.textContent=tipLevel(J.c);
     if(J.c%3===0||J.pend===1){slot.innerHTML=tipJarHtml(k,slot.dataset.for,J.c)}}},450);
   clearTimeout(J.t);const send=()=>{const n=Math.min(10,J.pend);if(!n)return;J.pend-=n;
     fetch("/api/tipjar",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({k,n})}).then(r=>r.json()).then(j=>{if(j.ok){J.c=j.count+J.pend}}).catch(()=>{});if(J.pend)J.t=setTimeout(send,300)};
