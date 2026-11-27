@@ -1744,7 +1744,7 @@ function punditPanel(m,v,opp,s,gs,motm){
     <p>“${PL[i]||esc(pk(p.L[tag]).replace("${opp}",opp))} ${ST[i]}”</p><div class="pd-score">Rating: <b>${p.sc}</b>/10</div></div></div>`).join("")}</div></div>`;
 }
 
-/* the Gaffer's tactics board: chalk Xs and Os, an arrow for each of our goals, and some deeply questionable notes */
+/* Fred Lasso's tactics board: chalk Xs and Os, an arrow for each of our goals, and some deeply questionable notes */
 function tacticsBoard(m,v,opp,gs,played){
   let seed=[...matchId(m)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);const R=()=>(seed=(seed*1103515245+12345)>>>0)/4294967296;
   const pk=a=>a[Math.floor(R()*a.length)];
@@ -1768,7 +1768,7 @@ function tacticsBoard(m,v,opp,gs,played){
   const plan=played?(v.r==="W"?pk(["PLAN: score more than them ✓","It worked?!","Exactly as drawn. Every bit.","Genius. Frame this board."]):v.r==="L"?pk(["PLAN: score more than them ✗","Arrows were correct. Players were not.","Back to the drawing board (this one)","Note to self: they also have players"]):pk(["Draw = half a win","Honours even, chalk wasted"])):pk(["PLAN: score more than them","Step 1: ball. Step 2: goal.","Don't overthink it","Pass to the one in the right shirt"]);
   const notes=[pk(["Stay compact!!","NO back passes","Shout MAN ON","Width! (???)","Press when it's their throw","Talk to each other","Hydrate"]),pk(["Watch #"+(2+Math.floor(R()*20)),"Keeper: be big","Shoot on sight","Tuck in","Overlap?","Don't foul"])];
   const circle=`<ellipse cx="${(goal.x+(R()-.5)*60).toFixed(0)}" cy="38" rx="70" ry="24" fill="none" stroke="${yel}" stroke-width="2.4" transform="rotate(${((R()-.5)*8).toFixed(1)} 300 38)"/>`;
-  return `<div class="card tb-card"><h3>The Gaffer's Tactics Board</h3>
+  return `<div class="card tb-card"><h3>Fred Lasso's Tactics Board</h3>
     <svg viewBox="0 0 ${W} ${H}" class="tb" role="img" aria-label="Chalkboard tactics for this game">
       <defs><filter id="chalkF"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs>
       <rect width="${W}" height="${H}" rx="6" fill="#23302a"/><rect x="6" y="6" width="${W-12}" height="${H-12}" rx="4" fill="none" stroke="#5a4632" stroke-width="10"/>
