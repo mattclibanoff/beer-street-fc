@@ -1525,7 +1525,7 @@ function renderMatch(id){
         ${oppRow?`<div class="muted-s">${esc(opp)}: ${ord(oppRow)} in ${esc(label(s))} ${formChips(oppForm)}</div>`:""}</div></div>
     </div>
     ${!played&&m.date>=TODAY?oddsBoard(s,m,opp):""}
-    ${played?punditPanel(m,v,opp):""}
+    ${played?punditPanel(m,v,opp,s,gs,motm):""}
     ${tacticsBoard(m,v,opp,gs,played)}
     ${statsHtml}
     ${hls.length?`<div class="card hl-card"><h3>Highlights</h3><div class="hl-grid">${hls.map(highlightCard).join("")}</div></div>`:""}
@@ -1575,7 +1575,15 @@ function renderTeam(slug){
 }
 
 /* the pundit panel: Saharah always sees the bright side, Cait never does, Lana calls it down the middle */
-function punditPanel(m,v,opp){
+/* league table as it stood after a given date (regular season only) */
+function tableAt(s,date){
+  const ms=(s.leagueMatches&&s.leagueMatches.length?s.leagueMatches:s.matches).filter(x=>!x.stage&&!x.bye&&x.hs!=null&&x.date<=date);
+  const t={},row=n=>t[n]||(t[n]={team:n,p:0,pts:0,gd:0,gf:0});
+  ms.forEach(x=>{const h=row(x.home),a=row(x.away);h.p++;a.p++;h.gf+=x.hs;a.gf+=x.as;h.gd+=x.hs-x.as;a.gd+=x.as-x.hs;
+    if(x.hs>x.as)h.pts+=3;else if(x.hs<x.as)a.pts+=3;else{h.pts++;a.pts++}});
+  return Object.values(t).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.team.localeCompare(b.team));
+}
+function punditPanel(m,v,opp,s,gs,motm){
   let seed=[...matchId(m)].reduce((a,c)=>(a*33+c.charCodeAt(0))>>>0,11);const R=()=>(seed=(seed*1664525+1013904223)>>>0)/4294967296,pk=a=>a[Math.floor(R()*a.length)];
   const gd=v.f-v.a, big=Math.abs(gd)>=5, tag=v.r==="W"?(big?"rout":"win"):v.r==="L"?(big?"hiding":"loss"):"draw";
   const UP={rout:["Total football. I've not seen pressing like that in years. Gorgeous.","Clinical. Absolutely clinical. They wanted it more.","That's a statement. The rest of the league should be nervous."],
@@ -1598,9 +1606,32 @@ function punditPanel(m,v,opp){
            {n:"Cait Phillips",t:"Tactics analyst. Glass permanently half empty.",c:"#3b5a7a",i:"CP",L:DOWN,sc:clamp(base-2.5+(R()-.5))},
            {n:"Saharah Sejour",t:"Pitchside reporter. Glass permanently half full.",c:"#6a6a2f",i:"SS",L:UP,sc:clamp(base+2.5+(R()-.5))}];
   const odd=1;   // Cait always disagrees
+  // --- standings: where things stood after this game (playoffs: final league positions)
+  const tb=m.stage?standings(s).map(r=>({team:r.team,pts:r.pts})):tableAt(s,m.date), N=tb.length;
+  const us=tb.findIndex(r=>r.team===US)+1, them=tb.findIndex(r=>r.team===opp)+1, top=tb[0]||{}, gap=us?(top.pts-tb[us-1].pts):0;
+  const ST=!us?["","",""]:m.stage?[
+      `We finished ${ord(us)} in the league${them?` and ${esc(opp)} ${ord(them)}`:""}, so ${v.r==="W"?(them&&them<us?"that's a proper upset":"that's exactly what should happen"):(them&&them<us?"that was always going to be hard":"we should be doing better than that")}.`,
+      `Let's be honest: we finished ${ord(us)}${N?` of ${N}`:""} in the regular season. ${v.r==="W"?"Enjoy it while it lasts.":"This is where ${ord(us)}-placed teams go out."}`.replace("${ord(us)}",ord(us)),
+      `${v.r==="W"?"Not bad":"Not bad at all"} for the side that finished ${ord(us)}. ${v.r==="W"?"The best is yet to come.":"Next season, we go all the way."}`]
+    :[`That leaves us ${ord(us)} of ${N} on ${tb[us-1].pts} points${them?`, with ${esc(opp)} ${ord(them)}`:""}.`,
+      us===1?`Top of the table? We've peaked too early.`:`Still ${gap} point${gap===1?"":"s"} off the top${them&&them<us?`, and ${esc(opp)} are still above us`:""}. Concerning.`,
+      us<=3?`${ord(us)} in the table. Title talk starts now.`:us<=Math.ceil(N/2)?`${ord(us)} and looking upward. The top is in sight.`:`${ord(us)} is just a number. The climb starts here.`];
+  // --- players: this game's stats, or the player of the match when there are no stats
+  const out=new Set((DATA.tabloid||{}).optOut||[]), ps=(gs||[]).filter(p=>!out.has(p.name)), first=n=>esc(n.split(" ")[0]);
+  const best=(k,min=1)=>ps.filter(p=>(p[k]||0)>=min).sort((a,b)=>(b[k]||0)-(a[k]||0))[0];
+  const sc=best("goals"),as=best("assists"),ta=best("takeaways",2),fo=best("fouls",2),sv=best("saves",3);
+  const wasteful=ps.filter(p=>(p.shots||0)>=4&&!(p.goals)).sort((a,b)=>b.shots-a.shots)[0];
+  const lowPM=ps.filter(p=>(p.plusMinus||0)<0).sort((a,b)=>a.plusMinus-b.plusMinus)[0];
+  const mm=motm&&!out.has(motm.name)?motm.name:null, pl=(n,w)=>`${n} ${w}${n===1?"":"s"}`;
+  const PL=[  // Lana: just the facts
+      sc?`${first(sc.name)} led the way with ${pl(sc.goals,"goal")}${as&&as!==sc?`, and ${first(as.name)} chipped in ${pl(as.assists,"assist")}`:""}.`:sv?`${first(sv.name)} made ${pl(sv.saves,"save")} and kept it respectable.`:mm?`${first(mm)} was the standout.`:"",
+      // Cait: always finds someone to have a go at
+      fo?`${first(fo.name)} gave away ${pl(fo.fouls,"foul")}. The fines committee will be busy.`:wasteful?`${first(wasteful.name)} had ${wasteful.shots} shots and nothing to show for it.`:lowPM?`${first(lowPM.name)} finished ${lowPM.plusMinus}. Numbers don't lie.`:sc?`${first(sc.name)} scored ${sc.goals}. Fine. Anyone could against that defence.`:mm?`${first(mm)} got player of the match? Generous.`:"",
+      // Saharah: everyone's a hero
+      sc?`${first(sc.name)} with ${pl(sc.goals,"goal")}! Give them the armband.`:ta?`${first(ta.name)}'s ${ta.takeaways} takeaways were a masterclass.`:sv?`${first(sv.name)} made ${pl(sv.saves,"save")}. A wall. A beautiful wall.`:mm?`${first(mm)} was magnificent. Player of the season, calling it now.`:""];
   return `<div class="card pundit-card"><h3>The Pundit Panel</h3><div class="pundits">${P.map((p,i)=>`<div class="pundit${i===odd?" dissent":""}">
     <div class="pd-face" style="background:${p.c}">${p.i}</div><div class="pd-body"><div class="pd-name">${p.n}${i===odd?` <span class="pd-tag">disagrees</span>`:""}</div><div class="pd-title">${p.t}</div>
-    <p>“${esc(pk(p.L[tag]).replace("${opp}",opp))}”</p><div class="pd-score">Rating: <b>${p.sc}</b>/10</div></div></div>`).join("")}</div></div>`;
+    <p>“${PL[i]||esc(pk(p.L[tag]).replace("${opp}",opp))} ${ST[i]}”</p><div class="pd-score">Rating: <b>${p.sc}</b>/10</div></div></div>`).join("")}</div></div>`;
 }
 
 /* the Gaffer's tactics board: chalk Xs and Os, an arrow for each of our goals, and some deeply questionable notes */
