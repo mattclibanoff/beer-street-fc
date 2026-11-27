@@ -681,7 +681,7 @@ body.hungover *{transition-duration:.9s!important}
 .np-star{padding:8px 0;border-bottom:1px dotted var(--rule)}.np-star-h{display:flex;align-items:center;gap:7px;font-family:"IM Fell English SC",serif;font-size:16px}
 .np-glyph{font-size:20px;line-height:1;font-family:"Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",serif}.np-rate{margin-left:auto;letter-spacing:1px;font-size:14px}
 .np-star p{font-family:"IM Fell English",serif;font-size:14.5px;line-height:1.35;margin:3px 0 0}.np-stars h3 small{font-family:"IM Fell English",serif;font-style:italic;font-size:.75em;letter-spacing:0}
-.np-bday{border:2px solid var(--rule);outline:1px solid var(--rule);outline-offset:3px;margin:0 auto 20px;max-width:620px;padding:10px 16px;text-align:center}
+.np-bday{border:2px solid var(--rule);outline:1px solid var(--rule);outline-offset:3px;margin:14px auto 18px;max-width:620px;padding:10px 16px;text-align:center}
 .np-bday-h{font-family:"Playfair Display",serif;font-weight:900;font-size:22px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
 .np-bday p{font-family:"IM Fell English",serif;font-size:17px;margin:4px 0}
 </style>
@@ -727,6 +727,7 @@ body.hungover *{transition-duration:.9s!important}
       <div class="np-ear"><b>Weather</b><span id="npWx"></span>We play indoors</div>
     </div>
     <div class="np-dateline" id="npDateline"></div>
+    <div id="npBday"></div>
     <div class="np-kicker" id="npKicker"></div>
     <h2 class="np-head" id="npHead"></h2>
     <p class="np-deck" id="npDeck"></p>
@@ -1878,9 +1879,7 @@ function motmFor(date){ const p=motmPicks(current)[date]; if(p) return p.name;
 const listTop=(arr,key,fmt)=>arr.filter(p=>(p[key]||0)>0).sort((a,b)=>b[key]-a[key]).map(p=>`${nm(p.name)} ${fmt?fmt(p):p[key]}`).join(", ");
 const savePct=p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return f?Math.round((p.saves||0)/f*100):null;};
 function birthdayFront(){
-  const b=birthdayWeek();if(!b.length)return;
-  const ear=document.querySelector(".np-ear");if(ear)ear.innerHTML=`<b>Birthday Week</b>${b.map(x=>esc(x.r.name)).join(" &amp; ")}<br>see back page`;
-  document.querySelectorAll("[data-flip]").forEach(f=>{if(/Back page/.test(f.textContent))f.textContent="🎂 Back page ↻"});
+  const el=document.getElementById("npBday");if(el)el.innerHTML=birthdayBox();
 }
 function previewFront(g,s,L){
   const ob=document.getElementById("npOdds");
@@ -2242,7 +2241,6 @@ function renderBackPage(){
   const head=T.headline||(rumours.length?"Pigeon Watch: transfer window swings open":"All quiet on Beer Street");
   document.getElementById("npBack").innerHTML=`<div class="np-backmast">The Beer Street Gazette · <i>Back Page</i></div>
     <h2 class="np-head np-backhead">${esc(head)}</h2>
-    ${birthdayBox()}
     <div class="np-cols">
       <section><h3>Transfer Talk</h3>${rumours.map(x=>`<p>${esc(x.text)}</p>`).join("")||"<p>Nothing to report.</p>"}</section>
       <section><h3>Overheard at the Bar</h3>${overheard.map(x=>`<p>${esc(x.text)}</p>`).join("")}</section>
