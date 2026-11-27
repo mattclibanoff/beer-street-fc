@@ -686,6 +686,13 @@ body.hungover *{transition-duration:.9s!important}
 .np-bday p{font-family:"IM Fell English",serif;font-size:17px;margin:4px 0}
 .tb{width:100%;display:block;border-radius:6px}.tb-n{font:13px "Permanent Marker",cursive;fill:rgba(245,242,230,.85)}
 .tb-plan{font:20px "Permanent Marker",cursive;fill:#f2dc6b}.tb-note{font:16px "Permanent Marker",cursive;fill:rgba(245,242,230,.85)}
+.np-rivals{margin:16px 0 4px;border-top:3px double var(--rule);padding-top:6px}
+.np-rivals h3{font-family:"IM Fell English SC",serif;font-size:20px;letter-spacing:.06em;margin:2px 0 8px;text-align:center;color:var(--paper-ink)}
+.np-duel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.np-duel{padding:4px 12px;border-left:1px solid var(--rule);text-align:center}.np-duel:first-child{border-left:0}
+.np-duel-k{font-family:"IM Fell English SC",serif;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.np-duel-v{font-family:"Playfair Display",serif;font-size:17px;margin:3px 0}.np-duel-v a{color:inherit}.np-duel-v b{font-weight:900;font-size:22px;margin:0 3px}.np-duel-v span{opacity:.6}
+.np-duel p{font-family:"IM Fell English",serif;font-style:italic;font-size:14.5px;margin:2px 0 6px}
+@media(max-width:700px){.np-duel-grid{grid-template-columns:1fr}.np-duel{border-left:0;border-top:1px dotted var(--rule);padding:6px 0}.np-duel:first-child{border-top:0}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -735,6 +742,7 @@ body.hungover *{transition-duration:.9s!important}
     <p class="np-deck" id="npDeck"></p>
     <hr class="np-rule">
     <div class="np-odds" id="npOdds" hidden></div>
+    <div id="npRivals"></div>
     </div>
     <div id="npBack" hidden></div>
   </article></div>
@@ -1921,6 +1929,26 @@ function motmFor(date){ const p=motmPicks(current)[date]; if(p) return p.name;
   return DATA.motm&&DATA.motm.date===date?DATA.motm.name:null; }
 const listTop=(arr,key,fmt)=>arr.filter(p=>(p[key]||0)>0).sort((a,b)=>b[key]-a[key]).map(p=>`${nm(p.name)} ${fmt?fmt(p):p[key]}`).join(", ");
 const savePct=p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return f?Math.round((p.saves||0)/f*100):null;};
+/* Rivalry Watch: three friendly stat duels between teammates in the same position group, new pairings every Monday */
+function rivalryFront(){
+  const el=document.getElementById("npRivals");if(!el)return;
+  const out=new Set((DATA.tabloid||{}).optOut||[]),alt=new Set((DATA.tabloid||{}).alternates||[]);
+  const act=(DATA.roster||[]).filter(r=>r.pos&&!/Alternate|Retired/i.test(r.pos)&&!alt.has(r.name)&&!out.has(r.name));
+  const tot={};seasons.forEach(s=>seasonPlayers(s).forEach(p=>{const t=tot[p.name]=tot[p.name]||{};["goals","assists","shots","plusMinus","takeaways","blocks","saves"].forEach(k=>t[k]=(t[k]||0)+(p[k]||0))}));
+  const any=Object.keys(tot).length>0;
+  const CATS={FW:[["goals","goals race"],["shots","shots-on-sight derby"],["assists","assist-off"]],MF:[["assists","assist-off"],["plusMinus","plus/minus duel"],["takeaways","takeaway tussle"]],DF:[["takeaways","takeaway tussle"],["blocks","blocking battle"],["plusMinus","plus/minus duel"]]};
+  const grp=g=>act.filter(r=>r.pos.split("/")[0]===g);
+  const wk=Math.floor((Date.UTC(...TODAY.split("-").map((x,i)=>i===1?x-1:+x))/864e5+3)/7);
+  const duels=["FW","MF","DF"].map((g,gi)=>{const ps=grp(g);if(ps.length<2)return null;
+    const pairs=[];for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++)pairs.push([ps[i],ps[j]]);
+    const [a,b]=pairs[(wk+gi)%pairs.length],[k,lab]=CATS[g][(wk+gi*2)%CATS[g].length];
+    const va=(tot[a.name]||{})[k]||0,vb=(tot[b.name]||{})[k]||0,fmt=x=>k==="plusMinus"?(x>0?"+"+x:x<0?"−"+(-x):x):x;
+    const line=!any?"Stats start "+(DATA.statsStart||"soon")+". Both camps claim a moral lead.":va===vb?"Dead level. Neither will admit it.":
+      `${esc((va>vb?a:b).name)} leads${Math.abs(va-vb)>=3?" comfortably":" by a whisker"}. ${pk2(["Bragging rights at stake.","Words have been exchanged.","The loser buys the round.","Sources say it's getting personal."],wk+gi)}`;
+    return `<div class="np-duel"><div class="np-duel-k">${esc(lab)}</div><div class="np-duel-v">${plink(a.name)} <b>${fmt(va)}</b><span>–</span><b>${fmt(vb)}</b> ${plink(b.name)}</div><p>${line}</p></div>`}).filter(Boolean);
+  el.innerHTML=duels.length?`<div class="np-rivals"><h3>Rivalry Watch</h3><div class="np-duel-grid">${duels.join("")}</div></div>`:"";
+}
+const pk2=(a,n)=>a[((n%a.length)+a.length)%a.length];
 function birthdayFront(){
   const el=document.getElementById("npBday");if(el)el.innerHTML=birthdayBox();
 }
@@ -1970,7 +1998,7 @@ function recapFront(g,s,L){
 function renderLanding(){
   const L=DATA.landing||{}; const el=document.getElementById("landing");
   if(!L.show) return false;
-  birthdayFront();
+  birthdayFront();rivalryFront();
   const s=current, byTime=(a,b)=>a.date.localeCompare(b.date)||(a.time||"").localeCompare(b.time||"");
   const games=ourMatches(s).filter(m=>!m.bye).sort(byTime);
   const hasRes=m=>m&&m.hs!=null&&m.as!=null;
