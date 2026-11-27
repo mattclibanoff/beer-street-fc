@@ -1597,7 +1597,7 @@ function punditPanel(m,v,opp){
   const P=[{n:"Lana Rodriguez",t:"Chief pundit. Calls it down the middle.",c:"#7a3b3b",i:"LR",L:MID,sc:clamp(base+(R()-.5))},
            {n:"Cait Phillips",t:"Tactics analyst. Glass permanently half empty.",c:"#3b5a7a",i:"CP",L:DOWN,sc:clamp(base-2.5+(R()-.5))},
            {n:"Saharah Sejour",t:"Pitchside reporter. Glass permanently half full.",c:"#6a6a2f",i:"SS",L:UP,sc:clamp(base+2.5+(R()-.5))}];
-  const odd=v.r==="L"?2:1;   // the one out of step with the result: Cait after a win or draw, Saharah after a loss
+  const odd=1;   // Cait always disagrees
   return `<div class="card pundit-card"><h3>The Pundit Panel</h3><div class="pundits">${P.map((p,i)=>`<div class="pundit${i===odd?" dissent":""}">
     <div class="pd-face" style="background:${p.c}">${p.i}</div><div class="pd-body"><div class="pd-name">${p.n}${i===odd?` <span class="pd-tag">disagrees</span>`:""}</div><div class="pd-title">${p.t}</div>
     <p>“${esc(pk(p.L[tag]).replace("${opp}",opp))}”</p><div class="pd-score">Rating: <b>${p.sc}</b>/10</div></div></div>`).join("")}</div></div>`;
