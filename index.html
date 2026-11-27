@@ -724,6 +724,10 @@ body.hungover *{transition-duration:.9s!important}
 @media(max-width:560px){.tipjar{gap:10px}.tj-art{flex-basis:96px}.tj-art svg{width:96px}}
 .np-fxs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 18px;margin-top:10px;text-align:left}.np-fx{font-size:.95em}.np-fx small{opacity:.7}.np-fx i{font-style:italic}
 @media(max-width:700px){.np-fxs{grid-template-columns:1fr}}
+.hat{position:absolute;left:50%;top:2%;width:34%;transform:translateX(-50%) rotate(-8deg);filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));z-index:2;animation:hatBob 3s ease-in-out infinite}
+@keyframes hatBob{50%{transform:translateX(-50%) rotate(-3deg) translateY(-3px)}}
+.hat-tag{position:absolute;left:0;right:0;bottom:0;z-index:2;background:rgba(0,0,0,.7);color:#fff;font:700 12px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.08em;padding:5px 8px;text-align:center}
+.np-acc{font-family:"IM Fell English",serif;font-style:italic;font-size:14.5px;text-align:center;margin:-2px 0 8px}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1459,7 +1463,7 @@ function tradingCard(r){
   return `<div class="tcard ${c.tier}" id="card-${slug}">
     <div class="tc-top"><div class="tc-ovr">${c.rating??"–"}</div><div class="tc-pos">${c.pos}</div>
       ${r.flag?`<img class="tc-flag" src="${esc(r.flag)}" alt="${esc(r.city||"")}">`:""}${r.captain?`<div class="tc-cap">${esc(r.captain)}</div>`:""}</div>
-    <div class="tc-photo">${r.photo?`<img src="${esc(r.photo)}" alt="">`:`<span>${r.num??"★"}</span>`}</div>
+    <div class="tc-photo">${r.photo?`<img src="${esc(r.photo)}" alt="">`:`<span>${r.num??"★"}</span>`}${hatTrick(r.name)?HAT:""}</div>
     <div class="tc-name">${esc(r.name)}</div>
     <div class="tc-stats">${c.stats.map(([k,x])=>`<div><b>${x}</b><i>${k}</i></div>`).join("")}</div>
     <div class="tc-ed"><span>${r.num!=null?"#"+r.num:""}</span><span>${esc(c.edition)}</span><span>BSFC</span></div>
@@ -1830,6 +1834,15 @@ function renderRecords(){
     <p class="note pk-link"><button type="button" class="linkish" data-shootout>Fancy a penalty? ⚽</button></p>`;
 }
 
+/* hat-trick hat: three or more goals in a game earns a top hat on your photo for the next week */
+function hatTrick(name){
+  let best=null;seasons.forEach(s=>ourMatches(s).forEach(m=>{if(m.bye||m.hs==null)return;const p=(statsFor(s,m)||[]).find(x=>x.name===name);
+    if(p&&(p.goals||0)>=3&&m.date<=TODAY&&(Date.UTC(...TODAY.split("-").map((x,i)=>i===1?x-1:+x))-Date.UTC(...m.date.split("-").map((x,i)=>i===1?x-1:+x)))/864e5<=7)best={g:p.goals,m,s}}));
+  return best;
+}
+const HAT=`<svg class="hat" viewBox="0 0 80 60" aria-hidden="true"><ellipse cx="40" cy="52" rx="38" ry="7" fill="#1b1b1b"/><path d="M18 52V12a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v40z" fill="#222"/><rect x="18" y="38" width="44" height="8" fill="#a8323e"/><path d="M24 12v24" stroke="rgba(255,255,255,.15)" stroke-width="4"/></svg>`;
+const hatOn=name=>{const h=hatTrick(name);return h?`${HAT}<span class="hat-tag">Hat-trick hero · ${h.g} goals vs ${esc(oppOfGame(h.m))}</span>`:""};
+
 /* shirt-sniff test: how ripe is the shirt? based on games played in a row (stats), or the laundry gods when there are none */
 function sniffStreak(name){
   const gs=[];seasons.forEach(s=>ourMatches(s).forEach(m=>{if(m.bye||m.hs==null)return;const st=statsFor(s,m);if(st&&st.length)gs.push(st)}));
@@ -1888,7 +1901,7 @@ function renderPlayer(slug){
   const photo=r.photo?`<img src="${esc(r.photo)}" alt="${esc(r.name)}" onerror="this.parentNode.classList.add('nophoto');this.remove()">`:"";
   root.innerHTML=`<a class="back" href="#current-stats">← Squad &amp; stats</a>
     <div class="pp-hero">
-      <div class="pp-photo ${photo?"":"nophoto"}">${photo}<span class="pp-ph">${r.num??"★"}</span></div>
+      <div class="pp-photo ${photo?"":"nophoto"}">${photo}<span class="pp-ph">${r.num??"★"}</span>${hatOn(r.name)}</div>
       <div class="pp-id"><div class="pp-num">${r.num!=null?"#"+r.num:""}</div><h2 class="pp-name">${esc(r.name)}${capBadge(r.name,true)}${cityFlag(r.name,true)}</h2>
         <div class="pp-pos">${esc(posWords(r.pos))}${r.pos==="Retired"||r.pos==="Alternate"?"":" · Beer Street FC"}</div>
         ${r.pos==="Retired"?"":`<div class="sniff"><button type="button" class="fun-btn" data-sniff="${esc(r.name)}">👃 Smell the shirt</button><span class="sniff-out" aria-live="polite"></span></div>`}
@@ -2461,6 +2474,22 @@ function birthdayBox(){
 const SIGNS={Aries:"♈",Taurus:"♉",Gemini:"♊",Cancer:"♋",Leo:"♌",Virgo:"♍",Libra:"♎",Scorpio:"♏",Sagittarius:"♐",Capricorn:"♑",Aquarius:"♒",Pisces:"♓"};
 const SIGN_TRAIT={Aries:"Your natural urge to charge at everything",Taurus:"Your famous stubbornness",Gemini:"Both of your personalities",Cancer:"Your protective instincts",Leo:"Your love of the spotlight",
   Virgo:"Your obsession with tidy passing",Libra:"Your eternal search for balance",Scorpio:"Your quiet intensity",Sagittarius:"Your restless, wandering spirit",Capricorn:"Your relentless work rate",Aquarius:"Your unpredictable genius",Pisces:"Your dreamy vision"};
+const hsH=(wk,str)=>{let x=wk*2654435761>>>0;for(const c of str)x=Math.imul(x^c.charCodeAt(0),16777619)>>>0;return x};
+const starsFor=(wk,name)=>{const q=(hsH(wk,name)>>>20)%20;return q<2?1:q<6?2:q<12?3:q<17?4:5};
+const weekOf=iso=>Math.floor((Date.UTC(...iso.split("-").map((x,i)=>i===1?x-1:+x))/864e5+3)/7);
+/* how good is Madame Pint? each forecast vs how the player actually ranked in that week's game (1-5 by game score) */
+function pintAccuracy(out){
+  const signed=new Set((DATA.roster||[]).filter(r=>r.sign&&!out.has(r.name)).map(r=>r.name)), res=[];
+  const score=p=>(p.goals||0)*3+(p.assists||0)*2+(p.takeaways||0)+(p.blocks||0)+(p.saves||0)*.5+(p.plusMinus||0)*.5-(p.fouls||0)-(p.giveaways||0)*.5;
+  seasons.forEach(s=>ourMatches(s).forEach(m=>{if(m.bye||m.hs==null)return;const st=statsFor(s,m);if(!st||st.length<2)return;
+    const ranked=st.slice().sort((a,b)=>score(a)-score(b)),wk=weekOf(m.date);
+    ranked.forEach((p,i)=>{if(!signed.has(p.name))return;const actual=1+Math.min(4,Math.floor(i/ranked.length*5)),pred=starsFor(wk,p.name);res.push({name:p.name,date:m.date,pred,actual,hit:Math.abs(pred-actual)<=1})})}));
+  if(!res.length)return `<p class="np-acc">Madame Pint's accuracy: <b>to be determined</b>. She is, she says, “extremely confident”. Scoring starts with ${esc(DATA.statsStart||"player stats")}.</p>`;
+  const pct=Math.round(res.filter(x=>x.hit).length/res.length*100), last=res.filter(x=>x.date===res[res.length-1].date);
+  const best=last.filter(x=>x.pred===x.actual).sort((a,b)=>b.actual-a.actual)[0], worst=last.slice().sort((a,b)=>Math.abs(b.pred-b.actual)-Math.abs(a.pred-a.actual))[0];
+  const verdict=pct>=70?"Spooky.":pct>=50?"Better than a coin toss. Just.":pct>=30?"The stars are cloudy.":"Madame Pint blames the floodlights.";
+  return `<p class="np-acc">Madame Pint's accuracy: <b>${pct}%</b> from ${res.length} forecast${res.length===1?"":"s"}. ${verdict}${best?` Last game's best call: ${esc(best.name)} (${best.pred}★, spot on).`:""}${worst&&Math.abs(worst.pred-worst.actual)>=2?` Biggest miss: ${esc(worst.name)} (forecast ${worst.pred}★, played like ${worst.actual}★).`:""}</p>`;
+}
 function horoscopes(wk,out){
   const ppl=(DATA.roster||[]).filter(r=>r.sign&&SIGNS[r.sign]&&!out.has(r.name));
   if(!ppl.length)return "";
@@ -2476,10 +2505,10 @@ function horoscopes(wk,out){
   const LUCKY=["a lucky left sock","the colour orange","a pre-game banana","shin pads on the correct legs","an untied bootlace (please tie it)","a high-five from the captain","the number 7","a cold pint at full time","stretching for once","arriving five minutes early","a fresh pair of grip socks","the word 'Beer' on your shirt","a pre-match playlist"];
   const fill=(t,p)=>t.replace("{act}",p.act).replace("{zone}",p.zone);
   const cap=t=>t[0].toUpperCase()+t.slice(1), o=h("week");   // planets, houses and charms are dealt out so nobody shares one in the same issue
-  const items=ppl.map((r,i)=>{const x=h(r.name),deal=(a,k)=>a[((o>>>k)+i)%a.length],q=(x>>>20)%20,stars=q<2?1:q<6?2:q<12?3:q<17?4:5,p=POS(r.pos),pick=(a,k)=>a[(x>>>k)%a.length];
+  const items=ppl.map((r,i)=>{const x=h(r.name),deal=(a,k)=>a[((o>>>k)+i)%a.length],stars=starsFor(wk,r.name),p=POS(r.pos),pick=(a,k)=>a[(x>>>k)%a.length];
     return `<div class="np-star"><div class="np-star-h"><span class="np-glyph" title="${r.sign}">${SIGNS[r.sign]}\uFE0E</span><b>${esc(r.name)}</b><span class="np-rate" title="Forecast: ${stars} of 5">${"★".repeat(stars)}${"☆".repeat(5-stars)}</span></div>
       <p>${cap(deal(PLANET,4))} drifts through your ${deal(HOUSE,9)}. ${SIGN_TRAIT[r.sign]} ${stars>=3?"works in your favour":"needs a gentle leash"} this week. ${fill(pick(LINES[stars],11),p)} <i>Lucky charm: ${deal(LUCKY,14)}.</i></p></div>`});
-  return `<div class="np-ads np-stars"><h3>Madame Pint's Stars <small>· your week on the pitch, foretold</small></h3><div class="np-star-grid">${items.join("")}</div></div>`;
+  return `<div class="np-ads np-stars"><h3>Madame Pint's Stars <small>· your week on the pitch, foretold</small></h3>${pintAccuracy(out)}<div class="np-star-grid">${items.join("")}</div></div>`;
 }
 function renderBackPage(){
   const T=DATA.tabloid||{}, out=new Set(T.optOut||[]), ok=x=>!x.who||!out.has(x.who);
