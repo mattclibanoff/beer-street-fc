@@ -741,6 +741,8 @@ body.hungover *{transition-duration:.9s!important}
 .ppost.read .ppost-note{display:block}.ppost-note b{display:block;font:700 11px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#a8323e;margin-bottom:2px}
 @media(prefers-reduced-motion:reduce){.ppost{display:none!important}}
 .var-foot{display:block;margin-top:8px;font-size:.62em;font-weight:400;opacity:.85;letter-spacing:0;text-transform:none;line-height:1.35}
+.pp-nostats{margin:4px 0 24px;color:var(--muted);font-size:13.5px;font-style:italic}
+@media(max-width:640px){.next-match.off .when{text-align:left}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1555,13 +1557,12 @@ function almanac(){
   games.forEach(g=>{if(g===games[0]||g===firstW)return;const v=view(g.m);ev.push({d:g.m.date,k:g.m.stage?esc(g.m.label||g.m.stage).split(" vs ")[0]:esc(label(g.s)),
     t:`<a href="#${matchId(g.m)}">${v.r==="W"?"Beat":v.r==="L"?"Lost to":"Drew with"} ${esc(oppOfGame(g.m))} ${v.f}–${v.a}</a>.`}) });
   (DATA.motmLog||[]).filter(x=>!out.has(x.name)).forEach(x=>ev.push({d:x.date,k:"Man of the Match",t:`${plink(x.name)} was named ${(DATA.womanOfMatch||[]).includes(x.name)?"(Wo)man":"Man"} of the Match${x.opponent?` vs ${esc(x.opponent)}`:""}.`}));
-  (DATA.roster||[]).filter(r=>r.bday&&!out.has(r.name)).forEach(r=>ev.push({d:"0000-"+r.bday,k:"Birthday",t:`Happy birthday, ${plink(r.name)}! 🎂`}));
   const T=DATA.tabloid||{};["rumours","overheard"].forEach(k=>(T[k]||[]).filter(x=>x.added&&(!x.who||!out.has(x.who))).forEach(x=>ev.push({d:x.added,k:"The Gazette",t:esc(x.text)})));
   const yr=d=>d.startsWith("0000")?"":d.slice(0,4), ago=d=>{const y=+TODAY.slice(0,4)-+d.slice(0,4);return d.startsWith("0000")||!y?"":` · ${y} year${y>1?"s":""} ago`};
   let todays=ev.filter(e=>md(e.d)===md(TODAY)&&(e.d.startsWith("0000")||e.d<TODAY)), head="On this day";
   if(!todays.length){   // nothing today: look a few days either side
     const D=d=>Date.UTC(2000,+d.slice(5,7)-1,+d.slice(8,10)),t=D(TODAY);
-    const near=ev.filter(e=>e.d.startsWith("0000")||e.d<TODAY).map(e=>({...e,gap:Math.round((D(e.d)-t)/864e5)})).filter(e=>Math.abs(e.gap)<=7&&e.gap!==0).sort((a,b)=>Math.abs(a.gap)-Math.abs(b.gap));
+    const near=ev.filter(e=>e.d.startsWith("0000")||e.d<TODAY).map(e=>({...e,gap:Math.round((D(e.d)-t)/864e5)})).filter(e=>e.gap<0&&e.gap>=-7).sort((a,b)=>Math.abs(a.gap)-Math.abs(b.gap));
     if(near.length){todays=near.slice(0,3);head="This week in history"}
     else{const past=ev.filter(e=>!e.d.startsWith("0000")&&e.d<TODAY);if(past.length){todays=[past[Math.round(Date.UTC(...TODAY.split("-").map((x,i)=>i===1?x-1:+x))/864e5)%past.length]];head="From the archive"}}
   }
@@ -1604,7 +1605,7 @@ function renderMatch(id){
       ${field.map(p=>`<tr><td class="l team">${plink(p.name)}</td>${z(p.goals)}${z(p.assists)}${z(p.shots)}${pm(p.plusMinus)}${z(p.takeaways)}${z(p.giveaways)}${z(p.blocks)}${z(p.fouls)}<td>${(p.yellow||p.red)?`<span class="cards">${p.yellow?`<i class="yc"></i>${p.yellow}`:""}${p.red?`<i class="rc"></i>${p.red}`:""}</span>`:`<span class="zero" style="color:var(--zero)">0</span>`}</td></tr>`).join("")}
     </tbody></table></div>${keep.length?`<div class="tbl-wrap"><table><thead><tr><th class="l">In goal</th><th>Saves</th><th>GA</th><th>Save %</th></tr></thead><tbody>
       ${keep.map(p=>{const f=(p.saves||0)+(p.goalsAgainst||0);return `<tr><td class="l team">${plink(p.name)}</td>${z(p.saves)}${z(p.goalsAgainst)}<td>${f?((p.saves||0)/f*100).toFixed(1)+"%":"–"}</td></tr>`}).join("")}</tbody></table></div>`:""}</div>`
-    :played?`<div class="card"><div class="empty" style="padding:20px">No player stats for this game${DATA.statsStart?` · player stats start ${esc(DATA.statsStart)}`:""}.</div></div>`:"";
+    :played?`<p class="pp-nostats">No player stats for this game${DATA.statsStart?` · player stats start ${esc(DATA.statsStart)}`:""}.</p>`:"";
   // head to head going into / including this game
   const meets=games.filter(x=>oppOfGame(x.m)===opp&&view(x.m).played);
   const hw=meets.filter(x=>view(x.m).r==="W").length, hl=meets.filter(x=>view(x.m).r==="L").length, hd=meets.length-hw-hl;
@@ -1879,7 +1880,8 @@ function pigeonMessages(){
 }
 (function(){
   const el=document.getElementById("ppost");if(!el)return;
-  const go=()=>{if(document.body.classList.contains("landing-open")||document.body.classList.contains("geo")){setTimeout(go,8000);return}
+  const busy=()=>document.body.classList.contains("landing-open")||document.body.classList.contains("geo")||["var","pk","ttx"].some(id=>{const x=document.getElementById(id);return x&&!x.hidden});
+  const go=()=>{if(busy()){setTimeout(go,8000);return}
     const msgs=pigeonMessages(),msg=msgs[Math.floor(Math.random()*msgs.length)],note=el.querySelector(".ppost-note"),bird=el.querySelector(".ppost-bird");
     el.hidden=false;el.classList.remove("read");note.innerHTML="";el.style.top=(70+Math.random()*60)+"px";
     el.classList.remove("fly");void el.offsetWidth;el.classList.add("fly");
@@ -1928,7 +1930,7 @@ function renderPlayer(slug){
       ${outf?tile("Rating",badge(fifaRating(car,false)))+tile("Apps",car.apps)+tile("Goals",car.goals)+tile("Assists",car.assists)+tile("G+A",car.goals+car.assists)+tile("+/-",pmS(car.plusMinus))+tile("Takeaways",car.takeaways)+tile("Blocks",car.blocks):""}
       ${gk&&car.gkApps?tile("Keeper rating",badge(fifaRating(car,true)))+tile("Apps in goal",car.gkApps)+tile("Saves",car.saves)+tile("Save %",spc(car))+tile("Clean sheets",car.cleanSheets):""}
       ${tile(`${wo?"(Wo)man":"Man"} of the Match`,motmN)}</div>`
-    :`<h3 class="pp-h">Career</h3><div class="card"><div class="empty" style="padding:22px 20px">Career stats start ${esc(DATA.statsStart||"soon")}${motmN?` · ${motmN} ${wo?"(Wo)man":"Man"} of the Match award${motmN>1?"s":""} so far`:""}.</div></div>`;
+    :`<p class="pp-nostats">Player stats start ${esc(DATA.statsStart||"soon")}${motmN?` · ${motmN} ${wo?"(Wo)man":"Man"} of the Match award${motmN>1?"s":""} so far`:""}.</p>`;
   const hist=rows.length?`<div class="card flush"><h3>Season by season</h3><div class="tbl-wrap"><table><thead><tr><th class="l">Season</th>
       ${outf?"<th>Apps</th><th>Goals</th><th>Assists</th><th>+/-</th><th>Rating</th>":""}${gk?"<th>In goal</th><th>Saves</th><th>Save %</th><th>GK rating</th>":""}</tr></thead><tbody>
       ${[...rows,{s:null,p:car}].map(({s,p})=>`<tr class="${s?"":"career-row"}"><td class="l">${s?esc(label(s)):"Career"}</td>${outf?`<td>${p.apps||0}</td><td>${p.goals||0}</td><td>${p.assists||0}</td><td>${pmS(p.plusMinus||0)}</td><td>${badge(fifaRating(p,false))}</td>`:""}${gk?`<td>${p.gkApps||0}</td><td>${p.saves||0}</td><td>${spc(p)}</td><td>${badge(fifaRating(p,true))}</td>`:""}</tr>`).join("")}
@@ -1953,7 +1955,7 @@ function renderPlayer(slug){
         ${r.pos==="Retired"?"":`<div class="sniff"><button type="button" class="fun-btn" data-sniff="${esc(r.name)}">👃 Smell the shirt</button><span class="sniff-out" aria-live="polite"></span></div>`}
         ${r.bio?`<p class="pp-bio">${esc(r.bio)}</p>`:""}</div>
     </div>
-    <h3 class="pp-h">${esc(label(current))}</h3>${curBlock}
+    ${cur||rows.length?`<h3 class="pp-h">${esc(label(current))}</h3>${curBlock}`:""}
     ${careerBlock}
     ${hist}
     <div class="card"><h3>Awards</h3>${awards.length?`<ul class="pp-aw">${awards.map(a=>`<li><svg><use href="#star"/></svg><div><b>${a.t}</b><small>${a.sub}${a.d&&a.t!=="Champion"?" · "+fmtDate(a.d,{month:"short",day:"numeric",year:"numeric"}):""}</small>${a.line?`<p>${esc(a.line)}</p>`:""}</div></li>`).join("")}</ul>`:`<div class="empty" style="padding:18px">No awards yet.</div>`}</div>
@@ -2186,6 +2188,7 @@ function rivalryFront(){
   const act=(DATA.roster||[]).filter(r=>r.pos&&!/Alternate|Retired/i.test(r.pos)&&!alt.has(r.name)&&!out.has(r.name));
   const tot={};seasons.forEach(s=>seasonPlayers(s).forEach(p=>{const t=tot[p.name]=tot[p.name]||{};["goals","assists","shots","plusMinus","takeaways","blocks","saves"].forEach(k=>t[k]=(t[k]||0)+(p[k]||0))}));
   const any=Object.keys(tot).length>0;
+  if(!any){el.innerHTML="";return}   // nothing to compare until player stats start
   const CATS={FW:[["goals","goals race"],["shots","shots-on-sight derby"],["assists","assist-off"]],MF:[["assists","assist-off"],["plusMinus","plus/minus duel"],["takeaways","takeaway tussle"]],DF:[["takeaways","takeaway tussle"],["blocks","blocking battle"],["plusMinus","plus/minus duel"]]};
   const grp=g=>act.filter(r=>r.pos.split("/")[0]===g);
   const wk=Math.floor((Date.UTC(...TODAY.split("-").map((x,i)=>i===1?x-1:+x))/864e5+3)/7);
@@ -2597,7 +2600,7 @@ function renderBackPage(){
   carded.forEach(p=>fines.push(`<b>${esc(p.name)}</b>: ${[p.yellow?p.yellow+" yellow":"",p.red?p.red+" red":""].filter(Boolean).join(", ")}. Pay up at the bar.`));
   if(!fines.length) fines.push("No fines yet. The committee is watching. The committee is always watching.");
   const head=T.headline||(rumours.length?"Pigeon Watch: transfer window swings open":"All quiet on Beer Street");
-  document.getElementById("npBack").innerHTML=`<div class="np-backmast">The Beer Street Gazette · <i>Back Page</i></div>
+  document.getElementById("npBack").innerHTML=`<div class="np-backmast">The Beer Street Gazette <i style="white-space:nowrap">· Back Page</i></div>
     <h2 class="np-head np-backhead">${esc(head)}</h2>
     <div class="np-cols">
       <section><h3>Transfer Talk</h3>${rumours.map(x=>`<p>${esc(x.text)}</p>`).join("")||"<p>Nothing to report.</p>"}</section>
