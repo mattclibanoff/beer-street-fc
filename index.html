@@ -740,6 +740,7 @@ body.hungover *{transition-duration:.9s!important}
 .ppost-note{position:absolute;left:60px;top:-6px;width:min(260px,60vw);background:#f3ead6;color:#2b2420;border:1px solid #8a7a62;border-radius:4px;padding:8px 10px;font:15px/1.3 "IM Fell English",serif;box-shadow:0 4px 12px rgba(0,0,0,.4);display:none;pointer-events:auto}
 .ppost.read .ppost-note{display:block}.ppost-note b{display:block;font:700 11px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#a8323e;margin-bottom:2px}
 @media(prefers-reduced-motion:reduce){.ppost{display:none!important}}
+.var-foot{display:block;margin-top:8px;font-size:.62em;font-weight:400;opacity:.85;letter-spacing:0;text-transform:none;line-height:1.35}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1621,7 +1622,7 @@ function renderMatch(id){
       </div>
       <div class="mp-when">${fmtDate(m.date,{weekday:"long",month:"long",day:"numeric",year:"numeric"})} · ${esc(m.time)}${m.field?" · "+esc(m.field):""}${!played&&m.date>=TODAY?calMenu(m,s):""}</div>
       ${played?`<div class="mp-res ${v.r}">${v.r==="W"?"Win":v.r==="L"?"Loss":"Draw"}</div>
-        <div class="mp-fun"><button type="button" class="fun-btn" data-var="${v.r}">Request VAR review</button>${v.r==="L"?`<button type="button" class="fun-btn" data-excuse>Explain this</button>`:""}</div>
+        <div class="mp-fun"><button type="button" class="fun-btn" data-var="${v.r}" data-mid="${matchId(m)}">Request VAR review</button>${v.r==="L"?`<button type="button" class="fun-btn" data-excuse>Explain this</button>`:""}</div>
         <div class="excuse" id="excuse" hidden></div>`:m.date<TODAY?`<div class="mp-res">No score posted</div>`:""}
       ${scorers.length?`<div class="mp-scorers">⚽ ${scorers.join(", ")}</div>`:""}
     </div>
@@ -2410,15 +2411,35 @@ document.getElementById("pidge").onclick=e=>{
 const VAR_STEPS=["Checking possible handball…","Drawing the lines…","Consulting the pigeon…","Zooming in on a blade of grass…","Checking the referee's bar tab…","Reviewing it again, slower…"];
 const EXCUSES=["The ball was too round.","Mercury was in retrograde.","Their keeper was suspiciously tall.","We'd had a big lunch.","The pitch was sloping. Both ways.","Wrong boots. Everyone.","We were saving ourselves for the bar.","The floodlights were too light.","Their kit was too distracting.","It was cold. Indoors. Somehow.","Half the team was still at work, spiritually.","We let them have that one.","The pigeon was in a bad mood.","We were playing a long game. A very long game."];
 let lastExcuse=-1;
+/* VAR picks on a couple of squad members (gentle football ribbing only; opted-out players and alternates are left alone) */
+const VAR_P=["Checking whether {p} was offside. Again.","Measuring {p}'s dive for artistic merit…","Confirming {p} actually touched the ball…","Asking {p} to stop talking to the referee…",
+  "Reviewing {p}'s appeal for a corner. It was a goal kick.","Checking if {p} tracked back. Loading…","Establishing whether {p}'s 'cross' was a shot. Or vice versa.","Replaying {p}'s first touch at 0.25x speed…",
+  "Looking for {p} in the defensive shape. Still looking…","Verifying {p}'s claim that they 'definitely got the last touch'…","Assessing {p}'s celebration for excessive confidence…","Zooming in on {p}'s shin pads. Both present. Progress."];
+const VAR_V=["Footnote: {p}'s celebration has been referred to the fines committee.","Footnote: {p} is reminded that pointing at the ref is not a tactic.","Footnote: {p}'s offside trap caught one person: {p}.",
+  "Footnote: {p}'s appeal has been noted and filed under 'no'.","Footnote: {p} has been asked to return the ball they booted onto the street.","Footnote: VAR has awarded {p} one (1) pint for effort.",
+  "Footnote: {p}'s positioning was described by the VAR team as 'abstract'.","Footnote: VAR would like a word with {p} about the throw-in."];
+function varPeople(mid){
+  const out=new Set((DATA.tabloid||{}).optOut||[]),alt=new Set((DATA.tabloid||{}).alternates||[]);
+  let pool=(DATA.roster||[]).filter(r=>!/Alternate|Retired/i.test(r.pos||"")&&!alt.has(r.name)&&!out.has(r.name)).map(r=>r.name);
+  const g=mid&&allGames().find(x=>matchId(x.m)===mid),st=g&&statsFor(g.s,g.m);
+  if(st&&st.length){const played=st.map(p=>p.name).filter(n=>pool.includes(n));if(played.length>=2)pool=played}
+  return {pool:pool.sort(()=>Math.random()-.5),st:st||[]};
+}
 document.addEventListener("click",e=>{
   const vb=e.target.closest("[data-var]");
   if(vb){const r=vb.dataset.var, box=document.getElementById("var"), st=document.getElementById("varStatus"), vd=document.getElementById("varVerdict"), cl=document.getElementById("varClose");
     box.hidden=false; vd.hidden=true; cl.hidden=true; box.classList.remove("done"); void box.offsetWidth; box.classList.add("run");
-    const steps=VAR_STEPS.slice().sort(()=>Math.random()-.5).slice(0,3); let i=0; st.textContent=steps[0];
+    const {pool,st:gs}=varPeople(vb.dataset.mid), pk=a=>a[Math.floor(Math.random()*a.length)], P=n=>esc(n);
+    // with this game's stats, VAR has receipts
+    const fouler=gs.filter(p=>(p.fouls||0)>=2&&pool.includes(p.name)).sort((a,b)=>b.fouls-a.fouls)[0], scorer=gs.filter(p=>(p.goals||0)>=2&&pool.includes(p.name)).sort((a,b)=>b.goals-a.goals)[0];
+    const pSteps=pool.slice(0,2).map(n=>pk(VAR_P).replace(/\{p\}/g,P(n)));
+    if(scorer)pSteps[0]=`Reviewing all ${scorer.goals} of ${P(scorer.name)}'s goals… annoyingly, all legal.`;
+    const steps=[pSteps[0],VAR_STEPS[Math.floor(Math.random()*VAR_STEPS.length)],pSteps[1]].filter(Boolean); let i=0; st.textContent=steps[0];
+    const foot=fouler?`Footnote: ${P(fouler.name)}'s ${fouler.fouls} fouls have been reviewed. All upheld. Pay at the bar.`:pool[2]?pk(VAR_V).replace(/\{p\}/g,P(pool[2])):"";
     const iv=setInterval(()=>{i++; if(i<steps.length){st.textContent=steps[i];return}
       clearInterval(iv); box.classList.remove("run"); box.classList.add("done"); st.textContent="Review complete.";
       const tease=r==="L"&&Math.random()<.15;
-      vd.innerHTML=tease?`Goal disallowed… <small>just kidding.</small> Decision stands. Still a loss.`:`Decision stands. Still a ${r==="W"?"win":r==="L"?"loss":"draw"}.`;
+      vd.innerHTML=(tease?`Goal disallowed… <small>just kidding.</small> Decision stands. Still a loss.`:`Decision stands. Still a ${r==="W"?"win":r==="L"?"loss":"draw"}.`)+(foot?`<small class="var-foot">${foot}</small>`:"");
       vd.hidden=false; cl.hidden=false; cl.focus();},1300);
     return;}
   if(e.target.closest("#varClose")||e.target.id==="var"){document.getElementById("var").hidden=true;return}
