@@ -852,6 +852,24 @@ body.season-summer #eggBird{position:relative}body.season-summer #eggBird .shade
 .thm-space .thm-res tr.r-L td.g,.thm-stocks .thm-res tr.r-L td.g,.thm-terminal .thm-res tr.r-L td.g,.thm-arcade .thm-res tr.r-L td.g,.thm-haunted .thm-res tr.r-L td.g,.thm-racing .thm-res tr.r-L td.g,.thm-speakeasy .thm-res tr.r-L td.g,.thm-noir .thm-res tr.r-L td.g{color:#ff6b6b}
 .thm-arcade .thm-t{font-size:1.9cqw}.thm-arcade .thm-tabs button{font-size:1.6cqw}
 @media(max-width:560px){.thm-tabs button{font-size:11px;padding:3px 9px}.thm-arcade .thm-t{font-size:9px}}
+.marcus{position:relative;flex:0 0 46px;width:46px;align-self:flex-end}.marcus svg{width:46px;display:block;overflow:visible}
+.marcus .mc-all,.marcus .mc-armL,.marcus .mc-armR{transform-box:fill-box}.marcus .mc-armL{transform-origin:100% 0}.marcus .mc-armR{transform-origin:0 0}.marcus .mc-all{transform-origin:50% 100%}
+.marcus .mc-cash,.marcus .mc-card,.marcus .mc-whistle{opacity:0}
+.card.tipjar{overflow:visible}.mc-bubble{position:absolute;bottom:calc(100% + 2px);left:-4px;transform:translate(0,4px) scale(.6);transform-origin:12px 100%;opacity:0;white-space:nowrap;background:#fff;color:#111;font:700 11px "Barlow Condensed",sans-serif;letter-spacing:.03em;padding:3px 7px;border-radius:8px;pointer-events:none;transition:.15s;z-index:3}
+.mc-bubble::after{content:"";position:absolute;left:22px;top:100%;margin-left:-4px;border:4px solid transparent;border-top-color:#fff}
+.marcus[class*=" mc-"] .mc-bubble{opacity:1;transform:translate(0,-2px) scale(1)}
+.mc-jump .mc-all{animation:mcJump .5s ease-out 2}@keyframes mcJump{40%{transform:translateY(-14px)}}
+.mc-jump .mc-armL{animation:mcArmUpL .5s 2}.mc-jump .mc-armR{animation:mcArmUpR .5s 2}@keyframes mcArmUpL{40%{transform:rotate(130deg)}}@keyframes mcArmUpR{40%{transform:rotate(-130deg)}}
+.mc-spin .mc-all{animation:mcSpin .8s ease-in-out}@keyframes mcSpin{to{transform:rotateY(360deg)}}
+.mc-whistle .mc-whistle{opacity:1}.mc-whistle .mc-mouth{opacity:0}.mc-whistle .mc-armR{animation:mcPoint 1.4s ease-out forwards}@keyframes mcPoint{20%,100%{transform:rotate(-100deg)}}
+.mc-whistle .mc-all{animation:mcPuff .2s ease-in-out 5 alternate}@keyframes mcPuff{to{transform:scale(1.04)}}
+.mc-card .mc-card{opacity:1}.mc-card .mc-armR{animation:mcRaise 1.6s ease-out forwards}@keyframes mcRaise{25%,100%{transform:rotate(-125deg) translate(-2px,-4px)}}
+.mc-cash .mc-cash{opacity:1}.mc-cash .mc-eyes{opacity:0}.mc-cash .mc-all{animation:mcPuff .25s ease-in-out 6 alternate}
+.mc-dance .mc-all{animation:mcDance .35s ease-in-out 4 alternate}@keyframes mcDance{from{transform:rotate(-10deg) translateX(-3px)}to{transform:rotate(10deg) translateX(3px)}}
+.mc-dance .mc-armL{animation:mcArmUpL .35s 4 alternate}.mc-dance .mc-armR{animation:mcArmUpR .35s 4 alternate;animation-delay:.17s}
+.mc-thumbs .mc-armL{animation:mcThumb 1.6s ease-out forwards}@keyframes mcThumb{20%,100%{transform:rotate(95deg)}}
+.mc-wink .mc-eyes circle:last-child{transform-box:fill-box;transform-origin:center;animation:mcWink 1.4s}@keyframes mcWink{15%,60%{transform:scaleY(.15)}}
+@media(prefers-reduced-motion:reduce){.marcus *{animation:none!important}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1625,10 +1643,39 @@ document.addEventListener("click",async e=>{
 /* bribe the ref: a shared tip jar per game, filled by everyone who visits (stored with the attendance data on Cloudflare) */
 const TIPJAR={};
 function tipLevel(c){return c<1?"Clean as a whistle":c<10?"A little sweetener":c<50?"Questionable":c<150?"Brown envelope territory":c<400?"Full-blown scandal":"Marcus has bought a yacht"}
+const MARCUS=`<div class="marcus" aria-hidden="true"><div class="mc-bubble"></div><svg viewBox="0 0 80 100">
+  <g class="mc-all">
+    <g class="mc-armL"><path d="M22 58 Q12 66 10 78" stroke="#ffd400" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="10" cy="79" r="5" fill="#c68a5a"/></g>
+    <g class="mc-armR"><path d="M58 58 Q68 66 70 78" stroke="#ffd400" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="70" cy="79" r="5" fill="#c68a5a"/>
+      <g class="mc-card"><rect x="64" y="60" width="13" height="18" rx="2" fill="#2fbf5b" stroke="#145c2a" stroke-width="1.2"/></g></g>
+    <path d="M18 98 Q18 58 40 54 Q62 58 62 98 Z" fill="#ffd400" stroke="#c9a400" stroke-width="1.2"/>
+    <path d="M32 55 L40 66 L48 55" fill="#111"/><path d="M40 66 V96" stroke="#111" stroke-width="1.4"/>
+    <rect x="45" y="70" width="10" height="9" rx="1.5" fill="#f2c800" stroke="#111" stroke-width="1"/>
+    <path d="M18 72 H24M56 72 H62" stroke="#111" stroke-width="3"/>
+    <path d="M34 56 Q40 70 46 56" fill="none" stroke="#444" stroke-width="1"/><circle cx="40" cy="70" r="2.6" fill="#c0c4cc" stroke="#555" stroke-width=".8"/>
+    <rect x="35" y="44" width="10" height="10" fill="#b57a4b"/>
+    <ellipse cx="19" cy="31" rx="4" ry="6" fill="#b57a4b"/><ellipse cx="61" cy="31" rx="4" ry="6" fill="#b57a4b"/>
+    <ellipse cx="40" cy="28" rx="21" ry="23" fill="#c68a5a"/>
+    <ellipse cx="33" cy="12" rx="7" ry="4" fill="#fff" opacity=".35" transform="rotate(-20 33 12)"/>
+    <path d="M28 21 Q32 18 36 21M44 21 Q48 18 52 21" stroke="#4a2e1c" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <g class="mc-eyes"><circle cx="32" cy="28" r="2.6" fill="#1b1b1b"/><circle cx="48" cy="28" r="2.6" fill="#1b1b1b"/></g>
+    <g class="mc-cash"><text x="32" y="32" text-anchor="middle" font-size="10" font-weight="900" fill="#1f8a3a" font-family="Arial">$</text><text x="48" y="32" text-anchor="middle" font-size="10" font-weight="900" fill="#1f8a3a" font-family="Arial">$</text></g>
+    <path d="M40 30 Q42 35 39 37" stroke="#9c6a42" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path class="mc-mouth" d="M33 41 Q40 47 47 41" stroke="#5a2a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <g class="mc-whistle"><rect x="44" y="40" width="9" height="5" rx="2.5" fill="#c0c4cc" stroke="#555" stroke-width=".8"/></g>
+  </g></svg></div>`;
+const MC_MOVES=[["jump","Wheee!"],["spin","Generous!"],["whistle","TWEEEET!"],["card","Green card for you!"],["cash","Ka-ching!"],["dance","♪ Bribe-a-licious ♪"],["thumbs","Penalty awarded. To you."],["wink","I saw nothing."]];
+let mcLast=-1;
+function marcusCelebrate(root){
+  const m=root&&root.querySelector(".marcus");if(!m)return;
+  let i;do{i=Math.floor(Math.random()*MC_MOVES.length)}while(i===mcLast);mcLast=i;
+  const [mv,say]=MC_MOVES[i];m.className="marcus";void m.offsetWidth;m.classList.add("mc-"+mv);
+  const bb=m.querySelector(".mc-bubble");bb.textContent=say;clearTimeout(m._t);m._t=setTimeout(()=>{m.className="marcus"},1800);
+}
 function tipJarHtml(k,forWhat,c){
   const fill=Math.min(1,c/200),top=150-118*fill,coins=Math.min(60,Math.ceil(c/3.4));let seed=7;const R=()=>(seed=(seed*1103515245+12345)>>>0)/4294967296;
   const cs=Array.from({length:coins},(_,i)=>{const row=Math.floor(i/6),x=38+((i%6)*14)+(row%2?7:0)+(R()-.5)*3,y=146-row*7.2;return y>top-4?`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="7" ry="3.2" fill="#e3b341" stroke="#8a6512" stroke-width="1"/>`:""}).join("");
-  return `<div class="card tipjar" title="Everyone who visits shares this jar. Purely ceremonial. Marcus has not been informed."><div class="tj-art"><svg viewBox="0 0 150 170" aria-hidden="true">
+  return `<div class="card tipjar" title="Everyone who visits shares this jar. Purely ceremonial. Marcus has not been informed.">${MARCUS}<div class="tj-art"><svg viewBox="0 0 150 170" aria-hidden="true">
       <defs><clipPath id="tjc-${k}"><path d="M32 34h86v108a14 14 0 0 1-14 14H46a14 14 0 0 1-14-14z"/></clipPath></defs>
       <g clip-path="url(#tjc-${k})">${cs}</g>
       <path d="M32 34h86v108a14 14 0 0 1-14 14H46a14 14 0 0 1-14-14z" fill="rgba(200,230,255,.08)" stroke="rgba(var(--cream-rgb),.7)" stroke-width="3"/>
@@ -1647,10 +1694,10 @@ async function tipJarMount(root){
   }
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-tip]");if(!b)return;const k=b.dataset.tip,J=TIPJAR[k];if(!J)return;
-  J.c++;J.pend++;const slot=b.closest("[data-tipjar]");
+  J.c++;J.pend++;const slot=b.closest("[data-tipjar]");marcusCelebrate(slot);
   const coin=document.createElement("span");coin.className="tj-coin";slot.querySelector(".tj-drop").appendChild(coin);setTimeout(()=>coin.remove(),700);
   setTimeout(()=>{if(slot.isConnected){const cnt=slot.querySelector(".tj-count b"),lv=slot.querySelector(".tj-count i");cnt.textContent=J.c;lv.textContent=tipLevel(J.c);
-    if(J.c%3===0||J.pend===1){slot.innerHTML=tipJarHtml(k,slot.dataset.for,J.c)}}},450);
+    if(J.c%3===0||J.pend===1){const t=document.createElement("div");t.innerHTML=tipJarHtml(k,slot.dataset.for,J.c);slot.querySelector(".tj-art svg").replaceWith(t.querySelector(".tj-art svg"))}}},450);
   clearTimeout(J.t);const send=()=>{const n=Math.min(10,J.pend);if(!n)return;J.pend-=n;
     fetch("/api/tipjar",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({k,n})}).then(r=>r.json()).then(j=>{if(j.ok){J.c=j.count+J.pend}}).catch(()=>{});if(J.pend)J.t=setTimeout(send,300)};
   J.t=setTimeout(send,1200);
