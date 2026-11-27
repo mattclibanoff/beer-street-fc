@@ -1602,9 +1602,9 @@ function punditPanel(m,v,opp,s,gs,motm){
     hiding:["That was a hiding. Someone has to say it.","Back to basics. Possibly back to the very basic basics.","I switched off at half time. Then I switched back on. Mistake."],
     draw:["Two points dropped, simple as.","A draw is just a loss that's too polite to say so.","Neither side wanted it. I wanted my evening back."]};
   const base=v.r==="W"?7+Math.min(2,gd/3):v.r==="L"?Math.max(2,4+gd/4):5.5, clamp=x=>Math.max(1,Math.min(10,Math.round(x)));
-  const P=[{n:"Lana Rodriguez",t:"Chief pundit. Calls it down the middle.",c:"#7a3b3b",i:"LR",L:MID,sc:clamp(base+(R()-.5))},
-           {n:"Cait Phillips",t:"Tactics analyst. Glass permanently half empty.",c:"#3b5a7a",i:"CP",L:DOWN,sc:clamp(base-2.5+(R()-.5))},
-           {n:"Saharah Sejour",t:"Pitchside reporter. Glass permanently half full.",c:"#6a6a2f",i:"SS",L:UP,sc:clamp(base+2.5+(R()-.5))}];
+  const P=[{n:"Lana Rodriguez",t:"Chief pundit",c:"#7a3b3b",i:"LR",L:MID,sc:clamp(base+(R()-.5))},
+           {n:"Cait Phillips",t:"Tactics analyst",c:"#3b5a7a",i:"CP",L:DOWN,sc:clamp(base-2.5+(R()-.5))},
+           {n:"Saharah Sejour",t:"Pitchside reporter",c:"#6a6a2f",i:"SS",L:UP,sc:clamp(base+2.5+(R()-.5))}];
   const odd=1;   // Cait always disagrees
   // --- standings: where things stood after this game (playoffs: final league positions)
   const tb=m.stage?standings(s).map(r=>({team:r.team,pts:r.pts})):tableAt(s,m.date), N=tb.length;
