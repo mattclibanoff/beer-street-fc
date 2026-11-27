@@ -1503,8 +1503,23 @@ function countdownCal(){
     "The pigeon has been spotted scouting opponents.","Rest day. The calves thank you.","Hydration check. Water counts. Mostly.",
     "Football is a simple game: twenty-two people chase a ball and then we all go to the pub."];
   const pics=(DATA.roster||[]).filter(r=>r.photo&&!/Retired/.test(r.pos||"")&&!new Set((DATA.tabloid||{}).optOut||[]).has(r.name));
-  const door=i=>{const k=i%3;if(k===1&&pics.length){const r=pics[(i*7)%pics.length];return `<img src="${esc(r.photo)}" alt=""><span>Squad photo of the day: <a href="#${playerSlug(r.name)}">${esc(r.name)}</a></span>`}
-    return k===2&&stats.length?`<b>Stat</b><span>${stats[(i*5)%stats.length]}</span>`:`<b>Joke</b><span>${esc(jokes[(i*7)%jokes.length])}</span>`};
+  // every door is different: results from the archive, more stats, jokes and each squad photo once, dealt in turn
+  const results=allGames().filter(g=>view(g.m).played).map(g=>{const v=view(g.m);return `Throwback, ${fmtDate(g.m.date,{month:"short",day:"numeric",year:"numeric"})}: ${v.r==="W"?"beat":v.r==="L"?"lost to":"drew with"} ${esc(oppOfGame(g.m))} ${v.f}–${v.a}${g.m.stage?` in the ${esc((g.m.label||g.m.stage).split(" vs ")[0])}`:""}.`});
+  const more=["Did you know? The club was founded in 2026, in a pub, obviously.","Most common Beer Street scoreline: whatever the other team scored, plus or minus a few.",
+    "The off-season is the only time our clean-sheet record is perfect.","Squad size: big enough for subs, small enough to fit in one booth.",
+    "Today's training drill: find your shin pads. They're somewhere.","Tactical note: the ball is round. Remember that.","Sock check: are both still in the kit bag? Good.",
+    "Weekly reminder from the fines committee: lateness is a pint.","If you can read this, you should be stretching.","Recovery tip: ice the legs, not the drink. Or both.",
+    "Team spirit index: high. Team fitness index: under review.","Pre-season goal: fewer goals against. Bold, we know.","The trophy cabinet has been dusted, just in case.",
+    "The pigeon sends its regards.","Reminder: the Gazette sees everything.","Today in history: someone, somewhere, took a throw-in with their foot on the line.",
+    "Fact: every great team starts with people who turn up. Turn up.","Off-season diet: carbs, mostly liquid.","Hydration tip: water is just beer that hasn't made it yet."];
+  const used=[...stats,...results].concat(jokes.map(esc),more.map(esc)), seen=new Set(), uniq=used.filter(x=>!seen.has(x)&&seen.add(x));
+  const sHalf=uniq.filter(x=>stats.includes(x)||results.includes(x)), jHalf=uniq.filter(x=>!sHalf.includes(x));
+  const mix=(arr,k)=>{arr=arr.slice();for(let i=arr.length-1;i>0;i--){k=(k*1103515245+12345)>>>0;const j=k%(i+1);[arr[i],arr[j]]=[arr[j],arr[i]]}return arr};
+  const sQ=mix(sHalf,77),jQ=mix(jHalf,91),pQ=mix(pics,53),deck=[];
+  while(sQ.length||jQ.length||pQ.length){for(const q of [jQ,pQ,sQ])if(q.length)deck.push(q===pQ?{p:q.shift()}:{t:q.shift(),s:q===sQ})}
+  const door=i=>{const it=deck[(i-1)%deck.length];
+    if(it.p)return `<img src="${esc(it.p.photo)}" alt=""><span>Squad photo of the day: <a href="#${playerSlug(it.p.name)}">${esc(it.p.name)}</a></span>`;
+    return `<b>${it.s?"Stat":"Joke"}</b><span>${it.t}</span>`};
   // laid out on a real calendar: one block per month, Sunday to Saturday
   const first=D(end)+864e5,last=D(end)+total*864e5,months=[];
   for(let t=first;t<=last;){const d=new Date(t),y=d.getUTCFullYear(),mo=d.getUTCMonth();months.push([y,mo]);t=Date.UTC(y,mo+1,1)}
