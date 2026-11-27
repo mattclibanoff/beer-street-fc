@@ -717,6 +717,11 @@ body.hungover *{transition-duration:.9s!important}
 .cd-show-d{flex:0 0 100%;font:800 12px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-2)}
 .cd-show img{width:84px;height:84px;object-fit:cover;border-radius:4px}.cd-show b{font:800 12px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-2);margin-right:4px}.cd-show a{color:inherit}
 .cd-door.shake{animation:sniffW .35s ease-in-out 2}
+.alm{margin-bottom:24px}.alm h3 small{font-family:inherit;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:.8em}
+.alm-l{list-style:none;margin:0;padding:0}.alm-l li{display:grid;grid-template-columns:150px 120px 1fr;gap:10px;padding:8px 0;border-top:1px solid rgba(var(--cream-rgb),.1);align-items:baseline}.alm-l li:first-child{border-top:0}
+.alm-d{font-size:13px;color:var(--cream-2)}.alm-k{font:800 11px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.alm-t a{color:inherit}
+.alm-none{margin:0;color:var(--cream-2);font-style:italic}
+@media(max-width:600px){.alm-l li{grid-template-columns:1fr;gap:2px}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1115,6 +1120,7 @@ function renderCurrentStandings(){
         <a class="np-more" href="#${matchId(next)}">Match preview →</a></div>
       <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}${next.date>=TODAY?calMenu(next,s):""}</div>
     </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()+countdownCal()}
+    ${almanac()}
     ${teamSummary(s)}
     <div class="grid">
       <div class="card flush">${standingsTable(s)}</div>
@@ -1479,6 +1485,31 @@ document.addEventListener("click",async e=>{
 });
 
 /* ---------- off-season: nothing left to play ---------- */
+/* the club almanac: what happened on this date in Beer Street history (or, failing that, this week) */
+function almanac(){
+  const out=new Set((DATA.tabloid||{}).optOut||[]), md=d=>d.slice(5,10), ev=[];
+  const games=allGames().filter(g=>view(g.m).played), firstW=games.find(g=>view(g.m).r==="W");
+  if(games.length)ev.push({d:games[0].m.date,t:`Beer Street FC played their first ever game: ${view(games[0].m).f}–${view(games[0].m).a} vs ${esc(oppOfGame(games[0].m))}. A legend began. Slowly.`,k:"Club history"});
+  if(firstW)ev.push({d:firstW.m.date,t:`The first win in club history: ${view(firstW.m).f}–${view(firstW.m).a} vs ${esc(oppOfGame(firstW.m))}. Drinks were had.`,k:"Club history"});
+  games.forEach(g=>{if(g===games[0]||g===firstW)return;const v=view(g.m);ev.push({d:g.m.date,k:g.m.stage?esc(g.m.label||g.m.stage).split(" vs ")[0]:esc(label(g.s)),
+    t:`<a href="#${matchId(g.m)}">${v.r==="W"?"Beat":v.r==="L"?"Lost to":"Drew with"} ${esc(oppOfGame(g.m))} ${v.f}–${v.a}</a>.`}) });
+  (DATA.motmLog||[]).filter(x=>!out.has(x.name)).forEach(x=>ev.push({d:x.date,k:"Man of the Match",t:`${plink(x.name)} was named ${(DATA.womanOfMatch||[]).includes(x.name)?"(Wo)man":"Man"} of the Match${x.opponent?` vs ${esc(x.opponent)}`:""}.`}));
+  (DATA.roster||[]).filter(r=>r.bday&&!out.has(r.name)).forEach(r=>ev.push({d:"0000-"+r.bday,k:"Birthday",t:`Happy birthday, ${plink(r.name)}! 🎂`}));
+  const T=DATA.tabloid||{};["rumours","overheard"].forEach(k=>(T[k]||[]).filter(x=>x.added&&(!x.who||!out.has(x.who))).forEach(x=>ev.push({d:x.added,k:"The Gazette",t:esc(x.text)})));
+  const yr=d=>d.startsWith("0000")?"":d.slice(0,4), ago=d=>{const y=+TODAY.slice(0,4)-+d.slice(0,4);return d.startsWith("0000")||!y?"":` · ${y} year${y>1?"s":""} ago`};
+  let todays=ev.filter(e=>md(e.d)===md(TODAY)&&(e.d.startsWith("0000")||e.d<TODAY)), head="On this day";
+  if(!todays.length){   // nothing today: look a few days either side
+    const D=d=>Date.UTC(2000,+d.slice(5,7)-1,+d.slice(8,10)),t=D(TODAY);
+    const near=ev.filter(e=>e.d.startsWith("0000")||e.d<TODAY).map(e=>({...e,gap:Math.round((D(e.d)-t)/864e5)})).filter(e=>Math.abs(e.gap)<=7&&e.gap!==0).sort((a,b)=>Math.abs(a.gap)-Math.abs(b.gap));
+    if(near.length){todays=near.slice(0,3);head="This week in history"}
+    else{const past=ev.filter(e=>!e.d.startsWith("0000")&&e.d<TODAY);if(past.length){todays=[past[Math.round(Date.UTC(...TODAY.split("-").map((x,i)=>i===1?x-1:+x))/864e5)%past.length]];head="From the archive"}}
+  }
+  const when=e=>e.d.startsWith("0000")?fmtDate(TODAY.slice(0,4)+e.d.slice(4),{month:"short",day:"numeric"}):fmtDate(e.d,{month:"short",day:"numeric",year:"numeric"});
+  return `<div class="card alm"><h3>The Club Almanac <small>· ${head}, ${fmtDate(TODAY,{month:"long",day:"numeric"})}</small></h3>
+    ${todays.length?`<ul class="alm-l">${todays.slice(0,4).map(e=>`<li><span class="alm-d">${when(e)}${head==="On this day"?ago(e.d):""}</span><span class="alm-k">${e.k}</span><span class="alm-t">${e.t}</span></li>`).join("")}</ul>`
+      :`<p class="alm-none">Nothing happened on this day in Beer Street history. Yet. Make it count.</p>`}</div>`;
+}
+
 /* off-season advent calendar: one door a day from the end of the season to the first game of the next */
 function countdownCal(){
   if(ourMatches(current).some(m=>!m.bye&&m.hs==null&&m.date>=TODAY))return "";
