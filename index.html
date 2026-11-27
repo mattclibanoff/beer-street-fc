@@ -722,6 +722,13 @@ body.hungover *{transition-duration:.9s!important}
 .alm-d{font-size:13px;color:var(--cream-2)}.alm-k{font:800 11px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.alm-t a{color:inherit}
 .alm-none{margin:0;color:var(--cream-2);font-style:italic}
 @media(max-width:600px){.alm-l li{grid-template-columns:1fr;gap:2px}}
+#npAlm .alm{background:none;border:0;border-top:3px double var(--rule);border-radius:0;padding:6px 0 0;margin:16px 0 4px;box-shadow:none;color:var(--paper-ink)}
+#npAlm .alm h3{font-family:"IM Fell English SC",serif;font-size:20px;letter-spacing:.06em;margin:2px 0 8px;text-align:center;color:var(--paper-ink);text-transform:none}
+#npAlm .alm h3 small{font-family:"IM Fell English",serif;font-style:italic;color:var(--paper-ink);opacity:.75}
+#npAlm .alm-l li{border-top:1px dotted var(--rule);grid-template-columns:130px 110px 1fr}#npAlm .alm-l li:first-child{border-top:0}
+#npAlm .alm-d{font-family:"IM Fell English",serif;color:var(--paper-ink);opacity:.8}#npAlm .alm-k{font-family:"IM Fell English SC",serif;color:var(--paper-ink);opacity:.7;font-weight:400;font-size:13px}
+#npAlm .alm-t{font-family:"IM Fell English",serif;font-size:16.5px}#npAlm .alm-t a{color:inherit}#npAlm .alm-none{color:var(--paper-ink);font-family:"IM Fell English",serif}
+@media(max-width:600px){#npAlm .alm-l li{grid-template-columns:1fr}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -772,6 +779,7 @@ body.hungover *{transition-duration:.9s!important}
     <hr class="np-rule">
     <div class="np-odds" id="npOdds" hidden></div>
     <div id="npRivals"></div>
+    <div id="npAlm"></div>
     </div>
     <div id="npBack" hidden></div>
   </article></div>
@@ -1120,7 +1128,6 @@ function renderCurrentStandings(){
         <a class="np-more" href="#${matchId(next)}">Match preview →</a></div>
       <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}${next.date>=TODAY?calMenu(next,s):""}</div>
     </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()+countdownCal()}
-    ${almanac()}
     ${teamSummary(s)}
     <div class="grid">
       <div class="card flush">${standingsTable(s)}</div>
@@ -2189,7 +2196,7 @@ function recapFront(g,s,L){
 function renderLanding(){
   const L=DATA.landing||{}; const el=document.getElementById("landing");
   if(!L.show) return false;
-  birthdayFront();rivalryFront();
+  birthdayFront();rivalryFront();{const a=document.getElementById("npAlm");if(a)a.innerHTML=almanac()}
   const s=current, byTime=(a,b)=>a.date.localeCompare(b.date)||(a.time||"").localeCompare(b.time||"");
   const games=ourMatches(s).filter(m=>!m.bye).sort(byTime);
   const hasRes=m=>m&&m.hs!=null&&m.as!=null;
@@ -2524,6 +2531,7 @@ function openLanding(el){
   el.querySelectorAll("[data-flip]").forEach(b=>b.onclick=()=>{const back=document.getElementById("npBack"),front=document.getElementById("npFront"),toBack=back.hidden;
     if(toBack&&!back.innerHTML)renderBackPage();back.hidden=!toBack;front.hidden=toBack;b.textContent=toBack?"Front page ↻":"Back page ↻";el.scrollTop=0;});
   el.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
+  el.addEventListener("click",e=>{if(e.target.closest('a[href^="#"]'))close();});   // links inside the paper (players, matches) go to the site
   // deep links (e.g. beerstreetfc.com/#about) go straight to the site
   if(location.hash&&(TABS.includes(location.hash.slice(1))||(/^#(player|in|match|team)-/.test(location.hash)||location.hash==="#cards"))) return false;
   el.hidden=false; document.body.classList.add("landing-open");
