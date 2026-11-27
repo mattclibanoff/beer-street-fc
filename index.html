@@ -1574,29 +1574,33 @@ function renderTeam(slug){
   document.title=`${name} · Beer Street FC`;
 }
 
-/* the pundit panel: three made-up TV pundits, and one of them always disagrees */
+/* the pundit panel: Saharah always sees the bright side, Cait never does, Lana calls it down the middle */
 function punditPanel(m,v,opp){
   let seed=[...matchId(m)].reduce((a,c)=>(a*33+c.charCodeAt(0))>>>0,11);const R=()=>(seed=(seed*1664525+1013904223)>>>0)/4294967296,pk=a=>a[Math.floor(R()*a.length)];
-  const P=[{n:"Lana Rodriguez",t:"Chief pundit. Has seen it all, twice.",c:"#7a3b3b",i:"LR"},
-           {n:"Cait Phillips",t:"Tactics analyst, owns a laser pointer",c:"#3b5a7a",i:"CP"},
-           {n:"Saharah Sejour",t:"Pitchside reporter, head of vibes",c:"#6a6a2f",i:"SS"}];
   const gd=v.f-v.a, big=Math.abs(gd)>=5, tag=v.r==="W"?(big?"rout":"win"):v.r==="L"?(big?"hiding":"loss"):"draw";
-  const POS={rout:["Total football. I've not seen pressing like that since my testimonial.","Clinical. Absolutely clinical. They wanted it more.","That's a statement. The rest of the league should be nervous."],
+  const UP={rout:["Total football. I've not seen pressing like that in years. Gorgeous.","Clinical. Absolutely clinical. They wanted it more.","That's a statement. The rest of the league should be nervous."],
     win:["A professional job. Three points, no fuss, home for tea.","Ground it out. Champions win games like that.","The shape was lovely. Compact, patient, ruthless."],
     loss:["Unlucky. The scoreline flatters them, honestly.","There were positives. The warm-up was excellent.","They'll learn more from this than from any win."],
-    hiding:["Character-building. Lots of character got built tonight.","The scoreboard doesn't show heart. Or effort. Or the post they hit.","Sometimes the other lot are just on fire. Credit to them."],
-    draw:["A fair result. Nobody deserved to lose, nobody deserved to win.","Honours even. I'll take that every week.","Tight, tense, beautiful. Like a good pint."]};
-  const NEG={rout:["Lucky. ${opp} were missing half their team, surely?","Easy to look good against that. Wait till they meet a proper side.","Too many goals. Where's the drama? I nearly fell asleep."],
+    hiding:["Character-building. Lots of character got built tonight.","The scoreboard doesn't show heart. Or effort. Or the post they hit.","Sometimes the other lot are just on fire. Credit to them, and onwards."],
+    draw:["A fair result, and a point is a point. Build on it.","Honours even. I'll take that every week.","Tight, tense, beautiful. Like a good pint."]};
+  const MID={rout:["A deserved win. The finishing was the difference.","Good result. Tougher tests are coming, but you can only beat what's in front of you.","Comfortable on the night. The work starts again on Monday."],
+    win:["Three points. Not perfect, but enough.","They did enough. A couple of sloppy spells to tidy up.","Fair result. Both sides had chances; Beer Street took theirs."],
+    loss:["Close, but the better side won on the night.","Fine margins. A couple of moments went the other way.","Not good enough today. Not a disaster either."],
+    hiding:["A tough night. ${opp} were sharper all over the pitch.","The result is the result. Time to review it and move on.","They were second best. It happens."],
+    draw:["About right. Neither side did enough to win it.","Even game, even result.","A point each, and no complaints from either camp."]};
+  const DOWN={rout:["Lucky. ${opp} were missing half their team, surely?","Easy to look good against that. Wait till they meet a proper side.","Too many goals. Where's the drama? I nearly fell asleep."],
     win:["Not convinced. That was a smash-and-grab if ever I saw one.","They rode their luck. The woodwork deserves man of the match.","Won ugly. I want beautiful football, not results."],
     loss:["No excuses. They were second best everywhere.","Too many players wandering. Where was the structure?","I've seen better organisation at a kids' party."],
     hiding:["That was a hiding. Someone has to say it.","Back to basics. Possibly back to the very basic basics.","I switched off at half time. Then I switched back on. Mistake."],
     draw:["Two points dropped, simple as.","A draw is just a loss that's too polite to say so.","Neither side wanted it. I wanted my evening back."]};
-  const pos=v.r!=="L", order=[0,1,2].sort(()=>R()-.5), dissenter=order[2];
-  const scores=P.map((_,i)=>{const base=v.r==="W"?7+Math.min(2,gd/3):v.r==="L"?Math.max(2,4+gd/4):5.5;return i===dissenter?Math.max(1,Math.min(10,Math.round(10-base+(R()-.5)*2))):Math.max(1,Math.min(10,Math.round(base+(R()-.5)*2)))});
-  const used=new Set(),line=(i)=>{const arr=((i===dissenter)!==!pos?NEG:POS)[tag];let k=Math.floor(R()*arr.length);while(used.has(arr[k]))k=(k+1)%arr.length;used.add(arr[k]);return arr[k].replace("${opp}",opp)};
-  return `<div class="card pundit-card"><h3>The Pundit Panel</h3><div class="pundits">${P.map((p,i)=>`<div class="pundit${i===dissenter?" dissent":""}">
-    <div class="pd-face" style="background:${p.c}">${p.i}</div><div class="pd-body"><div class="pd-name">${p.n}${i===dissenter?` <span class="pd-tag">disagrees</span>`:""}</div><div class="pd-title">${p.t}</div>
-    <p>“${esc(line(i))}”</p><div class="pd-score">Rating: <b>${scores[i]}</b>/10</div></div></div>`).join("")}</div></div>`;
+  const base=v.r==="W"?7+Math.min(2,gd/3):v.r==="L"?Math.max(2,4+gd/4):5.5, clamp=x=>Math.max(1,Math.min(10,Math.round(x)));
+  const P=[{n:"Lana Rodriguez",t:"Chief pundit. Calls it down the middle.",c:"#7a3b3b",i:"LR",L:MID,sc:clamp(base+(R()-.5))},
+           {n:"Cait Phillips",t:"Tactics analyst. Glass permanently half empty.",c:"#3b5a7a",i:"CP",L:DOWN,sc:clamp(base-2.5+(R()-.5))},
+           {n:"Saharah Sejour",t:"Pitchside reporter. Glass permanently half full.",c:"#6a6a2f",i:"SS",L:UP,sc:clamp(base+2.5+(R()-.5))}];
+  const odd=v.r==="L"?2:1;   // the one out of step with the result: Cait after a win or draw, Saharah after a loss
+  return `<div class="card pundit-card"><h3>The Pundit Panel</h3><div class="pundits">${P.map((p,i)=>`<div class="pundit${i===odd?" dissent":""}">
+    <div class="pd-face" style="background:${p.c}">${p.i}</div><div class="pd-body"><div class="pd-name">${p.n}${i===odd?` <span class="pd-tag">disagrees</span>`:""}</div><div class="pd-title">${p.t}</div>
+    <p>“${esc(pk(p.L[tag]).replace("${opp}",opp))}”</p><div class="pd-score">Rating: <b>${p.sc}</b>/10</div></div></div>`).join("")}</div></div>`;
 }
 
 /* the Gaffer's tactics board: chalk Xs and Os, an arrow for each of our goals, and some deeply questionable notes */
