@@ -1396,7 +1396,7 @@ function tradingCard(r){
   </div>`;
 }
 function cardBlock(r){const slug=playerSlug(r.name).slice(7);
-  return `<figure class="tc-wrap">${tradingCard(r)}<figcaption><a href="#${playerSlug(r.name)}">${esc(r.name)}</a><button type="button" class="linkish" data-card-dl="${slug}">Download</button><button type="button" class="linkish" data-jingle="${esc(r.name)}">♪ Walk-out</button></figcaption></figure>`;}
+  return `<figure class="tc-wrap">${tradingCard(r)}<figcaption><a href="#${playerSlug(r.name)}">${esc(r.name)}</a><button type="button" class="linkish" data-card-dl="${slug}">Download</button></figcaption></figure>`;}
 function renderCards(){
   const ros=(DATA.roster||[]).slice().sort((a,b)=>(a.pos==="Retired")-(b.pos==="Retired")||(a.pos==="Alternate")-(b.pos==="Alternate")||(a.num??999)-(b.num??999));
   document.getElementById("cards").innerHTML=`<a class="back" href="#current-stats">← Squad &amp; stats</a>
@@ -1638,7 +1638,6 @@ function renderPlayer(slug){
     ${hls.length?`<div class="card hl-card"><h3>Highlights</h3><div class="hl-grid">${hls.map(highlightCard).join("")}</div></div>`:""}
     <div class="card pp-card"><h3>Trading card</h3><div class="pp-card-in">${cardBlock(r)}<a class="np-more" href="#cards">See the whole squad →</a></div></div>`;
   document.title=`${r.name} · Beer Street FC`;
-  playJingle(r);   // works when you tapped your way here; browsers block sound otherwise, so the card also has a button
 }
 
 /* ---------- tabs + hash routing ---------- */
@@ -2073,18 +2072,6 @@ function oddsBoard(s,m,opp){const rows=oddsRows(s,m,opp);
     .then(r=>r.json()).then(j=>{const c=j.current;if(!c)return;el.textContent=`${Math.round(c.temperature_2m)}°F, ${(W[c.weather_code]||"weather").toLowerCase()}. `}).catch(()=>{});
 })();
 
-/* 7. an original 8-bit walk-out jingle for every player, generated from their shirt number */
-let AC=null;
-function playJingle(r){
-  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();}catch(e){return}
-  let seed=(r.num??([...r.name].reduce((a,c)=>a+c.charCodeAt(0),0)))*9301+49297;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
-  const scale=[0,2,4,7,9,12,14,16], base=220*Math.pow(2,Math.floor(rnd()*5)/12), t0=AC.currentTime+.05, step=.13;
-  const notes=[];for(let i=0;i<8;i++)notes.push(scale[Math.floor(rnd()*scale.length)]);notes[7]=12;   // always lands on the octave
-  notes.forEach((n,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=i%2?"square":"triangle";o.frequency.value=base*Math.pow(2,n/12);
-    const st=t0+i*step,len=i===7?.45:step*.9;g.gain.setValueAtTime(.0001,st);g.gain.exponentialRampToValueAtTime(.12,st+.01);g.gain.exponentialRampToValueAtTime(.0001,st+len);
-    o.connect(g).connect(AC.destination);o.start(st);o.stop(st+len+.02)});
-}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-jingle]");if(!b)return;const r=(DATA.roster||[]).find(x=>x.name===b.dataset.jingle);if(r)playJingle(r)});
 
 /* 8. Brad's ghost: between midnight and 4am his photo sometimes fades out */
 (function(){const m=document.querySelector(".memoriam");if(!m)return;
