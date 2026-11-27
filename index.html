@@ -756,6 +756,93 @@ body.season-autumn .season-fx i{width:14px;height:10px;border-radius:0 80% 0 80%
 body.season-autumn .season-fx i:nth-child(3n){background:linear-gradient(135deg,#e6b23a,#b5651d)}
 body.season-summer #eggBird{position:relative}body.season-summer #eggBird .shades{display:block;position:absolute;left:17px;top:8px;width:17px;height:6px;transform:rotate(-4deg)}
 @media(prefers-reduced-motion:reduce){.season-fx{display:none}}
+.thm-ov{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.86);display:grid;place-items:center;padding:12px}.thm-ov[hidden]{display:none}
+.thm-box{width:min(686px,calc(100vw - 68px));aspect-ratio:686/800;container-type:inline-size;overflow:auto;border-radius:14px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex}
+.thm-in{width:100%;padding:5cqw 5.5cqw 4cqw;display:flex;flex-direction:column;font-size:2.45cqw;line-height:1.3;box-sizing:border-box}
+.thm-h{font-size:6.6cqw;line-height:1.05;text-align:center}.thm-s{font-size:2.3cqw;text-align:center;font-style:italic;margin:1.2cqw 0 2.6cqw;opacity:.85}
+.thm-t{width:100%;border-collapse:collapse}.thm-t th,.thm-t td{padding:.85cqw .5cqw;text-align:center;white-space:normal;background:none;color:inherit;border:0;font:inherit}.thm-t th{font-size:2cqw;letter-spacing:.06em;text-transform:uppercase}
+.thm-t td.l,.thm-t th.l{text-align:left}.thm-t td.g{font-weight:700}.thm-ic{display:inline-block;margin-right:1.2cqw;min-width:2.6cqw;text-align:center}.thm-ic svg{width:3cqw;height:3.6cqw;vertical-align:middle}
+.thm-f{margin-top:auto;padding-top:2cqw;text-align:center;font-size:2.3cqw;font-style:italic}
+.thm-x{align-self:center;margin-top:1.6cqw;font:inherit;font-size:2.3cqw;padding:1cqw 2.6cqw;border-radius:4px;cursor:pointer;border:2px solid currentColor;background:none;color:inherit}
+.redact{background:#111;color:#111;letter-spacing:-2px}
+@media(max-width:560px){.thm-box{aspect-ratio:auto;max-height:92vh}.thm-in{font-size:max(11px,2.45cqw)}.thm-h{font-size:max(24px,6.6cqw)}.thm-s,.thm-f,.thm-x{font-size:max(10.5px,2.3cqw)}.thm-t th{font-size:max(9px,2cqw)}
+  .thm-t .c2,.thm-t .c4,.thm-t .c5{display:none}.thm-ic svg{width:14px;height:17px}}
+/* 1 medieval */
+.thm-medieval{background:#efe2c0 radial-gradient(ellipse at 50% 0%,#f6ecd2 0%,#e6d3a6 70%,#d7bf8a 100%);color:#2b1d12;box-shadow:inset 0 0 50px rgba(122,90,46,.5),0 20px 60px rgba(0,0,0,.6);font-family:"IM Fell English",serif}
+.thm-medieval .thm-h,.thm-medieval th,.thm-medieval .thm-t td.l{font-family:"UnifrakturMaguntia",serif;color:#7a1e1e}.thm-medieval .thm-t td.l{color:#2b1d12;font-size:1.1em}.thm-medieval th{text-transform:none;font-size:2.4cqw;border-bottom:2px solid #7a5a2e}.thm-medieval td{border-bottom:1px dotted #a88c5a!important}
+.thm-medieval tr.us td{background:rgba(122,30,30,.1)}.thm-medieval td.g{color:#7a1e1e}.thm-medieval .thm-x{color:#7a1e1e}
+/* 2 western */
+.thm-western{background:#e3c995 repeating-linear-gradient(0deg,rgba(120,80,30,.06) 0 3px,transparent 3px 7px);color:#3b2412;font-family:"Rye",serif;border:6px double #3b2412}
+.thm-western .thm-h{font-size:11cqw;letter-spacing:.08em;text-transform:uppercase}.thm-western .thm-s{font-family:Georgia,serif}.thm-western th{border-bottom:3px solid #3b2412}.thm-western td{border-bottom:1px dashed rgba(59,36,18,.4)!important}
+.thm-western tr.us td{background:rgba(180,40,20,.15)}.thm-western td.g{color:#8a1c0c}.thm-western .thm-ic{color:#b8860b}
+/* 3 pirate */
+.thm-pirate{background:radial-gradient(circle at 80% 85%,rgba(140,90,40,.25),transparent 40%),radial-gradient(circle at 15% 20%,rgba(140,90,40,.2),transparent 35%) #ead9a7;color:#3a2210;font-family:"Pirata One",serif;position:relative}
+.thm-pirate .thm-h{font-size:9cqw}.thm-pirate .thm-s{font-family:Georgia,serif}.thm-pirate th{border-bottom:2px dashed #8b1a1a;font-size:2.6cqw;text-transform:none}.thm-pirate tbody{font-size:1.15em}
+.thm-pirate tr.us td{background:rgba(139,26,26,.13)}.thm-pirate td.g{color:#8b1a1a}.thm-pirate .thm-f::before{content:"✕ ";color:#b3121e;font-style:normal}
+/* 4 space */
+.thm-space{background:radial-gradient(1px 1px at 20% 30%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 70% 60%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 40% 80%,#9cf 50%,transparent 51%),radial-gradient(1px 1px at 85% 15%,#fff 50%,transparent 51%),#050816;color:#bfefff;font-family:"Orbitron",sans-serif;border:1px solid #1f6f9f}
+.thm-space .thm-h{color:#7fdbff;text-shadow:0 0 10px #39f;letter-spacing:.12em;text-transform:uppercase;font-weight:800}.thm-space th{color:#7fdbff;border-bottom:1px solid #1f6f9f}.thm-space td{border-bottom:1px solid rgba(31,111,159,.35)!important}
+.thm-space tr.us td{background:rgba(127,219,255,.12);color:#fff}.thm-space td.g{color:#7fff9f}.thm-space .thm-ic{color:#7fdbff}
+/* 5 noir */
+.thm-noir{background:#141414 repeating-linear-gradient(170deg,rgba(255,255,255,.05) 0 14px,transparent 14px 30px);color:#ddd;font-family:"Special Elite",monospace;filter:grayscale(1)}
+.thm-noir .thm-h{font-size:8cqw;letter-spacing:.04em}.thm-noir th{border-bottom:1px solid #777;color:#aaa}.thm-noir td{border-bottom:1px solid #333!important}.thm-noir tr.us td{background:#2a2a2a;color:#fff}
+/* 6 rome */
+.thm-rome{background:linear-gradient(115deg,transparent 40%,rgba(150,150,160,.18) 41%,transparent 44%),linear-gradient(60deg,transparent 70%,rgba(150,150,160,.15) 71%,transparent 73%) #f3f0ea;color:#2c2540;font-family:"Cinzel",serif;border-top:12px solid #5b2a86;border-bottom:12px solid #5b2a86}
+.thm-rome .thm-h{font-weight:800;letter-spacing:.06em;color:#5b2a86}.thm-rome th{color:#a07a1c;border-bottom:2px solid #a07a1c}.thm-rome td{border-bottom:1px solid rgba(91,42,134,.18)!important}.thm-rome tr.us td{background:rgba(160,122,28,.15)}.thm-rome .thm-ic{color:#3f7a2a}.thm-rome td.g{color:#5b2a86}
+/* 7 arcade */
+.thm-arcade{background:#000;color:#fff;font-family:"Press Start 2P",monospace;border:4px solid #f0f;box-shadow:0 0 30px #f0f,0 20px 60px rgba(0,0,0,.6)}
+.thm-arcade .thm-h{font-size:6cqw;color:#ff0;text-shadow:3px 3px 0 #f00;margin-top:2cqw}.thm-arcade .thm-s{font-style:normal;font-size:1.8cqw;color:#0ff}
+.thm-arc{list-style:none;margin:3cqw 0 0;padding:0;display:grid;gap:2.2cqw}.thm-arc li{display:grid;grid-template-columns:1fr 1.4fr 1fr;text-align:center;font-size:2.6cqw}
+.thm-arc li:nth-child(1){color:#ff0}.thm-arc li:nth-child(2){color:#0ff}.thm-arc li:nth-child(3){color:#f80}.thm-arc li.us{color:#0f0;animation:arcBlink 1s steps(1) infinite}@keyframes arcBlink{50%{opacity:.25}}
+.thm-arcade .thm-f{font-style:normal;color:#f0f;font-size:2cqw;animation:arcBlink 1.2s steps(1) infinite}.thm-arcade .thm-x{font-size:1.8cqw;color:#ff0}
+@media(max-width:560px){.thm-arc li{font-size:10px}.thm-arcade .thm-h{font-size:18px}}
+/* 8 victorian */
+.thm-victorian{background:#f4ecd8;color:#1d3b2a;font-family:"IM Fell English",serif;border:3px double #1d3b2a;outline:1px solid #1d3b2a;outline-offset:-10px}
+.thm-victorian .thm-h{font-family:"IM Fell English SC",serif;font-size:7cqw}.thm-victorian th{font-family:"IM Fell English SC",serif;text-transform:none;font-size:2.3cqw;border-bottom:1px solid #1d3b2a}.thm-victorian td{border-bottom:1px dotted rgba(29,59,42,.35)!important}
+.thm-victorian tr.us td{background:rgba(29,59,42,.08);font-style:italic}
+/* 9 spy */
+.thm-spy{background:#e2cf98;color:#1b1b1b;font-family:"Special Elite",monospace;border-radius:4px 30px 4px 4px;position:relative}
+.thm-spy .thm-h{text-transform:uppercase;color:#a31515;border:4px solid #a31515;display:inline-block;align-self:center;padding:.5cqw 3cqw;transform:rotate(-3deg);font-size:5.4cqw}
+.thm-spy th{border-bottom:2px solid #1b1b1b}.thm-spy td{border-bottom:1px solid rgba(0,0,0,.15)!important}.thm-spy tr.us td{background:rgba(163,21,21,.1)}
+/* 10 racing */
+.thm-racing{background:#0b3d2e;color:#f3efe6;font-family:"Playfair Display",serif;border:8px solid #c9a227}
+.thm-racing .thm-h{color:#c9a227;font-style:italic}.thm-racing th{color:#c9a227;border-bottom:1px solid #c9a227}.thm-racing td{border-bottom:1px solid rgba(201,162,39,.25)!important}.thm-racing tr.us td{background:rgba(201,162,39,.15)}
+.silk{display:inline-block;width:2.8cqw;height:2.8cqw;min-width:12px;min-height:12px;border:1px solid #fff;margin-right:1.4cqw;vertical-align:middle;border-radius:2px}
+/* 11 wildlife */
+.thm-wildlife{background:linear-gradient(180deg,#f6c26b 0%,#e98a3c 55%,#a8542a 100%);color:#2b1608;font-family:"Playfair Display",serif}
+.thm-wildlife .thm-h{font-style:italic}.thm-wildlife th{border-bottom:2px solid #2b1608}.thm-wildlife td{border-bottom:1px solid rgba(43,22,8,.2)!important}.thm-wildlife tr.us td{background:rgba(255,255,255,.22)}
+/* 12 speakeasy */
+.thm-speakeasy{background:#0d0d0d repeating-linear-gradient(90deg,rgba(212,175,55,.08) 0 1px,transparent 1px 40px);color:#e8d9a8;font-family:"Limelight",serif;border:3px solid #d4af37;outline:1px solid #d4af37;outline-offset:-10px}
+.thm-speakeasy .thm-h{color:#d4af37;letter-spacing:.08em}.thm-speakeasy .thm-s{font-family:Georgia,serif}.thm-speakeasy th{color:#d4af37;border-bottom:1px solid #d4af37}.thm-speakeasy td{border-bottom:1px solid rgba(212,175,55,.2)!important}.thm-speakeasy tr.us td{background:rgba(212,175,55,.14)}
+/* 13 cooking */
+.thm-cooking{background:#fff repeating-conic-gradient(#fff 0 25%,#f3f3f3 0 50%) 0 0/30px 30px;color:#222;font-family:Georgia,serif;border:5px solid #c1121f}
+.thm-cooking .thm-h{font-family:"Lobster",cursive;color:#c1121f;font-size:8cqw}.thm-cooking th{border-bottom:2px solid #c1121f}.thm-cooking td{border-bottom:1px solid #ddd!important}.thm-cooking tr.us td{background:rgba(193,18,31,.08)}.thm-cooking td.g{color:#c1121f}
+/* 14 shipping forecast */
+.thm-shipping{background:#dfe6ea;color:#1f2d3a;font-family:"Barlow",sans-serif}
+.thm-shipping .thm-h{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:#1f3f5f}.thm-ship p{margin:0 0 1.3cqw;font-size:2.4cqw}.thm-ship p.us{font-weight:600;color:#0b3a66}
+@media(max-width:560px){.thm-ship p{font-size:11.5px}}
+/* 15 egypt */
+.thm-egypt{background:#e6cf96 repeating-linear-gradient(0deg,rgba(140,100,30,.07) 0 2px,transparent 2px 6px);color:#2b1d0e;font-family:"Cinzel",serif;border-left:14px solid #1f3a93;border-right:14px solid #1f3a93}
+.thm-egypt .thm-h{color:#1f3a93;font-weight:800}.thm-egypt th{color:#8a6a1a;border-bottom:2px solid #1f3a93}.thm-egypt td{border-bottom:1px solid rgba(31,58,147,.2)!important}.thm-egypt tr.us td{background:rgba(201,162,39,.25)}.thm-egypt .thm-ic{color:#1f3a93}
+/* 16 comic */
+.thm-comic{background:#ffe14d radial-gradient(rgba(0,0,0,.14) 20%,transparent 21%) 0 0/9px 9px;color:#111;font-family:"Bangers",cursive;border:5px solid #111;letter-spacing:.04em}
+.thm-comic .thm-h{font-size:10cqw;color:#e4002b;-webkit-text-stroke:2px #111;transform:rotate(-2deg)}.thm-comic .thm-s{font-family:"Comic Neue",Arial,sans-serif}.thm-comic th{border-bottom:3px solid #111;font-size:2.6cqw}.thm-comic tbody{font-size:1.15em}.thm-comic td{border-bottom:2px solid rgba(0,0,0,.15)!important}
+.thm-comic tr.us td{background:#fff}.thm-comic td.g{color:#e4002b}
+/* 17 stocks */
+.thm-stocks{background:#0b0f14;color:#d7e1ea;font-family:"DejaVu Sans Mono",Menlo,Consolas,monospace;border:1px solid #233}
+.thm-stocks .thm-h{color:#f5c542;font-family:inherit;text-transform:uppercase;letter-spacing:.1em}.thm-stocks th{color:#8aa;border-bottom:1px solid #345}.thm-stocks td{border-bottom:1px solid #18222c!important}.thm-stocks tr.us td{background:#13202c}
+.thm-stocks .up{color:#2ecc71}.thm-stocks .dn{color:#ff5a5a}
+/* 18 fairy */
+.thm-fairy{background:linear-gradient(160deg,#f6e6ff 0%,#e3f0ff 55%,#fff5e1 100%);color:#3b2d5c;font-family:Georgia,serif}
+.thm-fairy .thm-h{font-family:"Cinzel Decorative",serif;color:#7a4fbf}.thm-fairy th{color:#b8860b;border-bottom:2px solid #d9b8ff}.thm-fairy td{border-bottom:1px solid rgba(122,79,191,.15)!important}.thm-fairy tr.us td{background:rgba(255,215,0,.18)}.thm-fairy .thm-ic{color:#b8860b}
+/* 19 haunted */
+.thm-haunted{background:#1a0f24 radial-gradient(ellipse at 50% 0%,rgba(120,255,160,.12),transparent 60%);color:#cfe9d6;font-family:Georgia,serif}
+.thm-haunted .thm-h{font-family:"Creepster",cursive;color:#8cff9e;font-size:9cqw;text-shadow:0 0 12px rgba(140,255,158,.5)}.thm-haunted th{color:#b38cff;border-bottom:1px solid #4b2d6b}.thm-haunted td{border-bottom:1px solid rgba(75,45,107,.5)!important}.thm-haunted tr.us td{background:rgba(140,255,158,.08)}
+/* 20 terminal */
+.thm-terminal{background:#000;color:#33ff66;font-family:"VT323",monospace;border:2px solid #135;text-shadow:0 0 4px rgba(51,255,102,.6)}
+.thm-terminal .thm-in{font-size:3cqw}.thm-terminal .thm-h,.thm-terminal .thm-s{text-align:left;font-style:normal}.thm-terminal .thm-h{font-size:5.4cqw}.thm-terminal th{border-bottom:1px dashed #33ff66}.thm-terminal tr.us td{background:#33ff66;color:#000;text-shadow:none}
+.thm-terminal .thm-f{text-align:left;font-style:normal}.thm-terminal .thm-f::after{content:"█";animation:arcBlink 1s steps(1) infinite}.thm-terminal .thm-x{border-radius:0}
+
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -816,7 +903,7 @@ body.season-summer #eggBird{position:relative}body.season-summer #eggBird .shade
   <div class="season-fx" id="seasonFx" aria-hidden="true"></div>
   <div class="badges">
     <button type="button" class="egg" id="eggGlass" aria-label="Have another" aria-pressed="false"><svg style="color:var(--cream)"><use href="#glass"/></svg></button>
-    <button type="button" class="egg" id="eggBird" aria-label="Teletext"><svg style="color:var(--cream)"><use href="#crest"/></svg><svg class="shades" viewBox="0 0 40 12" aria-hidden="true"><path d="M1 2h16l-1 6q-1 3-5 3H6Q2 11 2 7z M23 2h16l-1 6q-1 3-5 3h-5q-4 0-4-4z M17 3h6" fill="#111" stroke="#111" stroke-width="1.4"/></svg></button>
+    <button type="button" class="egg" id="eggBird" aria-label="Surprise table: a different theme every time"><svg style="color:var(--cream)"><use href="#crest"/></svg><svg class="shades" viewBox="0 0 40 12" aria-hidden="true"><path d="M1 2h16l-1 6q-1 3-5 3H6Q2 11 2 7z M23 2h16l-1 6q-1 3-5 3h-5q-4 0-4-4z M17 3h6" fill="#111" stroke="#111" stroke-width="1.4"/></svg></button>
   </div>
   <div class="hero-inner">
     <div class="wordmark">
@@ -1892,7 +1979,7 @@ function pigeonMessages(){
 }
 (function(){
   const el=document.getElementById("ppost");if(!el)return;
-  const busy=()=>document.body.classList.contains("landing-open")||document.body.classList.contains("geo")||["var","pk","ttx"].some(id=>{const x=document.getElementById(id);return x&&!x.hidden});
+  const busy=()=>document.body.classList.contains("landing-open")||document.body.classList.contains("geo")||["var","pk","ttx","thm"].some(id=>{const x=document.getElementById(id);return x&&!x.hidden});
   const go=()=>{if(busy()){setTimeout(go,8000);return}
     const msgs=pigeonMessages();let msg=msgs[Math.floor(Math.random()*msgs.length)];
     const tmp=document.createElement("div");tmp.innerHTML=msg;let txt=tmp.textContent;
@@ -1917,6 +2004,72 @@ function pigeonMessages(){
     h+=`<i style="left:${l.toFixed(1)}%;animation-duration:${d.toFixed(1)}s;animation-delay:${dl.toFixed(1)}s;--z:${z.toFixed(2)};--sw:${sw}px;--r:${(Math.random()*360).toFixed(0)}deg"></i>`}
   fx.innerHTML=h;
 })();
+
+const roman=n=>{if(!n)return "—";if(n<0)return "−"+roman(-n);const M=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];let o="";for(const [v,r] of M)while(n>=v){o+=r;n-=v}return o};
+function shield(team){
+  let h=[...team].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,17);const C=["#8b1e2d","#1f3f7a","#2f6b3a","#6b2f6b","#b8860b","#1b1b1b","#c25e14"],M=["#e9d9a6","#f3efe6","#d6b35a"];
+  const a=C[h%7],b=M[(h>>3)%3],p=(h>>6)%5,id="sh"+(h%100000);
+  const charge=[`<path d="M0 0L30 34L0 34Z" fill="${b}"/>`,`<rect x="12" y="0" width="6" height="36" fill="${b}"/><rect x="0" y="13" width="30" height="6" fill="${b}"/>`,`<path d="M0 22L15 10L30 22V30L15 18L0 30Z" fill="${b}"/>`,`<rect x="0" y="0" width="15" height="36" fill="${b}"/>`,`<circle cx="15" cy="15" r="6" fill="${b}"/>`][p];
+  return `<svg class="med-sh" viewBox="0 0 30 36"><defs><clipPath id="${id}"><path d="M1 1H29V16C29 26 21 32 15 35C9 32 1 26 1 16Z"/></clipPath></defs><g clip-path="url(#${id})"><rect width="30" height="36" fill="${a}"/>${charge}</g><path d="M1 1H29V16C29 26 21 32 15 35C9 32 1 26 1 16Z" fill="none" stroke="#3b2a20" stroke-width="1.5"/></svg>`;
+}
+/* ---------- the crest button: teletext or one of 20 themed tables, a different one every click ---------- */
+const THEME_FONTS={western:"Rye",pirate:"Pirata+One",space:"Orbitron:wght@500;800",noir:"Special+Elite",rome:"Cinzel:wght@500;800",arcade:"Press+Start+2P",spy:"Special+Elite",
+  speakeasy:"Limelight",cooking:"Lobster",egypt:"Cinzel:wght@500;800",comic:"Bangers",fairy:"Cinzel+Decorative:wght@700",haunted:"Creepster",terminal:"VT323",racing:"Playfair+Display:ital,wght@0,700;1,700"};
+const thmFont=id=>{const f=THEME_FONTS[id];if(!f||document.getElementById("thf-"+id))return;const l=document.createElement("link");l.id="thf-"+id;l.rel="stylesheet";l.href=`https://fonts.googleapis.com/css2?family=${f}&display=swap`;document.head.appendChild(l)};
+const numWord=n=>["nil","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty","twenty-one","twenty-two","twenty-three","twenty-four","twenty-five","twenty-six","twenty-seven","twenty-eight","twenty-nine","thirty"][n]??String(n);
+const ticker=t=>t.replace(/^FA\s+|\bFC\b/g,"").replace(/[^A-Za-z ]/g,"").trim().split(/\s+/).map(w=>w[0]).join("").toUpperCase().padEnd(3,"X").slice(0,4);
+const initials=t=>{const w=t.replace(/^FA\s+|\bFC\b/g,"").replace(/[^A-Za-z ]/g," ").trim().split(/\s+/);return (w.length>=3?w.map(x=>x[0]).join(""):w.join("")).toUpperCase().slice(0,3).padEnd(3,"-")};
+const fracOddsN=(i,n)=>["Evens","6/4","2/1","5/2","3/1","4/1","6/1","10/1","20/1","50/1","100/1","250/1"][Math.min(11,i)];
+const THEMES=[
+  {id:"medieval",title:"Ye Roll of Honour",sub:s=>`Being the standings of the ${s} Campaign, in the Year of Our Lord ${roman(current.year)}`,cols:["Rank","House","Battles","Victories","Truces","Defeats","Glory"],n:roman,us:"The Noble House of Beer Street",icon:r=>shield(r.team),foot:"Hear ye: the heralds await thy return.",close:"Return to the present"},
+  {id:"western",title:"Wanted",sub:()=>"The most dangerous outfits in Brooklyn · Dead or alive",cols:["#","Outfit","Showdowns","Wins","Standoffs","Losses","Bounty"],pts:p=>"$"+(p*100).toLocaleString(),us:"The Beer Street Gang",icon:()=>"★",foot:"Reward paid in pints at the saloon.",close:"Ride into the sunset"},
+  {id:"pirate",title:"The Treasure Map",sub:()=>"Ranked by plunder, as decreed by the Pirate Code (more guidelines, really)",cols:["Berth","Crew","Voyages","Plunders","Parleys","Sunk","Doubloons"],pts:p=>p*10,us:"Cap'n Beer Street's Crew",icon:()=>"☠",foot:"X marks the spot. The spot is the pub.",close:"Abandon ship"},
+  {id:"space",title:"Mission Status",sub:()=>"Deep Space Network · Sector: Prospect Heights",cols:["Pos","Vessel","Orbits","Landings","Dockings","Aborts","Fuel"],pts:(p,max)=>Math.round(p/max*100)+"%",us:"BSS Beer Street",icon:()=>"◉",foot:"Houston, we have a pint.",close:"Return to Earth"},
+  {id:"noir",title:"The Case Files",sub:()=>"It was a Thursday. It was always a Thursday.",cols:["No.","Suspect","Cases","Cracked","Cold","Lost","Rep"],us:"Beer Street (my client)",foot:"The dame said the ball was round. She was right.",close:"Walk out into the rain"},
+  {id:"rome",title:"The Colosseum Standings",sub:()=>"By order of the Senate and People of Prospect Heights",cols:["Rank","Legion","Bouts","Triumphs","Truces","Defeats","Laurels"],n:roman,us:"Legio Cerevisia",icon:()=>"❦",foot:"Ave, Beer Street. Those about to drink salute you.",close:"Thumbs up (exit)"},
+  {id:"arcade",title:"HIGH SCORES",sub:()=>"PLAYER 1 · CREDITS 0",custom:"arcade",foot:"INSERT COIN TO CONTINUE",close:"GAME OVER"},
+  {id:"victorian",title:"The League Ledger",sub:()=>"As kept by the Honourable Society of Thursday Evening Football",cols:["No.","Society","Engagements","Triumphs","Stalemates","Setbacks","Esteem"],n:numWord,us:"The Beer Street Society",foot:"Most frightfully well played, one and all.",close:"Retire to the drawing room"},
+  {id:"spy",title:"Classified · Eyes Only",sub:()=>"Operation Thursday Night · Clearance: Pint",cols:["Rank","Agency","Ops","Success","Stalemate","Blown","Clearance"],us:"Agency BEER-7",redact:true,foot:"This briefing will self-destruct. Eventually.",close:"Burn after reading"},
+  {id:"racing",title:"The Form Guide",sub:()=>"Going: good to soft · Bar: open",custom:"racing",foot:"Each-way bets accepted in pints only.",close:"Leave the paddock"},
+  {id:"wildlife",title:"The Watering Hole",sub:()=>"Here, on the plains of Prospect Heights, the herds gather…",cols:["Rank","Herd","Outings","Feasts","Shared","Fled","Strength"],us:"The Beer Street Pride",icon:()=>"🐾",foot:"Nature is beautiful. Nature is also 17–3 to Cappello.",close:"Leave the savannah"},
+  {id:"speakeasy",title:"The Back Room Tally",sub:()=>"Members only · Password: pint",cols:["#","Joint","Nights","Wins","Draws","Busts","Points"],us:"Beer Street (members only)",foot:"Keep it quiet. The coppers are watching.",close:"Scram!"},
+  {id:"cooking",title:"The Leaderboard Kitchen",sub:()=>"Tonight's service, ranked by the head chef",cols:["#","Kitchen","Services","Served","Lukewarm","Burnt","Stars"],pts:(p,max,i)=>i<3?"★".repeat(3-i):p,us:"Chez Beer Street",icon:()=>"🍳",foot:"Yes, chef!",close:"Clean down your station"},
+  {id:"shipping",title:"The Shipping Forecast",sub:()=>"Issued by the Met Office on behalf of the Pub",custom:"shipping",foot:"And that concludes the shipping forecast.",close:"Switch off the wireless"},
+  {id:"egypt",title:"The Scroll of the Pharaohs",sub:()=>"As inscribed by the scribes of the Upper Field",cols:["Rank","Dynasty","Campaigns","Pyramids","Truces","Floods","Gold"],us:"The Dynasty of Beer Street",icon:()=>"𓂀",foot:"The Nile flows. The ball does not.",close:"Seal the tomb"},
+  {id:"comic",title:"Battle Rankings!",sub:()=>"Issue #1 · The Fight for Prospect Heights",cols:["#","Squad","Fights","KAPOW!","STANDOFF","OOF!","POWER"],us:"The Beer Street Squad",foot:"TO BE CONTINUED…",close:"BLAM! (close)"},
+  {id:"stocks",title:"The Ticker",sub:()=>"NYC Footy Exchange · Market close",custom:"stocks",foot:"Past performance is no guarantee of future pints.",close:"Close position"},
+  {id:"fairy",title:"Once Upon a Table",sub:()=>"A tale of ten kingdoms and one very round ball",cols:["Rank","Kingdom","Quests","Dragons slain","Truces","Curses","Gold stars"],us:"The Kingdom of Beer Street",icon:()=>"♛",foot:"…and they all drank happily ever after.",close:"The End"},
+  {id:"haunted",title:"The Ghoul Standings",sub:()=>"Your host this evening: Brad's ghost",cols:["Rank","Haunt","Séances","Hauntings","Unsettled","Exorcised","Frights"],us:"Beer Street Manor",icon:()=>"👻",foot:"Boo.",close:"Run!"},
+  {id:"terminal",title:"C:\\> STANDINGS.EXE",sub:()=>"BSFC-DOS v2.6 · 640K ought to be enough for anybody",cols:["POS","TEAM","GP","W","D","L","PTS"],us:"BEER_STREET.EXE",foot:"C:\\> _",close:"EXIT"}
+];
+const THM={last:null,timer:null};
+function thmBody(T){
+  const rows=standings(current),max=Math.max(1,...rows.map(r=>r.pts)),sea={Fall:"Autumn"}[current.name]||current.name;
+  const nm=r=>r.team===US?(T.us||US):r.team, N=T.n||(x=>x), P=(p,i)=>T.pts?T.pts(p,max,i):N(p);
+  if(T.custom==="arcade")return `<ol class="thm-arc">${rows.map((r,i)=>`<li class="${r.team===US?"us":""}"><span>${["1ST","2ND","3RD"][i]||(i+1)+"TH"}</span><span>${String(r.pts*1000).padStart(6,"0")}</span><span>${r.team===US?"BSF":initials(r.team)}</span></li>`).join("")}</ol>`;
+  if(T.custom==="shipping"){const W=["thirsty","becoming thirstier","rough, occasionally very rough","moderate or good","poor, becoming good later","cyclonic","fair","showers, then a pint"];
+    return `<div class="thm-ship">${rows.map((r,i)=>`<p class="${r.team===US?"us":""}"><b>${esc(nm(r))}.</b> ${i===0?"Top of the table":ordWord(i+1)[0].toUpperCase()+ordWord(i+1).slice(1)+" place"}, ${numWord(r.pts)} points. ${W[(i*3+r.w)%W.length][0].toUpperCase()+W[(i*3+r.w)%W.length].slice(1)}. ${r.l>r.w?"Poor.":"Good."}</p>`).join("")}</div>`;}
+  if(T.custom==="racing"){const silk=t=>{let h=[...t].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);const C=["#c1121f","#1d3557","#2a9d8f","#e9c46a","#6a4c93","#f4a261","#111"];return `<span class="silk" style="background:linear-gradient(90deg,${C[h%7]} 50%,${C[(h>>3)%7]} 50%)"></span>`};
+    return `<table class="thm-t"><thead><tr><th>Draw</th><th class="l">Runner</th><th>Runs</th><th>Won</th><th>Odds</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.team===US?"us":""}"><td>${i+1}</td><td class="l">${silk(r.team)}${esc(nm(r))}</td><td>${r.p}</td><td>${r.w}</td><td>${fracOddsN(i)}</td></tr>`).join("")}</tbody></table>`;}
+  if(T.custom==="stocks")return `<table class="thm-t"><thead><tr><th>#</th><th class="l">Symbol</th><th class="l">Company</th><th>Price</th><th>Chg</th></tr></thead><tbody>${rows.map((r,i)=>{const ch=((r.w-r.l)/Math.max(1,r.p)*12.3).toFixed(1);
+    return `<tr class="${r.team===US?"us":""}"><td>${i+1}</td><td class="l"><b>${r.team===US?"BSFC":ticker(r.team)}</b></td><td class="l">${esc(r.team)}</td><td>$${(r.pts*3.17+10).toFixed(2)}</td><td class="${ch>=0?"up":"dn"}">${ch>=0?"▲":"▼"} ${Math.abs(ch)}%</td></tr>`}).join("")}</tbody></table>`;
+  const c=T.cols;
+  return `<table class="thm-t"><thead><tr><th>${c[0]}</th><th class="l">${c[1]}</th><th class="c2">${c[2]}</th><th>${c[3]}</th><th class="c4">${c[4]}</th><th class="c5">${c[5]}</th><th>${c[6]}</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr class="${r.team===US?"us":""}"><td>${N(i+1)}</td><td class="l">${T.icon?`<span class="thm-ic">${T.icon(r)}</span>`:""}${esc(nm(r))}</td><td class="c2">${N(r.p)}</td><td>${N(r.w)}</td><td class="c4">${N(r.d)}</td><td class="c5">${T.redact&&r.team!==US?`<span class="redact">${"█".repeat(2)}</span>`:N(r.l)}</td><td class="g">${P(r.pts,i)}</td></tr>`).join("")}</tbody></table>`;
+}
+const ordWord=n=>["","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth","eleventh","twelfth"][n]||n+"th";
+function thmOpen(id){
+  const T=THEMES.find(t=>t.id===id);if(!T)return;thmFont(id);
+  let ov=document.getElementById("thm");if(!ov){ov=document.createElement("div");ov.id="thm";ov.className="thm-ov";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");document.body.appendChild(ov)}
+  const sea={Fall:"Autumn"}[current.name]||current.name;
+  ov.setAttribute("aria-label",T.title);
+  ov.innerHTML=`<div class="thm-box thm-${id}"><div class="thm-in"><div class="thm-h">${esc(T.title)}</div><div class="thm-s">${esc(T.sub(sea))}</div>${thmBody(T)}<div class="thm-f">${esc(T.foot)}</div>
+    <button type="button" class="thm-x">${esc(T.close)}</button></div></div>`;
+  ov.hidden=false;document.body.classList.add("ttx-open");ov.querySelector(".thm-x").focus();
+}
+function thmClose(){const ov=document.getElementById("thm");if(ov)ov.hidden=true;document.body.classList.remove("ttx-open");document.getElementById("eggBird").focus()}
+document.addEventListener("click",e=>{const ov=document.getElementById("thm");if(!ov||ov.hidden)return;if(e.target.closest(".thm-x")||e.target===ov)thmClose()});
+document.addEventListener("keydown",e=>{const ov=document.getElementById("thm");if(ov&&!ov.hidden&&e.key==="Escape")thmClose()});
 
 /* shirt-sniff test: how ripe is the shirt? based on games played in a row (stats), or the laundry gods when there are none */
 function sniffStreak(name){
@@ -2352,7 +2505,10 @@ function ttxOpen(){const el=document.getElementById("ttx");el.hidden=false;docum
     scr.innerHTML=`<span class="tw">P${n}</span>`},35);
   el.querySelector("button")?.focus?.();}
 function ttxClose(){clearInterval(TTX.timer);document.getElementById("ttx").hidden=true;document.body.classList.remove("ttx-open");document.getElementById("eggBird").focus()}
-document.getElementById("eggBird").onclick=()=>{TTX.page=302;ttxOpen()};
+document.getElementById("eggBird").onclick=()=>{
+  const opts=["teletext",...THEMES.map(t=>t.id)].filter(x=>x!==THM.last), pick=opts[Math.floor(Math.random()*opts.length)];THM.last=pick;
+  if(pick==="teletext"){TTX.page=302;ttxOpen()}else thmOpen(pick);
+};
 document.getElementById("ttx").addEventListener("click",e=>{const b=e.target.closest("[data-ttx]");
   if(b){if(b.dataset.ttx==="x")ttxClose();else{TTX.page=+b.dataset.ttx;ttxRender()}}else if(e.target.id==="ttx")ttxClose()});
 document.addEventListener("keydown",e=>{if(document.getElementById("ttx").hidden)return;
