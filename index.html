@@ -700,6 +700,19 @@ body.hungover *{transition-duration:.9s!important}
 .pd-name{font-weight:700}.pd-tag{font:700 10px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;background:var(--loss);color:#fff;border-radius:3px;padding:1px 5px;vertical-align:middle}
 .pd-title{font-size:12px;color:var(--muted)}.pundit p{margin:6px 0 4px;font-style:italic}.pd-score{font-size:12.5px;color:var(--cream-2)}.pd-score b{font-size:16px;color:var(--cream)}
 @media(max-width:760px){.pundits{grid-template-columns:1fr}}
+.sniff{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.sniff-out{font-size:14px}.sniff-out small{display:block;color:var(--muted);font-size:12px}
+.fun-btn.sniffing{animation:sniffW .5s ease-in-out 2}@keyframes sniffW{25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+.cd-card{margin-bottom:24px}.cd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
+.cd-door{position:relative;aspect-ratio:1;border:1.5px dashed rgba(var(--cream-rgb),.35);border-radius:6px;background:rgba(var(--cream-rgb),.04);color:var(--cream);cursor:pointer;padding:0;overflow:hidden;font:inherit}
+.cd-n{position:absolute;left:6px;top:4px;font:800 20px "Barlow Condensed",sans-serif;opacity:.8}
+.cd-door:not(.open){background:repeating-linear-gradient(135deg,rgba(var(--cream-rgb),.05) 0 8px,transparent 8px 16px)}
+.cd-door.open{border-style:solid;background:rgba(var(--cream-rgb),.08)}.cd-door.today{border-color:var(--win);box-shadow:0 0 0 2px var(--win)}
+.cd-in{position:absolute;inset:0;padding:26px 6px 6px;font-size:10.5px;line-height:1.2;text-align:left;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.cd-in img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}.cd-in b{font:800 11px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--cream-2)}
+.cd-in span{position:relative}.cd-in a{color:inherit}
+.cd-door.big{grid-column:span 3;grid-row:span 2;aspect-ratio:auto;min-height:170px}@media(max-width:560px){.cd-grid{grid-template-columns:repeat(5,1fr);gap:6px}.cd-n{font-size:16px}.cd-door.big{grid-column:1/-1}.cd-in b{font-size:9px}}.cd-door.big .cd-in{font-size:14px;padding:30px 12px 12px}.cd-door.big .cd-in img{opacity:.8}
+.cd-door.big .cd-in span{background:rgba(0,0,0,.55);padding:4px 6px;border-radius:4px;align-self:flex-start;margin-top:auto}.cd-door.big .cd-in b{font-size:13px}
+.cd-door.open:not(.big) .cd-in span{display:none}.cd-door.open:not(.big) .cd-in{justify-content:flex-end}.cd-door.shake{animation:sniffW .35s ease-in-out 2}.cd-peek{min-height:20px;margin-top:10px;font-size:13px;color:var(--cream-2)}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1097,7 +1110,7 @@ function renderCurrentStandings(){
         <div class="vs">${next.stage?esc(next.stage)+`<span>·</span>`+esc(next.label):`Beer Street FC<span>${view(next).home?"vs":"@"}</span>${esc(view(next).opp)}`}</div>
         <a class="np-more" href="#${matchId(next)}">Match preview →</a></div>
       <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}${next.date>=TODAY?calMenu(next,s):""}</div>
-    </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()}
+    </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()+countdownCal()}
     ${teamSummary(s)}
     <div class="grid">
       <div class="card flush">${standingsTable(s)}</div>
@@ -1462,6 +1475,41 @@ document.addEventListener("click",async e=>{
 });
 
 /* ---------- off-season: nothing left to play ---------- */
+/* off-season advent calendar: one door a day from the end of the season to the first game of the next */
+function countdownCal(){
+  if(ourMatches(current).some(m=>!m.bye&&m.hs==null&&m.date>=TODAY))return "";
+  const played=ourMatches(current).filter(m=>!m.bye&&m.hs!=null);if(!played.length)return "";
+  const D=d=>Date.UTC(...d.split("-").map((x,i)=>i===1?x-1:+x)), iso=t=>new Date(t).toISOString().slice(0,10);
+  const end=played[played.length-1].date, nx=DATA.nextSeason||{}, start=nx.start&&nx.start>end?nx.start:null;
+  const total=start?Math.round((D(start)-D(end))/864e5)-1:28, today=Math.round((D(TODAY)-D(end))/864e5);
+  if(total<1||(start&&TODAY>=start))return "";
+  // what's behind the doors: jokes, stats from the site, and squad photos
+  const sp=standings(current),pos=sp.findIndex(r=>r.team===US)+1,games=played.map(m=>({m,v:view(m)}));
+  const W=games.filter(g=>g.v.r==="W"),gf=games.reduce((a,g)=>a+g.v.f,0),big=W.slice().sort((a,b)=>(b.v.f-b.v.a)-(a.v.f-a.v.a))[0];
+  const stats=[`We scored ${gf} goals in ${esc(label(current))}. That's ${(gf/games.length).toFixed(1)} a game.`,
+    `${esc(label(current))}: ${W.length} wins from ${games.length}. Finished ${ord(pos)} in the league.`,
+    big?`Biggest win of the season: ${big.v.f}–${big.v.a} vs ${esc(oppOfGame(big.m))}.`:"",
+    ...(DATA.motmLog||[]).filter(x=>x.blurb).map(x=>`Remember: ${esc(x.blurb)} (${esc(x.name)})`),
+    `Beer Street have played ${allGames().filter(g=>view(g.m).played).length} competitive games, ever.`,
+    `Teams we've faced so far: ${new Set(allGames().map(g=>oppOfGame(g.m))).size}.`].filter(Boolean);
+  const jokes=["Why did the defender bring a ladder? To reach the next level of the table.","Off-season training plan: lift pint, lower pint, repeat.",
+    "Reminder: stretching is not just for the first five minutes of a game.","Our keeper has been practising. Mostly diving onto sofas.",
+    "Fun fact: 100% of goals we didn't shoot didn't go in.","The fines committee never sleeps. It only naps.",
+    "Pre-season fitness test: walk to the bar without getting distracted.","New tactic for next season: score first. Then score more.",
+    "The pigeon has been spotted scouting opponents.","Rest day. The calves thank you.","Hydration check. Water counts. Mostly.",
+    "Football is a simple game: twenty-two people chase a ball and then we all go to the pub."];
+  const pics=(DATA.roster||[]).filter(r=>r.photo&&!/Retired/.test(r.pos||"")&&!new Set((DATA.tabloid||{}).optOut||[]).has(r.name));
+  const door=i=>{const k=i%3;if(k===1&&pics.length){const r=pics[(i*7)%pics.length];return `<img src="${esc(r.photo)}" alt=""><span>Squad photo of the day: <a href="#${playerSlug(r.name)}">${esc(r.name)}</a></span>`}
+    return k===2&&stats.length?`<b>Stat</b><span>${stats[(i*5)%stats.length]}</span>`:`<b>Joke</b><span>${esc(jokes[(i*7)%jokes.length])}</span>`};
+  const cells=Array.from({length:total},(_,j)=>{const i=j+1,date=iso(D(end)+i*864e5),open=i<=today,cur=i===today;
+    return `<button type="button" class="cd-door${open?" open":""}${cur?" today":""}" data-cd="${i}" data-date="${date}" ${open?"":`aria-label="Door ${i}, opens ${fmtDate(date,{month:"short",day:"numeric"})}"`}><span class="cd-n">${i}</span>${open?`<div class="cd-in">${door(i)}</div>`:""}</button>`}).join("");
+  return `<div class="card cd-card"><h3>Countdown to ${esc(nx.name||"Winter 2027")}</h3>
+    <p class="note" style="margin:0 0 10px">${start?`${total-today+1} doors to go. `:"Start date TBC, so the calendar grows when the schedule lands. "}One new door every day: a joke, a stat or a face from the squad. Tap an open door to read it.</p>
+    <div class="cd-grid">${cells}</div><div class="cd-peek" aria-live="polite"></div></div>`;
+}
+document.addEventListener("click",e=>{const d=e.target.closest(".cd-door");if(!d)return;const pk=d.closest(".cd-card").querySelector(".cd-peek");
+  if(!d.classList.contains("open")){pk.textContent=`No peeking! Door ${d.dataset.cd} opens ${fmtDate(d.dataset.date,{weekday:"long",month:"short",day:"numeric"})}.`;d.classList.remove("shake");void d.offsetWidth;d.classList.add("shake");return}
+  d.closest(".cd-grid").querySelectorAll(".cd-door.big").forEach(x=>x!==d&&x.classList.remove("big"));d.classList.toggle("big");pk.textContent="";});
 function offSeasonCard(){
   if(ourMatches(current).some(m=>!m.bye&&m.hs==null&&m.date>=TODAY)) return "";
   const nx=DATA.nextSeason||{}, name=nx.name||"Winter 2027", start=nx.start&&nx.start>TODAY?nx.start:null;
@@ -1745,6 +1793,20 @@ function renderRecords(){
     <p class="note pk-link"><button type="button" class="linkish" data-shootout>Fancy a penalty? ⚽</button></p>`;
 }
 
+/* shirt-sniff test: how ripe is the shirt? based on games played in a row (stats), or the laundry gods when there are none */
+function sniffStreak(name){
+  const gs=[];seasons.forEach(s=>ourMatches(s).forEach(m=>{if(m.bye||m.hs==null)return;const st=statsFor(s,m);if(st&&st.length)gs.push(st)}));
+  if(!gs.length){let x=[...name+TODAY].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,5);return {n:x%6,guess:true}}
+  let n=0;for(let i=gs.length-1;i>=0;i--){if(gs[i].some(p=>p.name===name))n++;else break}return {n,guess:false};
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-sniff]");if(!b)return;const out=b.parentNode.querySelector(".sniff-out");
+  const {n,guess}=sniffStreak(b.dataset.sniff);
+  const R=[["Fresh as a daisy","Suspiciously fresh. Have you even played?"],["Lightly seasoned","A hint of Astroturf and ambition."],["Eau de Astroturf","Notes of sweat, rubber crumb and regret."],
+    ["Ripe","Stand downwind. Way downwind."],["Pungent","The kit bag has filed a formal complaint."],["Biohazard","Burn it. Then burn the ashes."]][Math.min(5,n)];
+  out.innerHTML=`<b>${R[0]}</b> · ${R[1]} <small>${guess?"(lab results based on vibes until stats start)":`(${n} game${n===1?"":"s"} in a row without a wash, allegedly)`}</small>`;
+  b.classList.remove("sniffing");void b.offsetWidth;b.classList.add("sniffing");
+});
+
 /* ---------- player pages: #player-ben-m ---------- */
 const POS_NAME={GK:"Goalkeeper",DF:"Defender",MF:"Midfielder",FW:"Forward"};
 const posWords=p=>p?p.split("/").map(x=>POS_NAME[x]||x).join(" / "):"";
@@ -1792,6 +1854,7 @@ function renderPlayer(slug){
       <div class="pp-photo ${photo?"":"nophoto"}">${photo}<span class="pp-ph">${r.num??"★"}</span></div>
       <div class="pp-id"><div class="pp-num">${r.num!=null?"#"+r.num:""}</div><h2 class="pp-name">${esc(r.name)}${capBadge(r.name,true)}${cityFlag(r.name,true)}</h2>
         <div class="pp-pos">${esc(posWords(r.pos))}${r.pos==="Retired"||r.pos==="Alternate"?"":" · Beer Street FC"}</div>
+        ${r.pos==="Retired"?"":`<div class="sniff"><button type="button" class="fun-btn" data-sniff="${esc(r.name)}">👃 Smell the shirt</button><span class="sniff-out" aria-live="polite"></span></div>`}
         ${r.bio?`<p class="pp-bio">${esc(r.bio)}</p>`:""}</div>
     </div>
     <h3 class="pp-h">${esc(label(current))}</h3>${curBlock}
