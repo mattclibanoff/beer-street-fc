@@ -729,6 +729,13 @@ body.hungover *{transition-duration:.9s!important}
 #npAlm .alm-d{font-family:"IM Fell English",serif;color:var(--paper-ink);opacity:.8}#npAlm .alm-k{font-family:"IM Fell English SC",serif;color:var(--paper-ink);opacity:.7;font-weight:400;font-size:13px}
 #npAlm .alm-t{font-family:"IM Fell English",serif;font-size:16.5px}#npAlm .alm-t a{color:inherit}#npAlm .alm-none{color:var(--paper-ink);font-family:"IM Fell English",serif}
 @media(max-width:600px){#npAlm .alm-l li{grid-template-columns:1fr}}
+.tipjar{display:flex;gap:18px;align-items:center;margin-bottom:24px}.tj-art{position:relative;flex:0 0 130px}.tj-art svg{width:130px;display:block}
+.tj-label{font:800 10px "Barlow Condensed",Arial Narrow,sans-serif;letter-spacing:.02em;fill:#3b2a20}
+.tj-body h3{margin:0 0 2px}.tj-for{color:var(--muted);font-size:13px;margin-bottom:8px}.tj-count b{font:800 30px "Barlow Condensed",sans-serif;margin-right:4px}.tj-level{margin:2px 0 10px;color:var(--cream-2)}
+.tj-drop{position:absolute;left:0;right:0;top:0;height:100%;pointer-events:none}
+.tj-coin{position:absolute;left:50%;top:-6px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe58a,#e3b341 60%,#8a6512);animation:tjDrop .7s ease-in forwards}
+@keyframes tjDrop{0%{transform:translateY(0) rotateY(0)}100%{transform:translateY(110px) rotateY(720deg);opacity:.2}}
+@media(max-width:560px){.tipjar{gap:10px}.tj-art{flex-basis:96px}.tj-art svg{width:96px}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -1127,7 +1134,7 @@ function renderCurrentStandings(){
         <div class="vs">${next.stage?esc(next.stage)+`<span>·</span>`+esc(next.label):`Beer Street FC<span>${view(next).home?"vs":"@"}</span>${esc(view(next).opp)}`}</div>
         <a class="np-more" href="#${matchId(next)}">Match preview →</a></div>
       <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}${next.date>=TODAY?calMenu(next,s):""}</div>
-    </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()+countdownCal()}
+    </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()+`<div class="tipjar-slot" data-tipjar="opener-${esc(((DATA.nextSeason||{}).name||"Winter 2027").toLowerCase().replace(/[^a-z0-9]+/g,"-"))}" data-for="${esc(((DATA.nextSeason||{}).name||"Winter 2027"))} opener"></div>`+countdownCal()}
     ${teamSummary(s)}
     <div class="grid">
       <div class="card flush">${standingsTable(s)}</div>
@@ -1492,6 +1499,41 @@ document.addEventListener("click",async e=>{
 });
 
 /* ---------- off-season: nothing left to play ---------- */
+/* bribe the ref: a shared tip jar per game, filled by everyone who visits (stored with the attendance data on Cloudflare) */
+const TIPJAR={};
+function tipLevel(c){return c<1?"Clean as a whistle":c<10?"A little sweetener":c<50?"Questionable":c<150?"Brown envelope territory":c<400?"Full-blown scandal":"Marcus has bought a yacht"}
+function tipJarHtml(k,forWhat,c){
+  const fill=Math.min(1,c/200),top=150-118*fill,coins=Math.min(60,Math.ceil(c/3.4));let seed=7;const R=()=>(seed=(seed*1103515245+12345)>>>0)/4294967296;
+  const cs=Array.from({length:coins},(_,i)=>{const row=Math.floor(i/6),x=38+((i%6)*14)+(row%2?7:0)+(R()-.5)*3,y=146-row*7.2;return y>top-4?`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="7" ry="3.2" fill="#e3b341" stroke="#8a6512" stroke-width="1"/>`:""}).join("");
+  return `<div class="card tipjar"><div class="tj-art"><svg viewBox="0 0 150 170" aria-hidden="true">
+      <defs><clipPath id="tjc-${k}"><path d="M32 34h86v108a14 14 0 0 1-14 14H46a14 14 0 0 1-14-14z"/></clipPath></defs>
+      <g clip-path="url(#tjc-${k})">${cs}</g>
+      <path d="M32 34h86v108a14 14 0 0 1-14 14H46a14 14 0 0 1-14-14z" fill="rgba(200,230,255,.08)" stroke="rgba(var(--cream-rgb),.7)" stroke-width="3"/>
+      <rect x="26" y="22" width="98" height="14" rx="4" fill="none" stroke="rgba(var(--cream-rgb),.7)" stroke-width="3"/>
+      <path d="M44 46v90" stroke="rgba(255,255,255,.18)" stroke-width="5" stroke-linecap="round"/>
+      <rect x="40" y="84" width="70" height="26" rx="3" fill="#efe6cf" transform="rotate(-4 75 97)"/><text x="75" y="101" text-anchor="middle" transform="rotate(-4 75 97)" class="tj-label" textLength="60" lengthAdjust="spacingAndGlyphs">MARCUS FUND</text>
+    </svg><div class="tj-drop" aria-hidden="true"></div></div>
+    <div class="tj-body"><h3>Bribe Marcus the Ref</h3><div class="tj-for">${esc(forWhat)}</div>
+      <div class="tj-count"><b>${c}</b> coin${c===1?"":"s"} in the jar</div><div class="tj-level">Corruption level: <i>${tipLevel(c)}</i></div>
+      <button type="button" class="fun-btn tj-btn" data-tip="${k}">🪙 Slip Marcus a coin</button>
+      <p class="note" style="margin:8px 0 0">Everyone who visits shares this jar. Purely ceremonial. Marcus has not been informed.</p></div></div>`;
+}
+async function tipJarMount(root){
+  for(const el of (root||document).querySelectorAll("[data-tipjar]")){const k=el.dataset.tipjar;
+    try{const r=await fetch("/api/tipjar?k="+encodeURIComponent(k),{cache:"no-store"});const j=await r.json();if(!j.ok)continue;
+      TIPJAR[k]=TIPJAR[k]||{c:0,pend:0,t:null};TIPJAR[k].c=j.count+TIPJAR[k].pend;el.innerHTML=tipJarHtml(k,el.dataset.for,TIPJAR[k].c)}catch(e){}   // no storage here (e.g. the Claude version): stays hidden
+  }
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-tip]");if(!b)return;const k=b.dataset.tip,J=TIPJAR[k];if(!J)return;
+  J.c++;J.pend++;const slot=b.closest("[data-tipjar]");
+  const coin=document.createElement("span");coin.className="tj-coin";slot.querySelector(".tj-drop").appendChild(coin);setTimeout(()=>coin.remove(),700);
+  setTimeout(()=>{if(slot.isConnected){const cnt=slot.querySelector(".tj-count b"),lv=slot.querySelector(".tj-level i");cnt.textContent=J.c;lv.textContent=tipLevel(J.c);
+    if(J.c%3===0||J.pend===1){slot.innerHTML=tipJarHtml(k,slot.dataset.for,J.c)}}},450);
+  clearTimeout(J.t);const send=()=>{const n=Math.min(10,J.pend);if(!n)return;J.pend-=n;
+    fetch("/api/tipjar",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({k,n})}).then(r=>r.json()).then(j=>{if(j.ok){J.c=j.count+J.pend}}).catch(()=>{});if(J.pend)J.t=setTimeout(send,300)};
+  J.t=setTimeout(send,1200);
+});
+
 /* the club almanac: what happened on this date in Beer Street history (or, failing that, this week) */
 function almanac(){
   const out=new Set((DATA.tabloid||{}).optOut||[]), md=d=>d.slice(5,10), ev=[];
@@ -1639,14 +1681,14 @@ function renderMatch(id){
         ${meets.length?`<div><b class="w">${hw}</b> W <b>${hd}</b> D <b class="l">${hl}</b> L</div>`:`<div>First meeting</div>`}
         ${oppRow?`<div class="muted-s">${esc(opp)}: ${ord(oppRow)} in ${esc(label(s))} ${formChips(oppForm)}</div>`:""}</div></div>
     </div>
-    ${!played&&m.date>=TODAY?oddsBoard(s,m,opp):""}
+    ${!played&&m.date>=TODAY?oddsBoard(s,m,opp)+`<div class="tipjar-slot" data-tipjar="${matchId(m).slice(6)}" data-for="${esc(m.stage?(m.label||m.stage):"vs "+opp)}"></div>`:""}
     ${played?punditPanel(m,v,opp,s,gs,motm):""}
     ${tacticsBoard(m,v,opp,gs,played)}
     ${statsHtml}
     ${hls.length?`<div class="card hl-card"><h3>Highlights</h3><div class="hl-grid">${hls.map(highlightCard).join("")}</div></div>`:""}
     <nav class="mp-nav">${nav(prev)}${nav(next)}</nav>`;
   document.title=`${m.stage?(m.label||m.stage):"vs "+opp} · ${fmtDate(m.date,{month:"short",day:"numeric"})} · Beer Street FC`;
-  if(!played&&m.date>=TODAY) renderAttInto("attWidgetM",m);
+  if(!played&&m.date>=TODAY){renderAttInto("attWidgetM",m);tipJarMount(root)}
 }
 async function renderAttInto(elId,g){
   const el=document.getElementById(elId); if(!el) return;
@@ -2550,7 +2592,7 @@ document.querySelectorAll("img.logo, img.fm-logo").forEach(im=>{
 document.getElementById("livePill").hidden=isComplete(current);
 const curRow=standings(current), curPos=curRow.findIndex(r=>r.team===US)+1;
 document.getElementById("heroMeta").innerHTML=`<small>${esc(DATA.league)}</small>${label(current)} · ${ord(curPos)} place`;
-renderCurrentStandings();renderCurrentStats();renderPastStandings();renderPastStats();renderRecords();renderAttWidget();
+renderCurrentStandings();renderCurrentStats();renderPastStandings();renderPastStats();renderRecords();renderAttWidget();tipJarMount();
 show(location.hash.slice(1));
 renderLanding();
 applyMood();   // after the landing decides whether it shows, so the 30 seconds start once you are on the site
