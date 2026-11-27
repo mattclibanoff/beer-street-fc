@@ -743,6 +743,16 @@ body.hungover *{transition-duration:.9s!important}
 .var-foot{display:block;margin-top:8px;font-size:.62em;font-weight:400;opacity:.85;letter-spacing:0;text-transform:none;line-height:1.35}
 .pp-nostats{margin:4px 0 24px;color:var(--muted);font-size:13.5px;font-style:italic}
 @media(max-width:640px){.next-match.off .when{text-align:left}}
+.season-fx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.season-fx i{position:absolute;top:-24px;display:block;animation:sfFall linear infinite;transform:scale(var(--z))}
+@keyframes sfFall{0%{transform:translate(0,0) rotate(var(--r)) scale(var(--z))}50%{transform:translate(var(--sw),50vh) rotate(calc(var(--r) + 180deg)) scale(var(--z))}100%{transform:translate(0,110vh) rotate(calc(var(--r) + 360deg)) scale(var(--z))}}
+.hero .season-fx i{animation-name:sfFallH}@keyframes sfFallH{0%{transform:translate(0,0) rotate(var(--r)) scale(var(--z))}50%{transform:translate(var(--sw),200px) rotate(calc(var(--r) + 180deg)) scale(var(--z))}100%{transform:translate(0,480px) rotate(calc(var(--r) + 360deg)) scale(var(--z))}}
+body.season-winter .season-fx i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 0 4px rgba(255,255,255,.6)}
+body.season-spring .season-fx i{width:11px;height:8px;border-radius:70% 0 70% 0;background:#f4b9c8;opacity:.85}
+body.season-autumn .season-fx i{width:14px;height:10px;border-radius:0 80% 0 80%;background:linear-gradient(135deg,#d9822b,#a8461f);opacity:.85}
+body.season-autumn .season-fx i:nth-child(3n){background:linear-gradient(135deg,#e6b23a,#b5651d)}
+body.season-summer #eggBird{position:relative}body.season-summer #eggBird .shades{display:block;position:absolute;left:17px;top:8px;width:17px;height:6px;transform:rotate(-4deg)}
+@media(prefers-reduced-motion:reduce){.season-fx{display:none}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -800,6 +810,7 @@ body.hungover *{transition-duration:.9s!important}
 </div>
 
 <header class="hero">
+  <div class="season-fx" id="seasonFx" aria-hidden="true"></div>
   <div class="badges">
     <button type="button" class="egg" id="eggGlass" aria-label="Have another" aria-pressed="false"><svg style="color:var(--cream)"><use href="#glass"/></svg></button>
     <button type="button" class="egg" id="eggBird" aria-label="Teletext"><svg style="color:var(--cream)"><use href="#crest"/></svg><svg class="shades" viewBox="0 0 40 12" aria-hidden="true"><path d="M1 2h16l-1 6q-1 3-5 3H6Q2 11 2 7z M23 2h16l-1 6q-1 3-5 3h-5q-4 0-4-4z M17 3h6" fill="#111" stroke="#111" stroke-width="1.4"/></svg></button>
@@ -1889,6 +1900,17 @@ function pigeonMessages(){
     el.addEventListener("animationend",e=>{if(e.target===el&&!el.classList.contains("read")){el.hidden=true;el.classList.remove("fly","fly-on")}},{once:false});
   };
   setTimeout(go,15000+Math.random()*20000);
+})();
+
+/* seasonal skins: snow in winter, blossom in spring, shades on the pigeon in summer, leaves in autumn (header only) */
+(function(){
+  const mo=+TODAY.slice(5,7), sz=mo===12||mo<=2?"winter":mo<=5?"spring":mo<=8?"summer":"autumn";
+  document.body.classList.add("season-"+sz);
+  const fx=document.getElementById("seasonFx");if(!fx||sz==="summer")return;
+  const n=sz==="winter"?26:14, glyph={winter:"",spring:"",autumn:""}[sz];
+  let h="";for(let i=0;i<n;i++){const l=Math.random()*100,d=(sz==="winter"?7:10)+Math.random()*8,dl=-Math.random()*d,z=.6+Math.random()*.8,sw=(Math.random()*60-30).toFixed(0);
+    h+=`<i style="left:${l.toFixed(1)}%;animation-duration:${d.toFixed(1)}s;animation-delay:${dl.toFixed(1)}s;--z:${z.toFixed(2)};--sw:${sw}px;--r:${(Math.random()*360).toFixed(0)}deg"></i>`}
+  fx.innerHTML=h;
 })();
 
 /* shirt-sniff test: how ripe is the shirt? based on games played in a row (stats), or the laundry gods when there are none */
