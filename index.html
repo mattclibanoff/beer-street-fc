@@ -736,6 +736,8 @@ body.hungover *{transition-duration:.9s!important}
 .tj-coin{position:absolute;left:50%;top:-6px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe58a,#e3b341 60%,#8a6512);animation:tjDrop .7s ease-in forwards}
 @keyframes tjDrop{0%{transform:translateY(0) rotateY(0)}100%{transform:translateY(110px) rotateY(720deg);opacity:.2}}
 @media(max-width:560px){.tipjar{gap:10px}.tj-art{flex-basis:96px}.tj-art svg{width:96px}}
+.np-fxs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 18px;margin-top:10px;text-align:left}.np-fx{font-size:.95em}.np-fx small{opacity:.7}.np-fx i{font-style:italic}
+@media(max-width:700px){.np-fxs{grid-template-columns:1fr}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -2070,6 +2072,29 @@ function playoffMvp(s,po){
   return pk?{name:pk.name,line:pk.line}:null;
 }
 /* Season-review front page: shown once Beer Street have no games left this season. */
+/* Season Preview Edition: from the day a new schedule lands until the week of the first game */
+function seasonPreviewFront(s,games,L){
+  const nm=`${esc(s.name)} ${s.year}`, rm=((DATA.matchupNames||{}).rematches||{})[s.id]||{}, prev=past[0];
+  const opps=[...new Set(games.filter(m=>!m.stage).map(m=>view(m).opp))], first=games[0];
+  let prevLine="",head=["A New Season",nm],deck="";
+  if(prev){const w=seasonWrap(prev),pr=standings(prev),pp=pr.findIndex(r=>r.team===US)+1;
+    const fin=ourMatches(prev).filter(m=>m.stage&&m.hs!=null).pop(),fv=fin&&view(fin),isF=fin&&/^championship/i.test(fin.label||"");
+    if(isF&&fv.r==="L"){head=["Unfinished Business",nm];deck=`Last season's runners-up are back, and they have a score to settle.`}
+    else if(isF&&fv.r==="W"){head=["The Champions Return",nm];deck=`The title holders begin the defence of their crown.`}
+    else if(pp){deck=`After finishing ${ord(pp)} in ${esc(prev.name)}, Beer Street go again.`}
+    prevLine=pp?`${esc(prev.name)} ${prev.year}: ${ord(pp)} of ${pr.length}${isF?(fv.r==="W"?", champions":", runners-up"):""}.`:"";}
+  // head to head with this season's opponents
+  const h2h=o=>{const g=allGames().filter(x=>oppOfGame(x.m)===o&&view(x.m).played);if(!g.length)return "first meeting";
+    const w=g.filter(x=>view(x.m).r==="W").length,l=g.filter(x=>view(x.m).r==="L").length;return `${w}W ${l}L all-time`};
+  const fx=games.filter(m=>!m.stage).map(m=>{const o=view(m).opp,tag=rm[o];
+    return `<span class="np-fx"><b>${fmtDate(m.date,{month:"short",day:"numeric"})}</b> ${view(m).home?"vs":"@"} ${esc(o)}${tag?` <i>· ${esc(tag)}</i>`:""} <small>(${h2h(o)})</small></span>`}).join("");
+  const rmN=opps.filter(o=>rm[o]).length, fresh=opps.filter(o=>h2h(o)==="first meeting").length;
+  const sub=`${prevLine?prevLine+" ":""}${opps.length} opponents${fresh?`, ${fresh} we have never played`:""}${rmN?`, ${rmN} rematch${rmN>1?"es":""} from last season's playoffs`:""}. First up: ${esc(view(first).opp)}, ${fmtDate(first.date,{weekday:"long",month:"long",day:"numeric"})} at ${esc(first.time||"TBC")}.
+    <span class="np-fxs">${fx}</span>`;
+  setFront("Season Preview Edition",`${nm} · Season Preview`,head,
+    `<span>Vol. ${["I","II","III","IV","V","VI"][Math.min(5,seasons.indexOf(s))]||"I"} · Season Preview</span><span>${fmtDate(TODAY,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</span>`,
+    (L.decks||{})["preview-"+s.id]||deck,sub,[["Kick-off",fmtDate(first.date,{month:"short",day:"numeric"})],["Games",games.filter(m=>!m.stage).length],["Opponents",opps.length],["Rematches",rmN||"–"]]);
+}
 function seasonWrap(s){
   const ms=ourMatches(s).filter(m=>!m.bye), played=ms.filter(m=>m.hs!=null);
   if(!played.length) return null;
@@ -2246,7 +2271,8 @@ function renderLanding(){
   if(recent&&!hasRes(recent)&&recent.date<TODAY){                            // e.g. final not posted yet, semi is
     const sameDay=games.filter(m=>m.date===recent.date&&hasRes(m)).pop(); if(sameDay) recent=sameDay; }
   const next=games.find(m=>m.date>TODAY||(m.date===TODAY&&!hasRes(m)&&m!==recent&&recent&&hasRes(recent)));
-  if(recent&&!hasRes(recent)) previewFront(recent,s,L);                      // game day / waiting for the score
+  if(!games.some(hasRes)&&next&&TODAY<previewStart(next.date)) seasonPreviewFront(s,games,L);   // new schedule out, first game not this week yet
+  else if(recent&&!hasRes(recent)) previewFront(recent,s,L);                      // game day / waiting for the score
   else if(next&&TODAY>=previewStart(next.date)) previewFront(next,s,L);      // Tuesday onward: next game
   else if(hasRes(recent)&&(next||!recent.stage)) recapFront(recent,s,L);      // score is in: postmortem
   else if(hasRes(recent)){                                                   // playoffs done, nothing left: season review
