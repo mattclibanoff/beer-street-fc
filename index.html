@@ -702,21 +702,7 @@ body.hungover *{transition-duration:.9s!important}
 @media(max-width:760px){.pundits{grid-template-columns:1fr}}
 .sniff{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.sniff-out{font-size:14px}.sniff-out small{display:block;color:var(--muted);font-size:12px}
 .fun-btn.sniffing{animation:sniffW .5s ease-in-out 2}@keyframes sniffW{25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
-.cd-card{margin-bottom:24px}.cd-months{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-.cd-mh{font:800 16px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;color:var(--cream-2)}
-.cd-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cd-wd{text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding-bottom:2px}
-.cd-day,.cd-door{aspect-ratio:1;border-radius:5px;position:relative}.cd-day.out{display:grid;place-items:center;font-size:12px;color:var(--muted);opacity:.45}
-.cd-day.end{opacity:1;color:var(--cream);border:1px solid rgba(var(--cream-rgb),.3)}
-.cd-door{border:1.5px dashed rgba(var(--cream-rgb),.35);background:repeating-linear-gradient(135deg,rgba(var(--cream-rgb),.05) 0 6px,transparent 6px 12px);color:var(--cream);cursor:pointer;padding:0;overflow:hidden;font:inherit}
-.cd-n{position:absolute;left:4px;top:2px;font:800 14px "Barlow Condensed",sans-serif;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-.cd-door.open{border-style:solid;background:rgba(var(--cream-rgb),.1)}.cd-door.today{border-color:var(--win);box-shadow:0 0 0 2px var(--win)}.cd-door.sel{outline:2px solid var(--cream);outline-offset:1px}
-.cd-in{position:absolute;inset:0}.cd-in img{width:100%;height:100%;object-fit:cover;opacity:.6}.cd-in span,.cd-in b{display:none}
-.cd-door.open:not(:has(img))::after{content:"✦";position:absolute;right:4px;bottom:2px;font-size:11px;color:var(--cream-2)}
-.cd-peek{min-height:20px;margin:0 0 14px;font-size:13px;color:var(--cream-2)}
-.cd-show{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:rgba(var(--cream-rgb),.06);border:1px solid rgba(var(--cream-rgb),.15);border-radius:6px;padding:10px 12px;color:var(--cream);font-size:15px}
-.cd-show-d{flex:0 0 100%;font:800 12px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-2)}
-.cd-show img{width:84px;height:84px;object-fit:cover;border-radius:4px}.cd-show b{font:800 12px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-2);margin-right:4px}.cd-show a{color:inherit}
-.cd-door.shake{animation:sniffW .35s ease-in-out 2}
+
 .alm{margin-bottom:24px}.alm h3 small{font-family:inherit;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:.8em}
 .alm-l{list-style:none;margin:0;padding:0}.alm-l li{display:grid;grid-template-columns:150px 120px 1fr;gap:10px;padding:8px 0;border-top:1px solid rgba(var(--cream-rgb),.1);align-items:baseline}.alm-l li:first-child{border-top:0}
 .alm-d{font-size:13px;color:var(--cream-2)}.alm-k{font:800 11px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.alm-t a{color:inherit}
@@ -1136,7 +1122,7 @@ function renderCurrentStandings(){
         <div class="vs">${next.stage?esc(next.stage)+`<span>·</span>`+esc(next.label):`Beer Street FC<span>${view(next).home?"vs":"@"}</span>${esc(view(next).opp)}`}</div>
         <a class="np-more" href="#${matchId(next)}">Match preview →</a></div>
       <div class="when"><b>${fmtDate(next.date,{weekday:"short",month:"short",day:"numeric"})} · ${next.time}</b>${esc(next.field)}${next.date>=TODAY?calMenu(next,s):""}</div>
-    </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()+`<div class="tipjar-slot" data-tipjar="opener-${esc(((DATA.nextSeason||{}).name||"Winter 2027").toLowerCase().replace(/[^a-z0-9]+/g,"-"))}" data-for="${esc(((DATA.nextSeason||{}).name||"Winter 2027"))} opener"></div>`+countdownCal()}
+    </div></div>${next.date>=TODAY?`<div id="attWidget" class="att" hidden></div>`:""}`:offSeasonCard()+`<div class="tipjar-slot" data-tipjar="opener-${esc(((DATA.nextSeason||{}).name||"Winter 2027").toLowerCase().replace(/[^a-z0-9]+/g,"-"))}" data-for="${esc(((DATA.nextSeason||{}).name||"Winter 2027"))} opener"></div>`}
     ${teamSummary(s)}
     <div class="grid">
       <div class="card flush">${standingsTable(s)}</div>
@@ -1561,66 +1547,6 @@ function almanac(){
       :`<p class="alm-none">Nothing happened on this day in Beer Street history. Yet. Make it count.</p>`}</div>`;
 }
 
-/* off-season advent calendar: one door a day from the end of the season to the first game of the next */
-function countdownCal(){
-  if(ourMatches(current).some(m=>!m.bye&&m.hs==null&&m.date>=TODAY))return "";
-  const played=ourMatches(current).filter(m=>!m.bye&&m.hs!=null);if(!played.length)return "";
-  const D=d=>Date.UTC(...d.split("-").map((x,i)=>i===1?x-1:+x)), iso=t=>new Date(t).toISOString().slice(0,10);
-  const end=played[played.length-1].date, nx=DATA.nextSeason||{}, start=nx.start&&nx.start>end?nx.start:null;
-  const total=start?Math.round((D(start)-D(end))/864e5)-1:28, today=Math.round((D(TODAY)-D(end))/864e5);
-  if(total<1||(start&&TODAY>=start))return "";
-  // what's behind the doors: jokes, stats from the site, and squad photos
-  const sp=standings(current),pos=sp.findIndex(r=>r.team===US)+1,games=played.map(m=>({m,v:view(m)}));
-  const W=games.filter(g=>g.v.r==="W"),gf=games.reduce((a,g)=>a+g.v.f,0),big=W.slice().sort((a,b)=>(b.v.f-b.v.a)-(a.v.f-a.v.a))[0];
-  const stats=[`We scored ${gf} goals in ${esc(label(current))}. That's ${(gf/games.length).toFixed(1)} a game.`,
-    `${esc(label(current))}: ${W.length} wins from ${games.length}. Finished ${ord(pos)} in the league.`,
-    big?`Biggest win of the season: ${big.v.f}–${big.v.a} vs ${esc(oppOfGame(big.m))}.`:"",
-    ...(DATA.motmLog||[]).filter(x=>x.blurb).map(x=>`Remember: ${esc(x.blurb)} (${esc(x.name)})`),
-    `Beer Street have played ${allGames().filter(g=>view(g.m).played).length} competitive games, ever.`,
-    `Teams we've faced so far: ${new Set(allGames().map(g=>oppOfGame(g.m))).size}.`].filter(Boolean);
-  const jokes=["Why did the defender bring a ladder? To reach the next level of the table.","Off-season training plan: lift pint, lower pint, repeat.",
-    "Reminder: stretching is not just for the first five minutes of a game.","Our keeper has been practising. Mostly diving onto sofas.",
-    "Fun fact: 100% of goals we didn't shoot didn't go in.","The fines committee never sleeps. It only naps.",
-    "Pre-season fitness test: walk to the bar without getting distracted.","New tactic for next season: score first. Then score more.",
-    "The pigeon has been spotted scouting opponents.","Rest day. The calves thank you.","Hydration check. Water counts. Mostly.",
-    "Football is a simple game: twenty-two people chase a ball and then we all go to the pub."];
-  const pics=(DATA.roster||[]).filter(r=>r.photo&&!/Retired/.test(r.pos||"")&&!new Set((DATA.tabloid||{}).optOut||[]).has(r.name));
-  // every door is different: results from the archive, more stats, jokes and each squad photo once, dealt in turn
-  const results=allGames().filter(g=>view(g.m).played).map(g=>{const v=view(g.m);return `Throwback, ${fmtDate(g.m.date,{month:"short",day:"numeric",year:"numeric"})}: ${v.r==="W"?"beat":v.r==="L"?"lost to":"drew with"} ${esc(oppOfGame(g.m))} ${v.f}–${v.a}${g.m.stage?` in the ${esc((g.m.label||g.m.stage).split(" vs ")[0])}`:""}.`});
-  const more=["Did you know? The club was founded in 2026, in a pub, obviously.","Most common Beer Street scoreline: whatever the other team scored, plus or minus a few.",
-    "The off-season is the only time our clean-sheet record is perfect.","Squad size: big enough for subs, small enough to fit in one booth.",
-    "Today's training drill: find your shin pads. They're somewhere.","Tactical note: the ball is round. Remember that.","Sock check: are both still in the kit bag? Good.",
-    "Weekly reminder from the fines committee: lateness is a pint.","If you can read this, you should be stretching.","Recovery tip: ice the legs, not the drink. Or both.",
-    "Team spirit index: high. Team fitness index: under review.","Pre-season goal: fewer goals against. Bold, we know.","The trophy cabinet has been dusted, just in case.",
-    "The pigeon sends its regards.","Reminder: the Gazette sees everything.","Today in history: someone, somewhere, took a throw-in with their foot on the line.",
-    "Fact: every great team starts with people who turn up. Turn up.","Off-season diet: carbs, mostly liquid.","Hydration tip: water is just beer that hasn't made it yet."];
-  const used=[...stats,...results].concat(jokes.map(esc),more.map(esc)), seen=new Set(), uniq=used.filter(x=>!seen.has(x)&&seen.add(x));
-  const sHalf=uniq.filter(x=>stats.includes(x)||results.includes(x)), jHalf=uniq.filter(x=>!sHalf.includes(x));
-  const mix=(arr,k)=>{arr=arr.slice();for(let i=arr.length-1;i>0;i--){k=(k*1103515245+12345)>>>0;const j=k%(i+1);[arr[i],arr[j]]=[arr[j],arr[i]]}return arr};
-  const sQ=mix(sHalf,77),jQ=mix(jHalf,91),pQ=mix(pics,53),deck=[];
-  while(sQ.length||jQ.length||pQ.length){for(const q of [jQ,pQ,sQ])if(q.length)deck.push(q===pQ?{p:q.shift()}:{t:q.shift(),s:q===sQ})}
-  const door=i=>{const it=deck[(i-1)%deck.length];
-    if(it.p)return `<img src="${esc(it.p.photo)}" alt=""><span>Squad photo of the day: <a href="#${playerSlug(it.p.name)}">${esc(it.p.name)}</a></span>`;
-    return `<b>${it.s?"Stat":"Joke"}</b><span>${it.t}</span>`};
-  // laid out on a real calendar: one block per month, Sunday to Saturday
-  const first=D(end)+864e5,last=D(end)+total*864e5,months=[];
-  for(let t=first;t<=last;){const d=new Date(t),y=d.getUTCFullYear(),mo=d.getUTCMonth();months.push([y,mo]);t=Date.UTC(y,mo+1,1)}
-  const cells=months.map(([y,mo])=>{const dim=new Date(Date.UTC(y,mo+1,0)).getUTCDate(),off=new Date(Date.UTC(y,mo,1)).getUTCDay();
-    const days=Array.from({length:dim},(_,k)=>{const t=Date.UTC(y,mo,k+1),i=Math.round((t-D(end))/864e5),date=iso(t);
-      if(i<1||i>total)return `<div class="cd-day out${date===end?" end":""}"${date===end?` title="Last game of ${esc(label(current))}"`:""}>${k+1}</div>`;
-      const open=i<=today,cur=i===today;
-      return `<button type="button" class="cd-door${open?" open":""}${cur?" today":""}" data-cd="${i}" data-date="${date}" aria-label="${fmtDate(date,{month:"short",day:"numeric"})}${open?"":", locked"}"><span class="cd-n">${k+1}</span>${open?`<div class="cd-in">${door(i)}</div>`:""}</button>`}).join("");
-    return `<div class="cd-month"><div class="cd-mh">${new Date(Date.UTC(y,mo,1)).toLocaleDateString("en-US",{month:"long",year:"numeric",timeZone:"UTC"})}</div>
-      <div class="cd-grid">${["S","M","T","W","T","F","S"].map(x=>`<div class="cd-wd">${x}</div>`).join("")}${'<div></div>'.repeat(off)}${days}</div></div>`}).join("");
-  return `<div class="card cd-card"><h3>Countdown to ${esc(nx.name||"Winter 2027")}</h3>
-    <p class="note" style="margin:0 0 10px">${start?`${total-today+1} doors to go. `:"Start date TBC, so the calendar grows when the schedule lands. "}One new door every day: a joke, a stat or a face from the squad. Tap an open day to read it.</p>
-    <div class="cd-peek" aria-live="polite">${today>=1&&today<=total?`<div class="cd-show"><div class="cd-show-d">Today · ${fmtDate(TODAY,{weekday:"long",month:"long",day:"numeric"})}</div>${door(today)}</div>`:""}</div><div class="cd-months">${cells}</div></div>`;
-}
-document.addEventListener("click",e=>{const d=e.target.closest(".cd-door");if(!d)return;const pk=d.closest(".cd-card").querySelector(".cd-peek");
-  if(!d.classList.contains("open")){pk.textContent=`No peeking! This one opens ${fmtDate(d.dataset.date,{weekday:"long",month:"short",day:"numeric"})}.`;d.classList.remove("shake");void d.offsetWidth;d.classList.add("shake");return}
-  const was=d.classList.contains("sel");d.closest(".cd-card").querySelectorAll(".cd-door.sel").forEach(x=>x.classList.remove("sel"));
-  if(was){pk.innerHTML="";return}d.classList.add("sel");
-  pk.innerHTML=`<div class="cd-show"><div class="cd-show-d">${fmtDate(d.dataset.date,{weekday:"long",month:"long",day:"numeric"})}</div>${d.querySelector(".cd-in").innerHTML}</div>`;});
 function offSeasonCard(){
   if(ourMatches(current).some(m=>!m.bye&&m.hs==null&&m.date>=TODAY)) return "";
   const nx=DATA.nextSeason||{}, name=nx.name||"Winter 2027", start=nx.start&&nx.start>TODAY?nx.start:null;
