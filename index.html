@@ -870,7 +870,20 @@ body.season-summer #eggBird{position:relative}body.season-summer #eggBird .shade
 .mc-thumbs .mc-armL{animation:mcThumb 1.6s ease-out forwards}@keyframes mcThumb{20%,100%{transform:rotate(95deg)}}
 .mc-wink .mc-eyes circle:last-child{transform-box:fill-box;transform-origin:center;animation:mcWink 1.4s}@keyframes mcWink{15%,60%{transform:scaleY(.15)}}
 @media(prefers-reduced-motion:reduce){.marcus *{animation:none!important}}
-.about .home-pub{font-size:15px;margin:14px 0 0;color:var(--cream-2);letter-spacing:.02em}.home-pub a{color:inherit}
+.pubsign-wrap{display:flex;flex-direction:column;align-items:center;margin:8px auto 40px;width:min(300px,86vw)}
+.pubsign-bracket svg{width:100%;display:block}
+.pubsign{display:flex;flex-direction:column;align-items:center;gap:4px;width:84%;margin-top:-2px;padding:16px 14px 14px;text-decoration:none;color:#f3e2b0;text-align:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.18)),#1f3a2a;border:6px solid #6b4a24;border-radius:6px;outline:2px solid #c9a227;outline-offset:-12px;
+  box-shadow:0 10px 24px rgba(0,0,0,.45),inset 0 0 18px rgba(0,0,0,.35);transform-origin:50% -20px;animation:psSway 6s ease-in-out infinite;transition:transform .2s}
+.pubsign:hover,.pubsign:focus-visible{animation-play-state:paused;transform:rotate(0) scale(1.03)}.pubsign:focus-visible{outline-color:#fff}
+@keyframes psSway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+.ps-kick{font:700 11px "Barlow Condensed",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#c9a227;margin-top:4px}
+.ps-pint{width:30px;height:40px;margin:2px 0}
+.ps-name{font:900 30px/1 "Playfair Display",serif;letter-spacing:.02em;color:#f7ecc8;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.ps-tag{font:italic 13.5px "IM Fell English",serif;color:#e6d7a8}
+.ps-addr{font:600 12px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#c9b98a;margin-top:2px}
+.ps-go{margin:8px 0 4px;font:700 12px "Barlow Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#1f3a2a;background:#c9a227;padding:5px 12px;border-radius:3px}
+@media(prefers-reduced-motion:reduce){.pubsign{animation:none}}
 </style>
 <script>
 /* Daily kit swap: green jersey on even days, purple on odd days (by the visitor's local date). */
@@ -995,7 +1008,16 @@ body.season-summer #eggBird{position:relative}body.season-summer #eggBird .shade
   <section class="panel" id="cards" aria-live="polite"></section>
   <section class="panel" id="records" role="tabpanel"></section>
   <section class="panel" id="about" role="tabpanel">
-    <div class="about"><p>Amateur footballers.<br>Professional drunks.</p><div class="home-pub">Home pub: <a href="https://www.beerstreetny.com" target="_blank" rel="noopener">Beer Street NY ↗</a></div></div>
+    <div class="about"><p>Amateur footballers.<br>Professional drunks.</p></div>
+    <div class="pubsign-wrap"><div class="pubsign-bracket" aria-hidden="true"><svg viewBox="0 0 260 40"><path d="M10 6H250M40 6Q40 30 70 30M220 6Q220 30 190 30" stroke="#8a6a3a" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="10" cy="6" r="5" fill="#8a6a3a"/><path d="M70 30V40M190 30V40" stroke="#6b5530" stroke-width="2"/></svg></div>
+      <a class="pubsign" href="https://www.beerstreetny.com" target="_blank" rel="noopener" aria-label="Our home pub: Beer Street, 550 Vanderbilt Ave, Brooklyn. Opens their website in a new tab">
+        <span class="ps-kick">★ Our Home Pub ★</span>
+        <svg class="ps-pint" viewBox="0 0 40 52" aria-hidden="true"><path d="M7 10h26l-3 36a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z" fill="#d99a2b" stroke="#f3e2b0" stroke-width="2"/><path d="M6 10c0-5 5-7 8-5 2-3 8-3 10 0 3-2 9 0 9 5z" fill="#fff8e8" stroke="#f3e2b0" stroke-width="1.5"/><path d="M14 18v24" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-linecap="round"/></svg>
+        <span class="ps-name">Beer Street</span>
+        <span class="ps-tag">Craft taps · rare bottles · tasting nights</span>
+        <span class="ps-addr">550 Vanderbilt Ave, Brooklyn</span>
+        <span class="ps-go">Visit the pub ↗</span>
+      </a></div>
     <section class="memoriam" aria-labelledby="memHead">
       <h2 id="memHead">In Memoriam</h2>
       <figure>
